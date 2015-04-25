@@ -5,9 +5,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class Mappa {
-	
-	colonne = {A,B,..}
-	righe
-	
-
+	//TODO
+    private final Map<Settore,Player> posizioniAttuali;
+    
+    private final Tabellone tabellone;
 }
