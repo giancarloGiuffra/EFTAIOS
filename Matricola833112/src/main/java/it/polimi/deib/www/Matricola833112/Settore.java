@@ -1,6 +1,8 @@
 // Nota per l'interfaccia grafica: la cartina fornita non è più utilizzabile
 package it.polimi.deib.www.Matricola833112;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Settore {
@@ -30,8 +32,8 @@ public class Settore {
 	public static int numeroSicuri; 
 	public static int numeroPericolosi; 
 	public enum Tipi {VUOTO, SICURO, PERICOLOSO, SCIALUPPA, BASE};
-	//public final int riga;
-	//public final char colonna;
+	public final int riga;
+	public final char colonna;
 	public Tipi tipologia;
 	public Tipi tipoSettore(){  
 		/* viene generato un intero casuale "indiceCasuale". Questo numero verrà utilizzato
@@ -83,12 +85,26 @@ public class Settore {
 			}
 		return tipologia;
 		}
-		
+
+	Settore(char col, int row, Tipi tipologia){
+        colonna = col;
+        riga = row;
+        this.tipologia = tipologia;
+    }	
 	
-	/*public Settore(char col, int row, Tipi tipologia){
-		colonna = col;
-		riga = row;
-		this.tipologia = tipo;
-	}*/
+	String nomi = "A01,B10,C06,...";
+	String[] nomiSettori = nomi.split(",");
+	
+	public List<Settore> getListSettoriDiTipo(List<String> nomiSettori, Tipi tipo){
+	    List<Settore> listaSettori = new ArrayList<Settore>();
+	    for(String s : nomiSettori){
+	        char colonna = s.charAt(0);
+	        int riga = Integer.parseInt(s.substring(1, 2));
+	        listaSettori.add(new Settore(colonna,riga,tipo));
+	    } 
+	    return listaSettori;
+	}
+	
+	
 	
 }
