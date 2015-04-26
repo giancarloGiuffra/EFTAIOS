@@ -1,18 +1,39 @@
 package it.polimi.model.sector;
 
+import it.polimi.model.exceptions.BadSectorException;
+import it.polimi.model.exceptions.BadSectorPositionNameException;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Settore {
     
     private final char col;
     private final int riga;
     private final TipoSettore tipo;
     
+    private static final char ULTIMA_COLONNA = 'W';
+    private static final  int ULTIMA_RIGA = 14;
+    
     Settore(char col, int riga, TipoSettore tipo){
-        this.col=col; this.riga=riga; this.tipo=tipo;
+        if (this.isValidSectorName(col, riga)){
+            this.col=Character.toUpperCase(col); this.riga=riga; this.tipo=tipo;
+        } else{
+            throw new BadSectorException(String.format("Colonna %c e/o Riga %d non valida(e)", col, riga));
+        }        
     }
     
     public char getColonna(){return this.col;}
     public int getRiga(){return this.riga;}
     public TipoSettore getTipo(){return this.tipo;}
+    public String getNome(){ //restituisce "A01" se col="A" e riga=1
+        return new StringBuilder().append(col).append(String.format("%02d", this.riga)).toString();
+    }
+    
+    public boolean isValidSectorName(char col, int riga){
+        return (1 <= riga && riga <= ULTIMA_RIGA ) &&
+               ('A' <= Character.toUpperCase(col) && Character.toUpperCase(col) <= ULTIMA_COLONNA);
+    }
     
     public boolean isInaccessibile(){return this.tipo==TipoSettore.INACCESSIBILE;}
     public boolean isSicuro(){return this.tipo==TipoSettore.SICURO;}
@@ -37,6 +58,32 @@ public class Settore {
     public boolean isTwoSectorAway(Settore settore){
         //TODO
         return false;
+    }
+    
+    private class SectorPosition{
+        private final char col;
+        private final int riga;
+        
+        public SectorPosition(char col, int riga){this.col=col; this.riga=riga;}
+        public char getCol(){return this.col;}
+        public int getRiga(){return this.riga;}
+    }
+    
+    public SectorPosition getSectorPositionFromName(String s){
+        final String REGEX = "[A-W](0[1-9]|1[0-4])";
+        if (!s.matches(REGEX)) throw new BadSectorPositionNameException(String.format("%s non è un nome di settore valido", s));
+        char colonna = s.charAt(0);
+        int riga = Integer.parseInt(s.substring(1, 2));
+        return new SectorPosition(colonna,riga);
+    }
+    
+    public List<Settore> getListSettoriDiTipo(List<String> nomiSettori, TipoSettore tipo){
+        List<Settore> listaSettori = new ArrayList<Settore>();
+        for(String s : nomiSettori){
+            SectorPosition sectorPosition = this.getSectorPositionFromName(s);
+            listaSettori.add(new Settore(sectorPosition.getCol(),sectorPosition.getRiga(),tipo));
+        } 
+        return listaSettori;
     }
     
     
