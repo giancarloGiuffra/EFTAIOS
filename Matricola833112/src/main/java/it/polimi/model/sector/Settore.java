@@ -26,17 +26,13 @@ public class Settore {
     public char getColonna(){return this.col;}
     public int getRiga(){return this.riga;}
     public TipoSettore getTipo(){return this.tipo;}
-    public String getNome(){ //restituisce "A01" se col="A" e riga=1
+    public String getNome(){ //returns "A01" if col="A" and riga=1
         return new StringBuilder().append(col).append(String.format("%02d", this.riga)).toString();
     }
     
     public boolean isValidSectorName(char col, int riga){
         return (1 <= riga && riga <= ULTIMA_RIGA ) &&
                ('A' <= Character.toUpperCase(col) && Character.toUpperCase(col) <= ULTIMA_COLONNA);
-    }
-    
-    private Settore(String nome, TipoSettore tipo){
-    	this(getColonnaFromName(nome), getRigaFromName(nome), tipo);
     }
     
     public boolean isInaccessibile(){return this.tipo==TipoSettore.INACCESSIBILE;}
@@ -64,45 +60,11 @@ public class Settore {
         return false;
     }
     
-    /*private class SectorPosition{
-        private final char col;
-        private final int riga;
-        
-        public SectorPosition(char col, int riga){this.col=col; this.riga=riga;}
-        public char getCol(){return this.col;}
-        public int getRiga(){return this.riga;}
-    }
-    
-    public SectorPosition getSectorPositionFromName(String s){
-        final String REGEX = "[A-W](0[1-9]|1[0-4])";
-        if (!s.matches(REGEX)) throw new BadSectorPositionNameException(String.format("%s non è un nome di settore valido", s));
-        char colonna = s.charAt(0);
-        int riga = Integer.parseInt(s.substring(1, 2));
-        return new SectorPosition(colonna,riga);
-    }*/
-    
-    private static void checkIfValidSectorName(String nome){
-    	final String REGEX = "[A-W](0[1-9]|1[0-4])";
-    	if( !nome.matches(REGEX)) throw new BadSectorPositionNameException(String.format("%s non è un nome di settore valido", nome));
-    }
-    
-    private static char getColonnaFromName(String nome){
-    	checkIfValidSectorName(nome);
-        return nome.charAt(0);
-    }
-    
-    private static int getRigaFromName(String nome){
-    	checkIfValidSectorName(nome);
-        return Integer.parseInt(nome.substring(1, 2));
-    }
-    
-    public List<Settore> getListSettoriDiTipo(List<String> nomiSettori, TipoSettore tipo){
+    static public List<Settore> getListSettoriDiTipo(List<String> nomiSettori, TipoSettore tipo){
         List<Settore> listaSettori = new ArrayList<Settore>();
         for(String s : nomiSettori){
-            /*SectorPosition sectorPosition = this.getSectorPositionFromName(s);
-            listaSettori.add(new Settore(sectorPosition.getCol(),sectorPosition.getRiga(),tipo));
-        	*/
-        	listaSettori.add(new Settore(s,tipo));
+            NomeSettore nome = new NomeSettore(s);
+        	listaSettori.add(new Settore(nome.getCol(), nome.getRiga(),tipo));
         } 
         return listaSettori;
     }
