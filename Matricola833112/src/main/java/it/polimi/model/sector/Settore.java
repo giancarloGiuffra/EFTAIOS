@@ -35,6 +35,10 @@ public class Settore {
                ('A' <= Character.toUpperCase(col) && Character.toUpperCase(col) <= ULTIMA_COLONNA);
     }
     
+    private Settore(String nome, TipoSettore tipo){
+    	this(getColonnaFromName(nome), getRigaFromName(nome), tipo);
+    }
+    
     public boolean isInaccessibile(){return this.tipo==TipoSettore.INACCESSIBILE;}
     public boolean isSicuro(){return this.tipo==TipoSettore.SICURO;}
     public boolean isPericoloso(){return this.tipo==TipoSettore.PERICOLOSO;}
@@ -60,7 +64,7 @@ public class Settore {
         return false;
     }
     
-    private class SectorPosition{
+    /*private class SectorPosition{
         private final char col;
         private final int riga;
         
@@ -75,13 +79,30 @@ public class Settore {
         char colonna = s.charAt(0);
         int riga = Integer.parseInt(s.substring(1, 2));
         return new SectorPosition(colonna,riga);
+    }*/
+    
+    private static void checkIfValidSectorName(String nome){
+    	final String REGEX = "[A-W](0[1-9]|1[0-4])";
+    	if( !nome.matches(REGEX)) throw new BadSectorPositionNameException(String.format("%s non è un nome di settore valido", nome));
+    }
+    
+    private static char getColonnaFromName(String nome){
+    	checkIfValidSectorName(nome);
+        return nome.charAt(0);
+    }
+    
+    private static int getRigaFromName(String nome){
+    	checkIfValidSectorName(nome);
+        return Integer.parseInt(nome.substring(1, 2));
     }
     
     public List<Settore> getListSettoriDiTipo(List<String> nomiSettori, TipoSettore tipo){
         List<Settore> listaSettori = new ArrayList<Settore>();
         for(String s : nomiSettori){
-            SectorPosition sectorPosition = this.getSectorPositionFromName(s);
+            /*SectorPosition sectorPosition = this.getSectorPositionFromName(s);
             listaSettori.add(new Settore(sectorPosition.getCol(),sectorPosition.getRiga(),tipo));
+        	*/
+        	listaSettori.add(new Settore(s,tipo));
         } 
         return listaSettori;
     }
