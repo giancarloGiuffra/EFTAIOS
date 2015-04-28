@@ -98,34 +98,5 @@ public class Settore {
         } 
         return listaSettori;
     }
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + col;
-		result = prime * result + riga;
-		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Settore other = (Settore) obj;
-		if (col != other.col)
-			return false;
-		if (riga != other.riga)
-			return false;
-		if (tipo != other.tipo)
-			return false;
-		return true;
-	}
-    
     
 }

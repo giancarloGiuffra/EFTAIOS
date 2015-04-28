@@ -6,11 +6,11 @@ import it.polimi.model.sector.TipoSettore;
 import java.util.Map;
 
 abstract class Tabellone {
-    protected Map<String, Settore> tabellone;
+    protected Map<String, Settore> sectors;
     
     public Settore getSettore(String nome){
     	Settore.checkIfValidSectorName(nome);
-    	if(!this.tabellone.containsKey(nome)) return new Settore(nome,TipoSettore.PERICOLOSO);
-    	return this.tabellone.get(nome);
+    	if(!this.sectors.containsKey(nome)) return new Settore(nome,TipoSettore.PERICOLOSO);
+    	return this.sectors.get(nome);
     }
 }

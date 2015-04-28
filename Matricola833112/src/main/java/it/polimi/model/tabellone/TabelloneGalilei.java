@@ -29,9 +29,9 @@ public class TabelloneGalilei extends Tabellone {
 		final Iterable<Settore> settori = Iterables.unmodifiableIterable(
         		Iterables.concat(scialuppe,sicuri,inaccessibili,baseUmana, baseAliena));
         
-        this.tabellone = new HashMap<String,Settore>();
+        this.sectors = new HashMap<String,Settore>();
         for(Settore settore:settori){
-        	this.tabellone.put(settore.getNome(), settore);
+        	this.sectors.put(settore.getNome(), settore);
         }
     }
 }
