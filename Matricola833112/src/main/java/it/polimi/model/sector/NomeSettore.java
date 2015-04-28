@@ -2,6 +2,9 @@ package it.polimi.model.sector;
 
 import it.polimi.model.exceptions.BadSectorPositionNameException;
 
+/**
+ * class not used
+ */
 public class NomeSettore {
     
     static final String REGEX = "[A-W](0[1-9]|1[0-4])";
