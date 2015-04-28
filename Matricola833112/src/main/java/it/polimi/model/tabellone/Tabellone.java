@@ -1,4 +1,4 @@
-package it.polimi.tabellone;
+package it.polimi.model.tabellone;
 
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;

@@ -1,4 +1,4 @@
-package it.polimi.tabellone;
+package it.polimi.model.tabellone;
 
 import java.util.Arrays;
 import java.util.HashMap;
