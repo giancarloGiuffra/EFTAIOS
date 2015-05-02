@@ -1,15 +1,15 @@
 package it.polimi.model.player;
 
 public enum Personaggio {
-    CAPITANO(Razza.HUMAN,"Ennio Maria Dominoni"),
-    PILOTA(Razza.HUMAN,"Julia Niguloti"),
-    PSICOLOGO(Razza.HUMAN,"Silvano Porpora"),
-    SOLDATO(Razza.HUMAN,"Tuccio Brendon"),
     ALIENO1(Razza.ALIEN,"Piero Ceccarella"),
+    CAPITANO(Razza.HUMAN,"Ennio Maria Dominoni"),
     ALIENO2(Razza.ALIEN,"Vittorio Martana"),
+    PILOTA(Razza.HUMAN,"Julia Niguloti"),
     ALIENO3(Razza.ALIEN,"Maria Galbani"),
-    ALIENO4(Razza.ALIEN,"Paolo Landon");
-    
+    PSICOLOGO(Razza.HUMAN,"Silvano Porpora"),
+    ALIENO4(Razza.ALIEN,"Paolo Landon"),
+    SOLDATO(Razza.HUMAN,"Tuccio Brendon");
+     
     private final Razza razza;
     private final String nome;
     
