@@ -6,6 +6,10 @@ import it.polimi.model.exceptions.BadSectorPositionNameException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe per rappresentare i settori.
+ *
+ */
 public class Settore {
     
     private final char col;
@@ -15,82 +19,223 @@ public class Settore {
     private static final char ULTIMA_COLONNA = 'W';
     private static final  int ULTIMA_RIGA = 14;
     
-    Settore(char col, int riga, TipoSettore tipo){
+    /**
+     * Costruttore
+     * @param col colonna del settore
+     * @param riga riga del settore
+     * @param tipo tipo di settore
+     */
+    private Settore(char col, int riga, TipoSettore tipo){
         if (!this.isValidSectorName(col, riga)) throw new BadSectorException(String.format("Colonna %c e/o Riga %d non valida(e)", col, riga));
-        this.col=Character.toUpperCase(col); this.riga=riga; this.tipo=tipo;     
+        this.col=Character.toUpperCase(col);
+        this.riga=riga;
+        this.tipo=tipo;     
     }
     
-    public char getColonna(){return this.col;}
-    public int getRiga(){return this.riga;}
-    public TipoSettore getTipo(){return this.tipo;}
-    public String getNome(){ //returns "A01" if col="A" and riga=1
+    /**
+     * Costruttore
+     * @param nome nome del settore, formato a 3 caratteri, eg: A01, W14
+     * @param tipo tipo del settore
+     */
+    public Settore(String nome, TipoSettore tipo){
+        this(getColonnaFromName(nome), getRigaFromName(nome), tipo);
+    }
+    
+    /**
+     * @return colonna del settore
+     */
+    public char getColonna(){
+        return this.col;
+    }
+    
+    /**
+     * @return riga del settore
+     */
+    public int getRiga(){
+        return this.riga;
+    }
+    
+    /**
+     * @return tipo del settore
+     */
+    public TipoSettore getTipo(){
+        return this.tipo;
+    }
+    
+    /**
+     * Nome del settore, formato a tre caratteri, eg: A01, W14.
+     * @return nome del settore
+     */
+    public String getNome(){
         return new StringBuilder().append(col).append(String.format("%02d", this.riga)).toString();
     }
     
+    /**
+     * Verifica se la colonna e la riga corrispondono a un settore valido
+     * @param col colonna del supposto settore
+     * @param riga riga del supposto settore
+     * @return true se il settore è valido, false altrimenti
+     */
     public boolean isValidSectorName(char col, int riga){
         return (1 <= riga && riga <= ULTIMA_RIGA ) &&
                ('A' <= Character.toUpperCase(col) && Character.toUpperCase(col) <= ULTIMA_COLONNA);
     }
     
-    public Settore(String nome, TipoSettore tipo){
-    	this(getColonnaFromName(nome), getRigaFromName(nome), tipo);
+    /**
+     * Verifica se il settore è inaccessibile
+     * @return true se il settore è inaccessibile, false altrimenti
+     */
+    public boolean isInaccessibile(){
+        return this.tipo==TipoSettore.INACCESSIBILE;
     }
     
-    public boolean isInaccessibile(){return this.tipo==TipoSettore.INACCESSIBILE;}
-    public boolean isSicuro(){return this.tipo==TipoSettore.SICURO;}
-    public boolean isPericoloso(){return this.tipo==TipoSettore.PERICOLOSO;}
-    public boolean isScialuppa(){return this.tipo==TipoSettore.SCIALUPPA;}
-    public boolean isBaseUmana(){return this.tipo==TipoSettore.BASE_HUMAN;}
-    public boolean isBaseALiena(){return this.tipo==TipoSettore.BASE_ALIEN;}
+    /**
+     * Verifica se il settore è sicuro
+     * @return true se il settore è sicuro, false altrimenti
+     */
+    public boolean isSicuro(){
+        return this.tipo==TipoSettore.SICURO;
+    }
     
-    public boolean isBase(){return this.isBaseUmana() || this.isBaseALiena();}
+    /**
+     * Verifica se il settore è pericoloso
+     * @return true se il settore è pericoloso, false altrimenti
+     */
+    public boolean isPericoloso(){
+        return this.tipo==TipoSettore.PERICOLOSO;
+    }
     
+    /**
+     * Verifica se il settore è una scialuppa
+     * @return true se il settore è scialuppa, false altrimenti
+     */
+    public boolean isScialuppa(){
+        return this.tipo==TipoSettore.SCIALUPPA;
+    }
+    
+    /**
+     * Verifica se il settore è la base umana
+     * @return true se il settore è la base umana, false altrimenti
+     */
+    public boolean isBaseUmana(){
+        return this.tipo==TipoSettore.BASE_HUMAN;
+    }
+    
+    /**
+     * Verifica se il settore è la base aliena
+     * @return true se il settore è la base aliena, false altrimenti
+     */
+    public boolean isBaseALiena(){
+        return this.tipo==TipoSettore.BASE_ALIEN;
+    }
+    
+    /**
+     * Verifica se il settore è una base
+     * @return true se il settore è una base, false altrimenti
+     */
+    public boolean isBase(){
+        return this.isBaseUmana() || this.isBaseALiena();
+    }
+    
+    /**
+     * Verifica se il settore è una destinazione valida per un giocatore umano
+     * @return true se il settore è una destinazione valida per un giocatore umano, false altrimenti
+     */
     public boolean isValidDestinationForHuman(){return  this.isSicuro() ||
                                                         this.isPericoloso() ||
                                                         this.isScialuppa();}
     
+    /**
+     * Verifica se il settore è una destinazione valida per un giocatore alieno
+     * @return true se il settore è una destinazione valida per un giocatore alieno, false altrimenti
+     */
     public boolean isValidDestinationForAlien(){return  this.isSicuro() || 
                                                         this.isPericoloso();}
     
+    /**
+     * Verifica se il settore è a un settore di distanza
+     * @param settore settore in input
+     * @return true se il settore è a un settore di distanza
+     */
     public boolean isOneSectorAway(Settore settore){
     	return (Math.abs(this.distanceColonna(settore))==1 && (this.distanceRiga(settore)==-1 || this.distanceRiga(settore)==0 ) ) ||
     		   (this.distanceColonna(settore)==0 && Math.abs(this.distanceRiga(settore))==1);
     }
     
+    /**
+     * Calcola la distanza tra le righe di questo settore e quello dato in input
+     * @param settore settore in input
+     * @return distanza tra le righe di questo settore e quello in input
+     */
     private int distanceRiga(Settore settore) {
 		return this.riga-settore.riga;
 	}
 
-	private int distanceColonna(Settore settore) {
+	/**
+	 * Calcola la distanza tra le colonne di questo settore e quello dato in input
+     * @param settore settore in input
+     * @return distanza tra le colonne di questo settore e quello in input
+     */
+    private int distanceColonna(Settore settore) {
 		return this.col-settore.col;
 	}
 
-	public boolean isAtMostTwoSectorAway(Settore settore){
+    /**
+     * Verifica se il settore è al massimo a due settori di distanza
+     * se il settore in input è lui stesso restituisce false
+     * @param settore settore in input
+     * @return true se il settore è al massimo a due settori di distanza
+     */
+    public boolean isAtMostTwoSectorAway(Settore settore){
         return isOneSectorAway(settore) ||
         	   isTwoSectorAway(settore);
     }
     
+    /**
+     * Verifica se il settore è a due settori di distanza
+     * @param settore settore in input
+     * @return true se il settore è a due settori di distanza
+     */
     private boolean isTwoSectorAway(Settore settore) {
 		return ( this.distanceColonna(settore)==0 && Math.abs(this.distanceRiga(settore))==2 ) ||
 			   ( Math.abs(this.distanceColonna(settore))==1 && ( this.distanceRiga(settore)==-2 || this.distanceRiga(settore)==1 ) ) ||
 			   ( Math.abs(this.distanceColonna(settore))==2 && Math.abs(this.distanceRiga(settore))<=1 );
 	}
 
-	public static void checkIfValidSectorName(String nome){
+	/**
+	 * Verifica se il nome del settore è valido
+	 * @param nome nome del settore da verificare
+	 * @thow BadSectorPositionNameException
+	 */
+    public static void checkIfValidSectorName(String nome){
     	final String REGEX = "[A-W](0[1-9]|1[0-4])";
     	if( !nome.matches(REGEX)) throw new BadSectorPositionNameException(String.format("%s non è un nome di settore valido", nome));
     }
     
-    public static char getColonnaFromName(String nome){
+    /**
+     * @param nome del settore
+     * @return colonna del settore
+     */
+    private static char getColonnaFromName(String nome){
     	checkIfValidSectorName(nome);
         return nome.charAt(0);
     }
     
-    public static int getRigaFromName(String nome){
+    /**
+     * @param nome del settore
+     * @return riga del settore
+     */
+    private static int getRigaFromName(String nome){
     	checkIfValidSectorName(nome);
         return Integer.parseInt(nome.substring(1, 2));
     }
     
+    /**
+     * Restituisce una lista di settori del tipo indicato 
+     * @param nomiSettori lista di nomi di settori, formato a tre caratteri, eg: A01, W14
+     * @param tipo dei settori
+     * @return lista di settori cui nomi sono stati indicati in input
+     */
     public static List<Settore> getListSettoriDiTipo(List<String> nomiSettori, TipoSettore tipo){
         List<Settore> listaSettori = new ArrayList<Settore>();
         for(String s : nomiSettori){

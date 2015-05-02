@@ -4,43 +4,83 @@ import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
 import it.polimi.model.sector.Settore;
 
+/**
+ * Classe Astratta da cui derivare i giocatori.
+ *
+ */
 abstract public class Player {
     
     protected final Personaggio personaggio;
     private Mazzo mazzo;
     
-    Player(Personaggio personaggio){this.personaggio=personaggio;}
+    /**
+     * Costruttore
+     * @param personaggio
+     */
+    Player(Personaggio personaggio){
+        this.personaggio=personaggio;
+    }
     
+    /**
+     *  Metodo per controllare se la mossa è valida
+     * @param from  settore di partenza
+     * @param to    settore di arrivo
+     * @return true se la mossa è valida, false altrimenti
+     */
     abstract public boolean isMoveValid(Settore from, Settore to);
 
-	public Personaggio getPersonaggio() {
+	/**
+	 * Restituisce il personaggio del giocatore
+	 * @return personaggio
+	 */
+    public Personaggio getPersonaggio() {
 		return personaggio;
 	}
 
-	public void annunciaSettoreMio() {
+	/**
+	 * Metodo per annunciare il settore in cui si trova il giocatore
+	 */
+    public void annunciaSettoreMio() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void annunciaSettore() {
+	/**
+	 * Metodo per chiedere un settore al giocatore e annunciarlo
+	 */
+    public void annunciaSettore() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void dichiaraSilenzio() {
+	/**
+	 * Metodo per dichiarare silenzio
+	 */
+    public void dichiaraSilenzio() {
 		// TODO Auto-generated method stub
 		
 	}
 	
-	public void usaCarta(Carta carta){
+	/**
+	 * Metodo per usare una carta
+	 * @param carta
+	 */
+    public void usaCarta(Carta carta){
 		carta.effetto(this);
 	}
 	
-	public void muore(){
+	/**
+	 * Metodo per dichiarare di essere morto
+	 */
+    public void muore(){
 		//TODO
 	}
 	
-	public void pescaCarta(Mazzo mazzo){
+	/**
+	 * Metodo per pescare una carta dal mazzo
+	 * @param mazzo mazzo da cui pescare la carta
+	 */
+    public void pescaCarta(Mazzo mazzo){
 		//TODO
 	}
 }

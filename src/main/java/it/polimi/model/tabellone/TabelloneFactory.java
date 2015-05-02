@@ -2,9 +2,17 @@ package it.polimi.model.tabellone;
 
 import it.polimi.model.exceptions.*;
 
-
-
+/**
+ * Classe per creare il tabellone
+ *
+ */
 public class TabelloneFactory {
+    
+    /**
+     * Restituisce il tabellone indicato
+     * @param tabellone nome del tabellone indicato
+     * @return
+     */
 	public Tabellone createTabellone(String tabellone){
         switch(tabellone){
             case "GALILEI": 

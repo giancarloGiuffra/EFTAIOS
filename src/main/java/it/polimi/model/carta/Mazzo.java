@@ -7,24 +7,43 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ * Classe per rappresentare un mazzo di carte
+ *
+ */
 public class Mazzo {
 	
 	private Stack<Carta> carte;
 	
+	/**
+     * Costruttore
+     * @param lista di carte
+     */
+    private Mazzo(List<Carta> lista){
+        Collections.shuffle(lista);
+        this.carte.addAll(lista);
+    }
+	
+	/**
+	 * @return la prossima carta da estrarre
+	 */
 	public Carta getCarta(){
 		if(this.isEmpty()) throw new MazzoVuotoException("Il Mazzo è vuoto");
 		return carte.pop();
 	}
 	
+	/**
+	 * @return true se il mazzo è vuoto, false altrimenti
+	 */
 	private boolean isEmpty(){
 		return carte.empty();
 	}
 	
-	private Mazzo(List<Carta> lista){
-	    Collections.shuffle(lista);
-	    this.carte.addAll(lista);
-	}
-	
+	/**
+	 * Restituisce un nuovo mazzo di carte con la distribuzione indicata
+	 * @param distribuzione delle carte di tipo settore
+	 * @return mazzo di carte di tipo settore con distribuzione indicata
+	 */
 	private Mazzo creaNuovoMazzoCarteSettore(DistribuzioneCarteSettore distribuzione){
 	    List<Carta> listaRumoreMio = CartaSettore.getListCarteSettoreDiTipo(TipoCartaSettore.RUMORE_MIO, distribuzione.rumoreMio());
 	    List<Carta> listaRumoreQualunque = CartaSettore.getListCarteSettoreDiTipo(TipoCartaSettore.RUMORE_QUALUNQUE, distribuzione.rumoreQualunque());
@@ -34,15 +53,23 @@ public class Mazzo {
 	    lista.addAll(listaRumoreMio);
 	    lista.addAll(listaRumoreQualunque);
 	    lista.addAll(listaSilenzio);
-	   
-	    Mazzo mazzo = new Mazzo(lista);
-	    return mazzo;	    
+	
+	    return new Mazzo(lista);	    
 	}
 	
+	/**
+     * Restituisce un nuovo mazzo di carte equidistribuito (tra i tipi di carte settore)
+     * @return mazzo di carte di tipo settore equidistribuito
+     */
 	public Mazzo creaNuovoMazzoCarteSettore(){
 	    return creaNuovoMazzoCarteSettore(DistribuzioneCarteSettore.EQUIDISTRIBUITA);
 	}
 	
+	/**
+	 * Aggiunge le carte al mazzo e rimischia
+	 * Si pensa di utilizzarla quando il mazzo sia vuoto
+	 * @param listaCarte lista di carte da aggiungere al mazzo
+	 */
 	public void rimischia(List<Carta> listaCarte){
 	    Collections.shuffle(listaCarte);
         this.carte.addAll(listaCarte);

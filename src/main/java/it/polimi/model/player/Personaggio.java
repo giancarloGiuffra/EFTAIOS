@@ -19,6 +19,7 @@ public enum Personaggio {
      
     private final Razza razza;
     private final String nome;
+    private static final int NRO_PERSONAGGI = 8;
     
     /**
      * Costruttore
@@ -31,7 +32,6 @@ public enum Personaggio {
     }
     
     /**
-     * Getter del attributo razza.
      * @return razza del Personaggio
      */
     public Razza razza(){
@@ -39,11 +39,17 @@ public enum Personaggio {
     }
     
     /**
-     * Getter del attributo nome.
      * @return nome del Personaggio
      */
     public String nome(){
         return this.nome;
+    }
+    
+    /**
+     * @return numero totale di personaggi
+     */
+    public static int numeroPersonaggi(){
+        return Personaggio.NRO_PERSONAGGI;
     }
     
     /**
