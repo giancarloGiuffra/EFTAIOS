@@ -1,5 +1,12 @@
 package it.polimi.model.player;
 
+/**
+ * Enumeration type per i Personaggi del gioco.
+ * L'ordine nel quale sono stati disposti è importante perchè permette
+ * di gestire in modo semplice il requisito di gioco di avere un alieno in più
+ * rispetto al numero di umani nel caso di numero di giocatori dispari.
+ *
+ */
 public enum Personaggio {
     ALIENO1(Razza.ALIEN,"Piero Ceccarella"),
     CAPITANO(Razza.HUMAN,"Ennio Maria Dominoni"),
@@ -13,11 +20,43 @@ public enum Personaggio {
     private final Razza razza;
     private final String nome;
     
+    /**
+     * Costruttore
+     * @param razza
+     * @param nome
+     */
     private Personaggio(Razza razza, String nome){
-        this.razza = razza; this.nome = nome;
+        this.razza = razza;
+        this.nome = nome;
     }
-    public Razza razza(){return this.razza;}
-    public String nome(){return this.nome;}
-    public boolean isHuman(){return this.razza==Razza.HUMAN;}
-    public boolean isAlien(){return this.razza==Razza.ALIEN;}
+    
+    /**
+     * Getter del attributo razza.
+     * @return razza del Personaggio
+     */
+    public Razza razza(){
+        return this.razza;
+    }
+    
+    /**
+     * Getter del attributo nome.
+     * @return nome del Personaggio
+     */
+    public String nome(){
+        return this.nome;
+    }
+    
+    /**
+     * @return true se il Personaggio è umano, false altrimenti.
+     */
+    public boolean isHuman(){
+        return this.razza==Razza.HUMAN;
+    }
+    
+    /**
+     * @return true se il Personaggio è alieno, false altrimenti.
+     */
+    public boolean isAlien(){
+        return this.razza==Razza.ALIEN;
+    }
 }
