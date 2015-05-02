@@ -1,5 +1,8 @@
 package it.polimi.model.carta;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import it.polimi.model.player.Player;
 
 public class CartaSettore implements Carta {
@@ -17,6 +20,15 @@ public class CartaSettore implements Carta {
 	
 	public Boolean hasIconaOgetto() {
 		return this.iconaOgetto;
+	}
+	
+	public static List<Carta> getListCarteSettoreDiTipo(TipoCartaSettore tipo, int quantita){
+	    Boolean defaultIconaOggetto = false;
+	    List<Carta> listaCarteSettore = new ArrayList<Carta>(quantita);
+	    for(int i=0; i<quantita;i++){
+	        listaCarteSettore.add(new CartaSettore(tipo,defaultIconaOggetto));
+	    }
+	    return listaCarteSettore;
 	}
 
 	@Override

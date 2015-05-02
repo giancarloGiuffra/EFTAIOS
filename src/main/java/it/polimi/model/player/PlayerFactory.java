@@ -2,7 +2,7 @@ package it.polimi.model.player;
 
 import it.polimi.model.exceptions.*;
 
-public class PlayeFactory {
+public class PlayerFactory {
     
     public Player createPlayer(Personaggio personaggio){
         switch(personaggio.razza()){
