@@ -33,6 +33,14 @@ public class Mazzo {
 	}
 	
 	/**
+	 * Inserisce la carta nel mazzo
+	 * @param carta da inserire
+	 */
+	public void putCarta(Carta carta){
+	    this.carte.push(carta);
+	}
+	
+	/**
 	 * @return true se il mazzo è vuoto, false altrimenti
 	 */
 	private boolean isEmpty(){

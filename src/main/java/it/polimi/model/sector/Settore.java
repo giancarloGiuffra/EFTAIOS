@@ -263,7 +263,7 @@ public class Settore {
      * @param nome del settore
      * @return colonna del settore
      */
-    private static char getColonnaFromName(String nome){
+    public static char getColonnaFromName(String nome){
     	checkIfValidSectorName(nome);
         return nome.charAt(0);
     }
@@ -272,7 +272,7 @@ public class Settore {
      * @param nome del settore
      * @return riga del settore
      */
-    private static int getRigaFromName(String nome){
+    public static int getRigaFromName(String nome){
     	checkIfValidSectorName(nome);
         return Integer.parseInt(nome.substring(1, 2));
     }
