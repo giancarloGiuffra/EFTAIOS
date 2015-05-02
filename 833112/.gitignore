@@ -1,5 +1,0 @@
-#esclude tutto eccetto cartella src, pom.xml, .gitignore
-/*
-!/src
-!pom.xml
-!.gitignore
