@@ -7,6 +7,7 @@ import it.polimi.model.exceptions.BadSectorPositionNameException;
  * Nomi ammissibili sono A01 fino a W14
  * @deprecated
  */
+@Deprecated
 public class NomeSettore {
     
     static final String REGEX = "[A-W](0[1-9]|1[0-4])";

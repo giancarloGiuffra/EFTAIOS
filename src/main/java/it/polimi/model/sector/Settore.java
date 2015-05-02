@@ -158,8 +158,8 @@ public class Settore {
      * @return true se il settore è a un settore di distanza
      */
     public boolean isOneSectorAway(Settore settore){
-    	return (Math.abs(this.distanceColonna(settore))==1 && (this.distanceRiga(settore)==-1 || this.distanceRiga(settore)==0 ) ) ||
-    		   (this.distanceColonna(settore)==0 && Math.abs(this.distanceRiga(settore))==1);
+    	return isLeftOrRight(settore) ||
+    	        isUpOrDown(settore);
     }
     
     /**
@@ -179,7 +179,26 @@ public class Settore {
     private int distanceColonna(Settore settore) {
 		return this.col-settore.col;
 	}
+    
+    /**
+     * Verifica se il settore è uno dei settori a destra oppure a sinistra
+     * @param settore
+     * @return true se il settore è uno dei due a sinistra oppure uno dei due a destra
+     */
+    private boolean isLeftOrRight(Settore settore){
+        return Math.abs(this.distanceColonna(settore))==1 && 
+                (this.distanceRiga(settore)==-1 || this.distanceRiga(settore)==0 );
+    }
 
+    /**
+     * Verifica se il settore è sopra oppure sotto
+     * @param settore
+     * @return true se il settore è il settore di sopra oppure quello di sotto
+     */
+    private boolean isUpOrDown(Settore settore){
+        return this.distanceColonna(settore)==0 && Math.abs(this.distanceRiga(settore))==1;
+    }
+    
     /**
      * Verifica se il settore è al massimo a due settori di distanza
      * se il settore in input è lui stesso restituisce false
@@ -197,10 +216,38 @@ public class Settore {
      * @return true se il settore è a due settori di distanza
      */
     private boolean isTwoSectorAway(Settore settore) {
-		return ( this.distanceColonna(settore)==0 && Math.abs(this.distanceRiga(settore))==2 ) ||
-			   ( Math.abs(this.distanceColonna(settore))==1 && ( this.distanceRiga(settore)==-2 || this.distanceRiga(settore)==1 ) ) ||
-			   ( Math.abs(this.distanceColonna(settore))==2 && Math.abs(this.distanceRiga(settore))<=1 );
+		return isUpOrDownTwo(settore) ||
+		       isLeftOrRightTwo(settore) ||
+		       isTwoSectorAwayInAdjacentColumns(settore);
 	}
+    
+    /**
+     * Verifica se il settore è sopra oppure sotto di due spazi
+     * @param settore
+     * @return true se soddisfa la condizione
+     */
+    private boolean isUpOrDownTwo(Settore settore){
+        return this.distanceColonna(settore)==0 && Math.abs(this.distanceRiga(settore))==2;
+    }
+    
+    /**
+     * Verifica se il settore è a distanza due nelle colonne adiacenti
+     * @param settore
+     * @return true se soddisfa la condizione
+     */
+    private boolean isTwoSectorAwayInAdjacentColumns(Settore settore){
+        return Math.abs(this.distanceColonna(settore))==1 && 
+                ( this.distanceRiga(settore)==-2 || this.distanceRiga(settore)==1);
+    }
+    
+    /**
+     * Verifica se il settore è a destra oppure a sinistra di due spazi
+     * @param settore
+     * @return true se soddisfa la condizione
+     */
+    private boolean isLeftOrRightTwo(Settore settore){
+        return Math.abs(this.distanceColonna(settore))==2 && Math.abs(this.distanceRiga(settore))<=1;
+    }
 
 	/**
 	 * Verifica se il nome del settore è valido

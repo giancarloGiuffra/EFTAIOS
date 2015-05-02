@@ -12,6 +12,13 @@ import it.polimi.model.exceptions.*;
 public class PlayerFactory {
     
     /**
+     * Costruttore
+     */
+    private PlayerFactory(){
+        //fa niente
+    }
+    
+    /**
      * Metodo per generare un giocatore per il personaggio di gioco
      * @param personaggio   personaggio da associare al giocatore
      * @return player   giocatore associato al personaggio

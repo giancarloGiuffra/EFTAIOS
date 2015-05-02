@@ -4,8 +4,8 @@ import it.polimi.model.exceptions.MazzoVuotoException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Classe per rappresentare un mazzo di carte
@@ -13,7 +13,7 @@ import java.util.Stack;
  */
 public class Mazzo {
 	
-	private Stack<Carta> carte;
+	private Deque<Carta> carte;
 	
 	/**
      * Costruttore
@@ -36,7 +36,7 @@ public class Mazzo {
 	 * @return true se il mazzo è vuoto, false altrimenti
 	 */
 	private boolean isEmpty(){
-		return carte.empty();
+		return carte.isEmpty();
 	}
 	
 	/**
