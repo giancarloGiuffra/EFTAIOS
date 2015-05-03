@@ -1,6 +1,7 @@
 package it.polimi.model.carta;
 
 import it.polimi.model.exceptions.IllegalTipoCartaSettore;
+import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 
 /**
@@ -8,12 +9,33 @@ import it.polimi.model.player.Player;
  *
  */
 public enum TipoCartaSettore {
-	RUMORE_MIO,RUMORE_QUALUNQUE,SILENZIO;
+	RUMORE_MIO(AzioneGiocatore.ANNUNCIA_SETTORE_MIO),
+	RUMORE_QUALUNQUE(AzioneGiocatore.ANNUNCIA_SETTORE),
+	SILENZIO(AzioneGiocatore.DICHIARA_SILENZIO);
+	
+	private final AzioneGiocatore azione;
+	
+	/**
+	 * Costruttore
+	 * @param azione che corrisponde al tipo di carta
+	 */
+	private TipoCartaSettore(AzioneGiocatore azione){
+	    this.azione = azione;
+	}
+	
+	/**
+	 * @return azione che produce l'utilizzo di questo tipo di carta
+	 */
+	public AzioneGiocatore azione() {
+        return this.azione;
+    }
 	
 	/**
 	 * Chiama l'azione associata all'effetto della carta RUMORE_MIO
 	 * @param player di cui si chiama l'azione
+	 * @deprecated
 	 */
+	@Deprecated
 	private void effettoRumoreMio(Player player){
 		player.annunciaSettoreMio();
 	}
@@ -21,7 +43,9 @@ public enum TipoCartaSettore {
 	/**
      * Chiama l'azione associata all'effetto della carta RUMORE_QUALUNQUE
      * @param player di cui si chiama l'azione
+     * @deprecated
      */
+	@Deprecated
 	private void effettoRumoreQualunque(Player player){
 		player.annunciaSettore();
 	}
@@ -29,7 +53,9 @@ public enum TipoCartaSettore {
 	/**
      * Chiama l'azione associata all'effetto della carta SILENZIO
      * @param player di cui si chiama l'azione
+     * @deprecated
      */
+	@Deprecated
 	private void effettoSilenzio(Player player){
 		player.dichiaraSilenzio();
 	}
@@ -37,7 +63,9 @@ public enum TipoCartaSettore {
 	/**
 	 * Chiama l'effetto corretto a seconda del tipo di carta settore
 	 * @param player su cui applicare l'effetto
+	 * @deprecated
 	 */
+	@Deprecated
 	public void effetto(Player player){
 		switch(this){
 			case RUMORE_MIO:
@@ -53,4 +81,5 @@ public enum TipoCartaSettore {
 				throw new IllegalTipoCartaSettore(String.format("%s non è un tipo valido di Carta Settore", this.toString()));
 		}
 	}
+
 }

@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
+import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
 import it.polimi.model.sector.Settore;
 
 /**
@@ -74,10 +75,32 @@ abstract public class Player {
 	 * @param carta
 	 */
     public void usaCarta(Carta carta){
-		carta.effetto(this);
+		//carta.effetto(this); -->vecchia implementazione
+        this.azione(carta);
 	}
 	
-	/**
+    /**
+     * Chiama l'azione che il giocatore deve compiere all'usare la carta
+     * @param carta
+     */
+	private void azione(Carta carta) {
+        switch(carta.azione()){
+            case ANNUNCIA_SETTORE:
+                this.annunciaSettore();
+                break;
+            case ANNUNCIA_SETTORE_MIO:
+                this.annunciaSettoreMio();
+                break;
+            case DICHIARA_SILENZIO:
+                this.dichiaraSilenzio();
+                break;
+            default:
+                throw new IllegalAzioneGiocatoreException("Azione Giocatore non valida");
+        }
+        
+    }
+
+    /**
 	 * Metodo per dichiarare di essere morto
 	 */
     public void muore(){

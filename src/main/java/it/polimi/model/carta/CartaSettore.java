@@ -9,7 +9,7 @@ import it.polimi.model.player.Player;
  * Classe per rappresentare la carta settore
  *
  */
-public class CartaSettore implements Carta {
+public class CartaSettore extends Carta {
 
 	private final TipoCartaSettore tipo;
 	private final Boolean iconaOgetto;
@@ -20,7 +20,8 @@ public class CartaSettore implements Carta {
 	 * @param iconaOggetto se ha o meno l'icon oggetto
 	 */
 	private CartaSettore(TipoCartaSettore tipo, Boolean iconaOggetto){
-		this.tipo = tipo;
+		super(tipo.azione());
+	    this.tipo = tipo;
 		this.iconaOgetto = iconaOggetto;
 	}
 	
@@ -57,7 +58,7 @@ public class CartaSettore implements Carta {
 	 * Effetto che la carta a sul giocatore
 	 * @param giocatore sul quale applicare l'effetto
 	 */
-	@Override
+	@Deprecated
 	public void effetto(Player player) {
 		this.tipo.effetto(player);
 	}
