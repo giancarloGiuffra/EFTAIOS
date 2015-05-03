@@ -40,7 +40,7 @@ abstract public class Player {
 	 * Restituisce il personaggio del giocatore
 	 * @return personaggio
 	 */
-    public Personaggio getPersonaggio() {
+    public Personaggio personaggio() {
 		return personaggio;
 	}
     
