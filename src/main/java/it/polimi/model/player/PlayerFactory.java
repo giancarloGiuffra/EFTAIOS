@@ -23,7 +23,7 @@ public class PlayerFactory {
      * @param personaggio   personaggio da associare al giocatore
      * @return player   giocatore associato al personaggio
      */
-    public static Player createPlayer(Personaggio personaggio){
+    private static Player createPlayer(Personaggio personaggio){
         switch(personaggio.razza()){
             case HUMAN: 
                 return new HumanPlayer(personaggio);

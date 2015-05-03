@@ -43,6 +43,13 @@ abstract public class Player {
     public Personaggio getPersonaggio() {
 		return personaggio;
 	}
+    
+    /**
+     * @return razza del personaggio del giocatore
+     */
+    public Razza razza(){
+        return this.personaggio.razza();
+    }
 
 	/**
 	 * Metodo per annunciare il settore in cui si trova il giocatore

@@ -3,6 +3,7 @@ package it.polimi.model.tabellone;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,8 +12,10 @@ import java.util.Map;
  * vengono salvati tutti gli altri e per default il resto sono i settori pericolosi.
  *
  */
-abstract class Tabellone {
+abstract public class Tabellone {
     protected Map<String, Settore> sectors;
+    protected Settore baseUmana;
+    protected Settore baseAliena;
     
     /**
      * @param nome del settore
@@ -22,5 +25,13 @@ abstract class Tabellone {
     	Settore.checkIfValidSectorName(nome);
     	if(!this.sectors.containsKey(nome)) return new Settore(nome,TipoSettore.PERICOLOSO);
     	return this.sectors.get(nome);
+    }
+
+    public Settore baseUmana() {
+        return this.baseUmana;
+    }
+
+    public Settore baseAliena() {
+        return this.baseAliena;
     }
 }

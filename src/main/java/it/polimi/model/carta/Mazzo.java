@@ -52,7 +52,7 @@ public class Mazzo {
 	 * @param distribuzione delle carte di tipo settore
 	 * @return mazzo di carte di tipo settore con distribuzione indicata
 	 */
-	private Mazzo creaNuovoMazzoCarteSettore(DistribuzioneCarteSettore distribuzione){
+	private static Mazzo creaNuovoMazzoCarteSettore(DistribuzioneCarteSettore distribuzione){
 	    List<Carta> listaRumoreMio = CartaSettore.getListCarteSettoreDiTipo(TipoCartaSettore.RUMORE_MIO, distribuzione.rumoreMio());
 	    List<Carta> listaRumoreQualunque = CartaSettore.getListCarteSettoreDiTipo(TipoCartaSettore.RUMORE_QUALUNQUE, distribuzione.rumoreQualunque());
 	    List<Carta> listaSilenzio = CartaSettore.getListCarteSettoreDiTipo(TipoCartaSettore.SILENZIO, distribuzione.silenzio());
@@ -69,7 +69,7 @@ public class Mazzo {
      * Restituisce un nuovo mazzo di carte equidistribuito (tra i tipi di carte settore)
      * @return mazzo di carte di tipo settore equidistribuito
      */
-	public Mazzo creaNuovoMazzoCarteSettore(){
+	public static Mazzo creaNuovoMazzoCarteSettore(){
 	    return creaNuovoMazzoCarteSettore(DistribuzioneCarteSettore.EQUIDISTRIBUITA);
 	}
 	

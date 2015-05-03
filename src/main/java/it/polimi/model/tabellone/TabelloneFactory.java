@@ -13,7 +13,7 @@ public class TabelloneFactory {
      * @param tabellone nome del tabellone indicato
      * @return
      */
-	public Tabellone createTabellone(String tabellone){
+	public static Tabellone createTabellone(String tabellone){
         switch(tabellone){
             case "GALILEI": 
                 return new TabelloneGalilei();

@@ -44,5 +44,9 @@ public class TabelloneGalilei extends Tabellone {
         for(Settore settore:settori){
         	this.sectors.put(settore.getNome(), settore);
         }
+        
+        //inizializzazione altri attributi
+        this.baseUmana = baseUmana.get(0);
+        this.baseAliena = baseAliena.get(0);
     }
 }
