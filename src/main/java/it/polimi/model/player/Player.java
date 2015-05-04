@@ -4,6 +4,9 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
 import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
@@ -15,7 +18,7 @@ import it.polimi.model.sector.Settore;
  */
 abstract public class Player {
     
-    protected final Personaggio personaggio;
+    private final Personaggio personaggio;
     private Mazzo mazzo;
     private Settore settore;
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
@@ -26,6 +29,16 @@ abstract public class Player {
      */
     Player(Personaggio personaggio){
         this.personaggio=personaggio;
+    }
+    
+    /**
+     * Costruttore di Copia
+     * @param another
+     */
+    public Player(Player another){
+    	this.personaggio = another.personaggio;
+    	this.mazzo = another.mazzo;
+    	this.settore = another.settore;
     }
     
     /**
@@ -113,6 +126,10 @@ abstract public class Player {
     public void muore(){
         LOGGER.log(Level.INFO, String.format("%s è morto",this.personaggio.nome()));
 	}
+    
+    public void attacca(){
+    	LOGGER.log(Level.INFO, String.format("ATTACCO IN SETTORE [%s,%d]",this.settore.getColonna(),this.settore.getRiga()));
+    }
 	
 	/**
 	 * Metodo per pescare una carta dal mazzo
@@ -130,4 +147,25 @@ abstract public class Player {
     public void salvaCarta(Carta carta){
         this.mazzo.putCarta(carta);
     }
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(31, 17).
+				append(this.personaggio).
+				toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Player))
+			return false;
+		Player other = (Player) obj;
+		return new EqualsBuilder().
+				append(this.personaggio,other.personaggio).
+				isEquals();
+	}
 }
