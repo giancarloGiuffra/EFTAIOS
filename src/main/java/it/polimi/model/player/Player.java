@@ -32,7 +32,7 @@ abstract public class Player {
     }
     
     /**
-     * Costruttore di Copia
+     * Costruttore di Copia - !FORSE MEGLIO LASCIARE CHE SI COPI LA REFERENCE! 
      * @param another
      */
     public Player(Player another){

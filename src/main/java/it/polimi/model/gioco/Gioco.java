@@ -40,7 +40,6 @@ public class Gioco extends Observable {
         }
     }
     
-    
     /**
      * @return	il giocatore a cui tocca giocare
      */
@@ -53,6 +52,13 @@ public class Gioco extends Observable {
      */
     public void finishTurn(){
     	this.players.add(this.players.remove());
+    }
+    
+    /**
+     * Gestisce un turno
+     */
+    public void manageRound(){
+    	//TODO
     }
 
 }
