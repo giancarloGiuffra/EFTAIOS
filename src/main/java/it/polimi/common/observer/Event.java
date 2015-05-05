@@ -11,7 +11,7 @@ abstract public class Event {
 	 * Costruttore
 	 * @param msg
 	 */
-	private Event(String msg){
+	protected Event(String msg){
 		this.msg = msg;
 	}
 	
