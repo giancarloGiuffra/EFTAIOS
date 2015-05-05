@@ -127,6 +127,9 @@ abstract public class Player {
         LOGGER.log(Level.INFO, String.format("%s è morto",this.personaggio.nome()));
 	}
     
+    /**
+     * Metodo per attaccare
+     */
     public void attacca(){
     	LOGGER.log(Level.INFO, String.format("ATTACCO IN SETTORE [%s,%d]",this.settore.getColonna(),this.settore.getRiga()));
     }
