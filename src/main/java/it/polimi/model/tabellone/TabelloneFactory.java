@@ -9,6 +9,13 @@ import it.polimi.model.exceptions.*;
 public class TabelloneFactory {
     
     /**
+     * Costruttore
+     */
+	private TabelloneFactory(){
+    	//per nacondere il costruttore - suggerito da sonar
+    }
+	
+	/**
      * Restituisce il tabellone indicato
      * @param tabellone nome del tabellone indicato
      * @return

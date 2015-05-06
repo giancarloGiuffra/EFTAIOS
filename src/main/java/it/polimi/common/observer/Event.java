@@ -21,4 +21,12 @@ abstract public class Event {
 	public String getMsg(){
 		return this.msg;
 	}
+	
+	/**
+	 * @return il nome dell'evento - dato dalla sua classe derivata
+	 */
+	public String name(){
+		return this.getClass().getSimpleName();
+	}
+	
 }

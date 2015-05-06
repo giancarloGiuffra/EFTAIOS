@@ -14,7 +14,11 @@ public class CartaOggetto extends Carta {
 	    super(azione);
 	}
     
-    @Deprecated
+    /**
+     * @deprecated
+     */
+	@Deprecated
+	@Override
 	public void effetto(Player player) {
 		// TODO Auto-generated method stub
 

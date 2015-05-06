@@ -20,7 +20,9 @@ public class Carta {
      * @deprecated si veda metodo azione
      */
     @Deprecated
-	public void effetto(Player player){}
+	public void effetto(Player player){
+    	//Prima Carta si pensava di implementare come interfaccia
+    }
 
     public AzioneGiocatore azione() {
         return this.azione;

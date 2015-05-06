@@ -2,6 +2,7 @@ package it.polimi.model.carta;
 
 import it.polimi.model.exceptions.MazzoVuotoException;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
@@ -22,6 +23,10 @@ public class Mazzo {
     private Mazzo(List<Carta> lista){
         Collections.shuffle(lista);
         this.carte.addAll(lista);
+    }
+    
+    public Mazzo(){
+    	this.carte = new ArrayDeque<Carta>();
     }
 	
 	/**

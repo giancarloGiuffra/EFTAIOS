@@ -29,6 +29,7 @@ abstract public class Player {
      */
     Player(Personaggio personaggio){
         this.personaggio=personaggio;
+        this.mazzo = new Mazzo();
     }
     
     /**

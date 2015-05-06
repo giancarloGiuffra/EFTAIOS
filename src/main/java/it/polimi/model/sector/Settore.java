@@ -255,8 +255,8 @@ public class Settore {
 	 * @thow BadSectorPositionNameException
 	 */
     public static void checkIfValidSectorName(String nome){
-    	final String REGEX = "[A-W](0[1-9]|1[0-4])";
-    	if( !nome.matches(REGEX)) throw new BadSectorPositionNameException(String.format("%s non è un nome di settore valido", nome));
+    	final String regex = "[A-W](0[1-9]|1[0-4])";
+    	if( !nome.matches(regex)) throw new BadSectorPositionNameException(String.format("%s non è un nome di settore valido", nome));
     }
     
     /**

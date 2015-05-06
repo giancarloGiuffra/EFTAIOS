@@ -1,40 +1,74 @@
-//package it.polimi.model.gioco;
-//
-//import it.polimi.model.player.Personaggio;
-//import java.util.Random;
-//
-//public class Turno {
-//    
-//    private int numeroGiocatore;
-//    private Personaggio listaGiocatori[];
-//    private boolean terminePartita = false;
-//    
-//    /* All'inizio di una partita, quando viene inizializzato per la prima volta un oggetto di 
-//     * tipo "Turno", viene scelto casualmente il giocatore da cui comincerà il giro
-//     */ 
-//    public Turno(int numeroGiocatori, Personaggio listaGiocatori[]) {
-//        Random random = new Random();
-//        this.numeroGiocatore = random.nextInt(numeroGiocatori); 
-//        this.listaGiocatori = listaGiocatori;
-//    }
-//    
-//    /* il gioco continuerà fino a quando la variabile booleana "terminePartita" 
-//     * non assumerà il valore "true". Quindi questa variabile costituisce l'unica 
-//     * condizione che determina l'uscita dal ciclo (il contatore "i" viene riportato a 
-//     * 0 ogni volta che viene raggiunta la coda dell'array, in modo da simulare la
-//     * ripetizione del giro)
-//     */
-//    public void giroTurni() { 
-//        /* metodo da migliorare: contare il numero di turni giocati da ciascun giocatore,
-//         * in modo da verificare la condizione di fine partita dopo 39 turni.
-//         * Gestire anche le altre condizioni di fine partita
-//         */
-//        for (int i = this.numeroGiocatore; i < listaGiocatori.length && terminePartita == false; i++) {
-//            listaGiocatori[i].muove();  // implementare il metodo 'muove' per ogni personaggio
-//            if (i == listaGiocatori.length-1) {
-//                i = 0;
-//            }
-//        }
-//    }
-//
-//}
+package it.polimi.model.gioco;
+
+import it.polimi.model.exceptions.IllegalTurnoGiocatore;
+import it.polimi.model.exceptions.TurniFinitiException;
+import it.polimi.model.player.Player;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+/**
+ * Classe per gestire i turni
+ *
+ */
+public class Turno {
+
+	private final int nro_max_turni = 39;
+	private int turn_counter = 0;
+	private final int nro_players;
+	private Queue<Player> players;
+	
+	/**
+	 * Costruttore
+	 * @param listOfPlayers
+	 */
+	public Turno(List<Player> listOfPlayers) {
+		Collections.shuffle(listOfPlayers); //primo giocatore random
+		this.players = new LinkedList<Player>(listOfPlayers);
+		this.nro_players = this.players.size();
+	}
+	
+	/**
+	 * @return lista di giocatori
+	 */
+	public List<Player> players(){
+		return this.players();
+	}
+	
+	/**
+	 * @return il prossimo giocatore
+	 */
+	public Player nextPlayer(){
+		if(!this.turnsOver()) throw new TurniFinitiException("I turni sono finiti!");
+		return players.peek();
+	}
+	
+	/**
+	 * Registra che il turno del giocatore player è finito
+	 * @param player
+	 */
+	public void finishTurn(Player player){
+		if(!this.players.peek().equals(player)) throw new IllegalTurnoGiocatore(String.format("Sta giocando %s, non può chiudere il turno %s", this.players.peek().personaggio().toString(),player.personaggio().toString()));
+		this.players.remove();
+		this.players.add(player);
+		this.turn_counter++;
+	}
+	
+	/**
+	 * Controlla se i turni sono finiti
+	 * @return true in quel caso
+	 */
+	public boolean turnsOver(){
+		return this.turn_counter == this.nro_max_turni*this.nro_players;
+	}
+	
+	/**
+	 * @return il turno corrente, cioè il giro corrente
+	 */
+	public int currentTurn(){
+		return this.turn_counter/this.nro_players+1;
+	}
+
+}

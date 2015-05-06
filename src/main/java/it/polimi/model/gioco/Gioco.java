@@ -1,6 +1,7 @@
 package it.polimi.model.gioco;
 
 import it.polimi.model.carta.Mazzo;
+import it.polimi.model.exceptions.IllegalMoveException;
 import it.polimi.model.player.Player;
 import it.polimi.model.player.PlayerFactory;
 import it.polimi.model.player.Razza;
@@ -11,15 +12,14 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
 import java.util.Queue;
 
-public class Gioco extends Observable {
+public class Gioco {
 
-    private final Tabellone tabellone;
+	private final Tabellone tabellone;
     private Mazzo mazzoDiCarteSettore;
     private Map<Player,Settore> positions;
-    private Queue<Player> players; //Per gestire i turni
+    private Turno turni; //Per gestire i turni
     
     /**
      * Costruttore
@@ -28,10 +28,8 @@ public class Gioco extends Observable {
     public Gioco(int numGiocatori) {
         this.tabellone = TabelloneFactory.createTabellone("GALILEI");
         this.mazzoDiCarteSettore = Mazzo.creaNuovoMazzoCarteSettore();
-        List<Player> players = PlayerFactory.createPlayers(numGiocatori);
-        Collections.shuffle(players); //primo giocatore random
-        this.players = new LinkedList<Player>(players);
-        for(Player player:this.players){
+        this.turni = new Turno(PlayerFactory.createPlayers(numGiocatori));
+        for(Player player:turni.players()){
             if(player.razza()==Razza.HUMAN){
                 positions.put(player, tabellone.baseUmana());
             }else{
@@ -44,14 +42,36 @@ public class Gioco extends Observable {
      * @return	il giocatore a cui tocca giocare
      */
     public Player nextPlayer(){
-    	return this.players.element();
+    	return this.turni.nextPlayer();
     }
     
     /**
-     * Passa il giocatore del turno corrente alla fine
+     * Sposta il giocatore player nel settore se la mossa è valida
+     * @param player
+     * @param settore
      */
-    public void finishTurn(){
-    	this.players.add(this.players.remove());
+    private void move(Player player, Settore settore){
+    	if(!player.isMoveValid(positions.get(player), settore)) throw new IllegalMoveException("Mossa non valida!");
+    	this.positions.remove(player);
+    	this.positions.put(player, settore);
+    	//TODO forse qua sarà inserito un notify alla view
+    }
+    
+    /**
+     * Sposta il giocatore player nel settore cui nome viene indicato
+     * @param player
+     * @param nomeSettore
+     */
+    public void move(Player player, String nomeSettore){
+    	Settore settore = this.tabellone.getSettore(nomeSettore);
+    	this.move(player, settore);
+    }
+    
+    /**
+     * Registra che il giocatore player ha finito il suo turno
+     */
+    public void finishTurn(Player player){
+    	this.turni.finishTurn(player);
     }
     
     /**
@@ -61,4 +81,11 @@ public class Gioco extends Observable {
     	//TODO
     }
 
+	/**
+	 * @return mazzo di carte settore
+	 */
+    public Mazzo mazzoDiCarteSettore() {
+		return this.mazzoDiCarteSettore;
+	}
+    
 }

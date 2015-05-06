@@ -7,6 +7,7 @@ package it.polimi.common.observer;
 public final class UserMoveEvent extends Event {
 	
 	private final String SETTORE_DESTINO;
+	public static final String CLASS_NAME = UserMoveEvent.class.getSimpleName();
 	
 	/**
 	 * Costruttore
@@ -27,9 +28,10 @@ public final class UserMoveEvent extends Event {
 	}
 	
 	/**
-	 * @return il noome del settore di destinazione
+	 * @return il nome del settore di destinazione
 	 */
 	public String settoreDestinazione(){
 		return this.SETTORE_DESTINO;
 	}
+	
 }
