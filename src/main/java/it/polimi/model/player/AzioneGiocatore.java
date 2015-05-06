@@ -4,5 +4,6 @@ public enum AzioneGiocatore {
     ANNUNCIA_SETTORE,
     ANNUNCIA_SETTORE_MIO,
     DICHIARA_SILENZIO,
+    PESCA_CARTA,
     ATTACCA;
 }

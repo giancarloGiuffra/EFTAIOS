@@ -60,11 +60,37 @@ public class View extends BaseObservable implements BaseObserver {
 		this.sendMossa(mossa);
 	}
 	
+	/**
+	 * Chiede azione da eseguire a seconda di quelle elencate nella lista
+	 * @param azioni ista di azioni
+	 */
 	public void chiediAzione(List<AzioneGiocatore> azioni){
-		//TODO
+		if (azioni.isEmpty()){
+		    return;
+		} else if (azioni.size() == 1 && azioni.get(0) == AzioneGiocatore.PESCA_CARTA){
+		    this.chiediDiPescareCarta();
+		} else {
+		    this.chiediDiScegliereAzione(azioni);
+		}
 	}
 	
 	/**
+	 * Chiede all'utente di scegliere tra le azioni nella lista
+	 */
+	private void chiediDiScegliereAzione(List<AzioneGiocatore> azioni) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+	 * Chiede all'utente di procedere per pescare una carta
+	 */
+	private void chiediDiPescareCarta() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
 	 * Verifica che la mossa sia nel formato valido
 	 * @param mossa
 	 * @return true se la mossa è nel formato valido

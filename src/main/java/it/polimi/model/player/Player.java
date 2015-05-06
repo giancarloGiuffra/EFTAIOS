@@ -59,6 +59,20 @@ abstract public class Player {
 	}
     
     /**
+     * @return true se il personaggio del giocatore è alieno 
+     */
+    public boolean isAlien(){
+        return this.personaggio.isAlien();
+    }
+    
+    /**
+     * @return true se il personaggio del giocatore è umano
+     */
+    public boolean isHuman(){
+        return this.personaggio.isHuman();
+    }
+    
+    /**
      * @return razza del personaggio del giocatore
      */
     public Razza razza(){
