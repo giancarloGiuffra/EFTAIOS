@@ -9,6 +9,7 @@ import it.polimi.model.sector.Settore;
 import it.polimi.model.tabellone.*;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Queue;
 
 public class Gioco {
 
-	private final Tabellone tabellone;
+    private final Tabellone tabellone;
     private Mazzo mazzoDiCarteSettore;
     private Map<Player,Settore> positions;
     private Turno turni; //Per gestire i turni
@@ -29,6 +30,7 @@ public class Gioco {
         this.tabellone = TabelloneFactory.createTabellone("GALILEI");
         this.mazzoDiCarteSettore = Mazzo.creaNuovoMazzoCarteSettore();
         this.turni = new Turno(PlayerFactory.createPlayers(numGiocatori));
+        this.positions = new HashMap<Player,Settore>();
         for(Player player:turni.players()){
             if(player.razza()==Razza.HUMAN){
                 positions.put(player, tabellone.baseUmana());
