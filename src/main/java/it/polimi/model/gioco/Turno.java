@@ -41,7 +41,7 @@ public class Turno {
 	 * @return il prossimo giocatore
 	 */
 	public Player nextPlayer(){
-		if(!this.turnsOver()) throw new TurniFinitiException("I turni sono finiti!");
+		if(this.turnsOver()) throw new TurniFinitiException("I turni sono finiti!");
 		return players.peek();
 	}
 	
