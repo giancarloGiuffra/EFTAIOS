@@ -80,7 +80,7 @@ public class Gioco {
      * Gestisce un turno
      */
     public void manageRound(){
-    	//TODO
+    	//TODO mi sa che va nel controller e non qua
     }
 
 	/**
