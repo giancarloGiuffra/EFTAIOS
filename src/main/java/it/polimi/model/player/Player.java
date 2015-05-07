@@ -10,6 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
 import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
+import it.polimi.model.exceptions.InvalidSectorForAnnouncement;
 import it.polimi.model.sector.Settore;
 
 /**
@@ -70,22 +71,11 @@ abstract public class Player {
     }
 
 	/**
-	 * Metodo per annunciare il settore in cui si trova il giocatore
-	 */
-    public void annunciaSettoreMio() {
-        LOGGER.log(Level.INFO, String.format("RUMORE IN SETTORE [%s,%d]",this.settore.getColonna(),this.settore.getRiga()) );
-	}
-
-	/**
 	 * Metodo per chiedere un settore al giocatore e annunciarlo
 	 */
-    public void annunciaSettore() {
-        LOGGER.log(Level.INFO,"Inserire il nome del Settore da annunciare: ");
-		Scanner scanner = new Scanner(System.in);
-		String nome = scanner.nextLine();
-		scanner.close();
-		Settore.checkIfValidSectorName(nome);
-		LOGGER.log(Level.INFO,String.format("RUMORE IN SETTORE [%s,%d]", Settore.getColonnaFromName(nome),Settore.getRigaFromName(nome)));
+    public void annunciaSettore(Settore settore){
+		if(!settore.isValidSectorForAnnouncement()) throw new InvalidSectorForAnnouncement("Non si può dichiarare rumore in questo settore");
+		LOGGER.log(Level.INFO,String.format("RUMORE IN SETTORE [%s,%d]", settore.getColonna(), settore.getRiga()));
 	}
 
 	/**
@@ -95,36 +85,6 @@ abstract public class Player {
         LOGGER.log(Level.INFO, "SILENZIO");
 	}
 	
-	/**
-	 * Metodo per usare una carta
-	 * @param carta
-	 */
-    public void usaCarta(Carta carta){
-		//carta.effetto(this); -->vecchia implementazione
-        this.azione(carta);
-	}
-	
-    /**
-     * Chiama l'azione che il giocatore deve compiere all'usare la carta
-     * @param carta
-     */
-	private void azione(Carta carta) {
-        switch(carta.azione()){
-            case ANNUNCIA_SETTORE:
-                this.annunciaSettore();
-                break;
-            case ANNUNCIA_SETTORE_MIO:
-                this.annunciaSettoreMio();
-                break;
-            case DICHIARA_SILENZIO:
-                this.dichiaraSilenzio();
-                break;
-            default:
-                throw new IllegalAzioneGiocatoreException("Azione Giocatore non valida");
-        }
-        
-    }
-
     /**
 	 * Metodo per dichiarare di essere morto
 	 */

@@ -54,15 +54,4 @@ public class CartaSettore extends Carta {
 	    return listaCarteSettore;
 	}
 
-	/**
-	 * Effetto che la carta a sul giocatore
-	 * @param giocatore sul quale applicare l'effetto
-	 * @deprecated
-	 */
-	@Deprecated
-	@Override
-	public void effetto(Player player) {
-		this.tipo.effetto(player);
-	}
-
 }

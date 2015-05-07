@@ -3,8 +3,8 @@ package it.polimi.model.gioco;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
+import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
 import it.polimi.model.exceptions.IllegalMoveException;
-import it.polimi.model.exceptions.MazzoVuotoException;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 import it.polimi.model.player.PlayerFactory;
@@ -43,17 +43,18 @@ public class Gioco extends BaseObservable {
     }
     
     /**
-     * @return	il giocatore a cui tocca giocare
+     * @return il giocatore corrente
      */
-    public Player nextPlayer(){
-    	return this.turni.nextPlayer();
+    private Player currentPlayer(){
+    	return this.turni.currentPlayer();
     }
     
     /**
-     * @return il giocatore corrente
+     * Sposta il giocatore corrente nella posizione indicata
+     * @param nomeSettore
      */
-    public Player currentPlayer(){
-    	return this.turni.currentPlayer();
+    public void moveCurrentPlayer(String nomeSettore){
+        this.move(this.currentPlayer(), nomeSettore);
     }
     
     /**
@@ -73,9 +74,16 @@ public class Gioco extends BaseObservable {
      * @param player
      * @param nomeSettore
      */
-    public void move(Player player, String nomeSettore){
+    private void move(Player player, String nomeSettore){
     	Settore settore = this.tabellone.getSettore(nomeSettore);
     	this.move(player, settore);
+    }
+    
+    /**
+     * @return lista di azioni valide per giocatore corrente
+     */
+    public List<AzioneGiocatore> getValidActionsForCurrentPlayer(){
+        return this.getValidActionsForPlayer(this.currentPlayer());
     }
     
     /**
@@ -90,22 +98,52 @@ public class Gioco extends BaseObservable {
     }
     
     /**
-     * Registra che il giocatore player ha finito il suo turno
+     * Registra che il giocatore corrente ha finito il suo turno
      */
-    public void finishTurn(Player player){
-    	this.turni.finishTurn(player);
+    public void finishTurn(){
+    	this.turni.finishTurn();
+    }
+    
+    /**
+     * Fa pescare carta al giocatore corrente
+     */
+    public void currentPlayerPescaCartaSettore(){
+        this.pescaCartaSettore(this.currentPlayer());
     }
     
     /**
      * Fa prendere al giocatore player una carta dal mazzo di carte settore
      * @param player
      */
-    public void pescaCartaSettore(Player player) {
+    private void pescaCartaSettore(Player player) {
 		if(this.mazzoDiCarteSettore.isEmpty()) this.ricostruisciMazzoCarteSettore();
 		Carta carta = player.pescaCarta(this.mazzoDiCarteSettore);
 		//TODO notify da mettere per comunicare la carta pescata
-		
+		this.usaCarta(player, carta);
 	}
+    
+    /**
+     * Fa utilizzare a player la carta
+     * @param player
+     * @param carta
+     */
+    private void usaCarta(Player player, Carta carta){
+        switch(carta.azione()){
+        case ANNUNCIA_SETTORE:
+            //TODO notify per chiedere un settore
+            break;
+        case ANNUNCIA_SETTORE_MIO:
+            player.annunciaSettore(this.positions.get(player));
+            //TODO notify probabilmente
+            break;
+        case DICHIARA_SILENZIO:
+            player.dichiaraSilenzio();
+            //TODO notify probabilmente
+            break;
+        default:
+            throw new IllegalAzioneGiocatoreException("Azione Giocatore non valida");
+        }
+    }
 
 	/**
 	 * Ricostruisce il mazzo di carte settore con le carte già

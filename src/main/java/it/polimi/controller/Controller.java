@@ -20,7 +20,6 @@ public class Controller implements BaseObserver {
 	
 	private Model model;
 	private View view;
-	private Player currentPlayer;
 	
 	/**
 	 * Costruttore
@@ -36,7 +35,6 @@ public class Controller implements BaseObserver {
      * Inizia un turno
      */
     private void startTurn(){
-    	this.currentPlayer = this.model.nextPlayer();
     	this.view.chiediMossa(); //bisogna capire poi come viene girata alla view corrispondente al giocatore currentPlayer
     }
 	
@@ -48,17 +46,18 @@ public class Controller implements BaseObserver {
 				this.startTurn();
 				break;
 			case "UserMoveEvent":
-				this.model.move(this.currentPlayer, ((UserMoveEvent) event).settoreDestinazione());
-				this.view.chiediAzione(this.model.getValidActionsForPlayer(this.currentPlayer));
+				this.model.moveCurrentPlayer( ((UserMoveEvent) event).settoreDestinazione() );
+				this.view.chiediAzione(this.model.getValidActionsForCurrentPlayer());
 				break;
 			case "UserPicksCardEvent":
-				this.model.pescaCartaSettore(this.currentPlayer);
+				this.model.currentPlayerPescaCartaSettore();
 				break;
 			case "UserAttackEvent":
 				break;
 			case "UserTurnoFinitoEvent":
 				this.finishTurn();
 				this.startTurn();
+				break;
 			default:
 				throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
 		}
@@ -68,7 +67,7 @@ public class Controller implements BaseObserver {
 	 * Finisce il turno
 	 */
 	private void finishTurn() {
-		this.model.finishTurn(this.currentPlayer);
+		this.model.finishTurn();
 	}
 
 }

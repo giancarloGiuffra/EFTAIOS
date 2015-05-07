@@ -1,7 +1,5 @@
 package it.polimi.model.gioco;
 
-import it.polimi.model.exceptions.IllegalTurnoGiocatore;
-import it.polimi.model.exceptions.TurniFinitiException;
 import it.polimi.model.player.Player;
 
 import java.util.Collections;
@@ -38,21 +36,11 @@ public class Turno {
 	}
 	
 	/**
-	 * @return il prossimo giocatore
-	 */
-	public Player nextPlayer(){
-		if(this.turnsOver()) throw new TurniFinitiException("I turni sono finiti!");
-		return players.peek();
-	}
-	
-	/**
 	 * Registra che il turno del giocatore player è finito
 	 * @param player
 	 */
-	public void finishTurn(Player player){
-		if(!this.players.peek().equals(player)) throw new IllegalTurnoGiocatore(String.format("Sta giocando %s, non può chiudere il turno %s", this.players.peek().personaggio().toString(),player.personaggio().toString()));
-		this.players.remove();
-		this.players.add(player);
+	public void finishTurn(){
+		this.players.add(this.players.remove());
 		this.turn_counter++;
 	}
 	
