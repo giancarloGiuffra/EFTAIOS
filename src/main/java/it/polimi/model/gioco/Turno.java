@@ -71,4 +71,12 @@ public class Turno {
 		return this.turn_counter/this.nro_players+1;
 	}
 
+	/**
+	 * restituisce il giocatore corrente
+	 * @return
+	 */
+	public Player currentPlayer() {
+		return this.players.peek();
+	}
+
 }

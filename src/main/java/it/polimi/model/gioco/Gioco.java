@@ -1,7 +1,10 @@
 package it.polimi.model.gioco;
 
+import it.polimi.common.observer.BaseObservable;
+import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
 import it.polimi.model.exceptions.IllegalMoveException;
+import it.polimi.model.exceptions.MazzoVuotoException;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 import it.polimi.model.player.PlayerFactory;
@@ -10,14 +13,11 @@ import it.polimi.model.sector.Settore;
 import it.polimi.model.tabellone.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
-public class Gioco {
+public class Gioco extends BaseObservable {
 
     private final Tabellone tabellone;
     private Mazzo mazzoDiCarteSettore;
@@ -47,6 +47,13 @@ public class Gioco {
      */
     public Player nextPlayer(){
     	return this.turni.nextPlayer();
+    }
+    
+    /**
+     * @return il giocatore corrente
+     */
+    public Player currentPlayer(){
+    	return this.turni.currentPlayer();
     }
     
     /**
@@ -90,11 +97,26 @@ public class Gioco {
     }
     
     /**
-     * Gestisce un turno
+     * Fa prendere al giocatore player una carta dal mazzo di carte settore
+     * @param player
      */
-    public void manageRound(){
-    	//TODO mi sa che va nel controller e non qua
-    }
+    public void pescaCartaSettore(Player player) {
+		if(this.mazzoDiCarteSettore.isEmpty()) this.ricostruisciMazzoCarteSettore();
+		Carta carta = player.pescaCarta(this.mazzoDiCarteSettore);
+		//TODO notify da mettere per comunicare la carta pescata
+		
+	}
+
+	/**
+	 * Ricostruisce il mazzo di carte settore con le carte già
+	 * utilizzate dai giocatori
+	 */
+    private void ricostruisciMazzoCarteSettore() {
+		for(Player player : this.positions.keySet()){
+			this.mazzoDiCarteSettore.addMazzo(player.mazzo());
+		}
+		this.mazzoDiCarteSettore.rimischia();		
+	}
 
 	/**
 	 * @return mazzo di carte settore

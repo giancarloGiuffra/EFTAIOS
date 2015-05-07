@@ -32,7 +32,7 @@ public abstract class BaseObservable {
 	 */
 	protected final void notify(Event event){
 		for(BaseObserver obs:this.observers){
-			obs.notify(this, event);
+			obs.notifyRicevuto(this, event);
 		}
 	}
 

@@ -33,16 +33,6 @@ abstract public class Player {
     }
     
     /**
-     * Costruttore di Copia - !FORSE MEGLIO LASCIARE CHE SI COPI LA REFERENCE! 
-     * @param another
-     */
-    public Player(Player another){
-    	this.personaggio = another.personaggio;
-    	this.mazzo = another.mazzo;
-    	this.settore = another.settore;
-    }
-    
-    /**
      *  Metodo per controllare se la mossa è valida
      * @param from  settore di partenza
      * @param to    settore di arrivo
@@ -185,5 +175,9 @@ abstract public class Player {
 		return new EqualsBuilder().
 				append(this.personaggio,other.personaggio).
 				isEquals();
+	}
+
+	public Mazzo mazzo() {
+		return this.mazzo;
 	}
 }
