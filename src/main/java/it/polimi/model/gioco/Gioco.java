@@ -2,12 +2,14 @@ package it.polimi.model.gioco;
 
 import it.polimi.model.carta.Mazzo;
 import it.polimi.model.exceptions.IllegalMoveException;
+import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 import it.polimi.model.player.PlayerFactory;
 import it.polimi.model.player.Razza;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.tabellone.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -67,6 +69,17 @@ public class Gioco {
     public void move(Player player, String nomeSettore){
     	Settore settore = this.tabellone.getSettore(nomeSettore);
     	this.move(player, settore);
+    }
+    
+    /**
+     * @param player
+     * @return lista di azioni valide per il giocatore
+     */
+    public List<AzioneGiocatore> getValidActionsForPlayer(Player player){
+        List<AzioneGiocatore> listAzioni = new ArrayList<AzioneGiocatore>();
+        if(this.positions.get(player).isPericoloso()) listAzioni.add(AzioneGiocatore.PESCA_CARTA);
+        if(player.isAlien()) listAzioni.add(AzioneGiocatore.ATTACCA);
+        return listAzioni;
     }
     
     /**
