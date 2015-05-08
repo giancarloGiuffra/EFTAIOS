@@ -1,6 +1,5 @@
 package it.polimi.model.player;
 
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +20,6 @@ abstract public class Player {
     
     private final Personaggio personaggio;
     private Mazzo mazzo;
-    private Settore settore;
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
     
     /**
@@ -95,8 +93,8 @@ abstract public class Player {
     /**
      * Metodo per attaccare
      */
-    public void attacca(){
-    	LOGGER.log(Level.INFO, String.format("ATTACCO IN SETTORE [%s,%d]",this.settore.getColonna(),this.settore.getRiga()));
+    public void attacca(Settore settore){
+    	LOGGER.log(Level.INFO, String.format("ATTACCO IN SETTORE [%s,%d]", settore.getColonna(), settore.getRiga()));
     }
 	
 	/**

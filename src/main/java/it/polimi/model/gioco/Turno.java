@@ -66,5 +66,13 @@ public class Turno {
 	public Player currentPlayer() {
 		return this.players.peek();
 	}
+	
+	/**
+	 * Elimina player del turno
+	 * @param player
+	 */
+	public void remove(Player player){
+		this.players.remove(player);
+	}
 
 }

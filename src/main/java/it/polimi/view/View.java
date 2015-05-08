@@ -16,19 +16,20 @@ import java.util.regex.Pattern;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
+import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserAttackEvent;
 import it.polimi.common.observer.UserMoveEvent;
 import it.polimi.common.observer.UserPicksCardEvent;
 import it.polimi.common.observer.UserStartEvent;
 import it.polimi.common.observer.UserTurnoFinitoEvent;
 import it.polimi.model.exceptions.AzioneSceltaInaspettataException;
-import it.polimi.model.exceptions.GameException;
 import it.polimi.model.exceptions.IterazioneNonPrevistaException;
 import it.polimi.model.player.AzioneGiocatore;
 
 public class View extends BaseObservable implements BaseObserver, Runnable {
 
 	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.)");
+	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.)");
 	private Scanner scanner;
 	private PrintStream output;
 	private static final Logger LOGGER = Logger.getLogger(View.class.getName());
@@ -90,7 +91,7 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	 */
 	private void comunicaTurnoFinito() {
 		print("Il tuo turno è finito.");
-		this.notifyEvent(new UserTurnoFinitoEvent());
+		this.notify(new UserTurnoFinitoEvent());
 	}
 
 	/**
@@ -103,7 +104,7 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
         	this.chiediDiPescareCarta();
         	break;
         case ATTACCA:
-        	this.notifyEvent(new UserAttackEvent());
+        	this.notify(new UserAttackEvent());
         	break;
         default:
         	throw new AzioneSceltaInaspettataException("Azione Scelta Non Prevista");
@@ -168,7 +169,7 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
         print("Devi pescare una Carta Settore. Premi invio per procedere.");
         this.scanner.nextLine(); //Verifica se utente ha premuto invio
         Event event = new UserPicksCardEvent();
-        this.notifyEvent(event);
+        this.notify(event);
     }
 
     /**
@@ -188,19 +189,7 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	private void sendMossa(String mossa){
 		Matcher matcher = PATTERN_MOSSA.matcher(mossa);
 		Event event = new UserMoveEvent(matcher.group("nomeSettore"));
-		this.notifyEvent(event);
-	}
-	
-	/**
-	 * Notifica l'evento agli observer
-	 * @param event
-	 */
-	private void notifyEvent(Event event){
-		try {
-			this.notify(event);
-		} catch (GameException ex){
-			LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-		}
+		this.notify(event);
 	}
 	
 	/**
@@ -224,7 +213,42 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	public void run() {
 		this.printWelcomeMessage();
 		this.scanner.nextLine(); // verifica se utente ha premuto invio
-		this.notifyEvent(new UserStartEvent());
+		this.notify(new UserStartEvent());
+	}
+
+	/**
+	 * chiede all'utente di inserire un settore da annunciare 
+	 */
+	public void chiediSettoreDaAnnunciare() {
+		print("Devi annunciare un settore");
+		print("Ricorda che il formato da utlizzare è:");
+		print(PATTERN_ANNOUNCE.pattern());
+		String announce = this.scanner.nextLine();
+		while(!isValidAnnouncement(announce)){
+			print("L'annuncio inserito non è valido. Inserirne un altro.");
+			announce = this.scanner.nextLine();
+		}
+		this.sendAnnouncement(announce);
+	}
+
+	/**
+	 * invia il notify che il giocatore è annunciato un settore
+	 * @param announce
+	 */
+	private void sendAnnouncement(String announce) {
+		Matcher matcher = PATTERN_ANNOUNCE.matcher(announce);
+		Event event = new UserAnnounceSectorEvent(matcher.group("nomeSettore"));
+		this.notify(event);	
+	}
+
+	/**
+	 * verifica se l'annuncio di settore è valido
+	 * @param announce
+	 * @return
+	 */
+	private boolean isValidAnnouncement(String announce) {
+		Matcher matcher = PATTERN_ANNOUNCE.matcher(announce);
+		return matcher.matches();
 	}
 
 }

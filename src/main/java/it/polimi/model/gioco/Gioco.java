@@ -133,17 +133,24 @@ public class Gioco extends BaseObservable {
             //TODO notify per chiedere un settore
             break;
         case ANNUNCIA_SETTORE_MIO:
-            player.annunciaSettore(this.positions.get(player));
-            //TODO notify probabilmente
+            this.annunciaSettore(player, this.positions.get(player));
             break;
         case DICHIARA_SILENZIO:
-            player.dichiaraSilenzio();
-            //TODO notify probabilmente
+            this.dichiaraSilenzio(player);
             break;
         default:
             throw new IllegalAzioneGiocatoreException("Azione Giocatore non valida");
         }
     }
+
+	/**
+	 * fa dichiarare silenzio a player
+	 * @param player
+	 */
+    private void dichiaraSilenzio(Player player) {
+		player.dichiaraSilenzio();
+		//TODO notify di averlo fatto
+	}
 
 	/**
 	 * Ricostruisce il mazzo di carte settore con le carte già
@@ -155,12 +162,60 @@ public class Gioco extends BaseObservable {
 		}
 		this.mazzoDiCarteSettore.rimischia();		
 	}
-
-	/**
-	 * @return mazzo di carte settore
-	 */
-    public Mazzo mazzoDiCarteSettore() {
-		return this.mazzoDiCarteSettore;
-	}
+    
+    /**
+     * Fa al player annuniciare il settore indicato
+     * @param player
+     * @param settore
+     */
+    private void annunciaSettore(Player player, Settore settore){
+    	player.annunciaSettore(settore);
+    	//TODO notify che il settore è stato annunciato
+    }
+    
+    /**
+     * Fa al player annunciare il settore cui nome è indicato
+     * @param player
+     * @param nomeSettore
+     */
+    private void annunciaSettore(Player player, String nomeSettore){
+    	Settore settore = this.tabellone.getSettore(nomeSettore);
+    	this.annunciaSettore(player, settore);
+    }
+    
+    /**
+     * Fa annunciare al giocatore corrente il settore indicato
+     * @param nomeSettore
+     */
+    public void currentPlayerAnnunciaSettore(String nomeSettore){
+    	this.annunciaSettore(this.currentPlayer(), nomeSettore);
+    }
+    
+    /**
+     * Fa attaccare al giocatore corrente
+     */
+    public void currentPlayerAttacca(){
+    	this.attacca(this.currentPlayer());
+    }
+    
+    /**
+     * fa attaccare a player
+     * @param player
+     * @param settore
+     */
+    private void attacca(Player player){
+    	player.attacca(this.positions.get(player));
+    	List<Player> playersMorti = new ArrayList<Player>();
+    	for(Player possibileVictima : this.positions.keySet()){
+    		if(this.positions.get(possibileVictima) == this.positions.get(player) &&
+    				!player.equals(possibileVictima)){
+    			possibileVictima.muore();
+    			this.positions.remove(possibileVictima);
+    			this.turni.remove(possibileVictima);
+    			playersMorti.add(possibileVictima);
+    		}
+    	}
+    	//TODO notify l'attacco ed eventuali morti
+    }
     
 }
