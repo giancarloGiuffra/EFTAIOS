@@ -11,6 +11,9 @@ public class Main {
 	private View view;
 	private Controller controller;
 	
+	/**
+	 * Costruttore
+	 */
 	private Main() {
 		this.model = new Model(8); //TODO dovrà essere modificato per gestire nro giocatore a seconda degli utenti connessi
 		this.view = new View(System.in, System.out); //NOSONAR si vuole usare System.out per interagire con l'utente
@@ -19,11 +22,18 @@ public class Main {
 		model.addObserver(view);
 	}
 
+	/**
+	 * main
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Main main = new Main();
 		main.run();		
 	}
 
+	/**
+	 * inizia il gioco
+	 */
 	private void run() {		
 		(new Thread(view)).start();		
 	}	

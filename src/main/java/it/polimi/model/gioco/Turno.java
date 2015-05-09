@@ -68,7 +68,7 @@ public class Turno {
 	}
 	
 	/**
-	 * Elimina player del turno
+	 * Elimina player del gioco perchè non ci sarà nei turno successivi
 	 * @param player
 	 */
 	public void remove(Player player){
