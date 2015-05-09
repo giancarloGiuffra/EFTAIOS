@@ -1,3 +1,10 @@
+package it.polimi.main;
+
+import it.polimi.controller.Controller;
+import it.polimi.model.Model;
+import it.polimi.view.View;
+
+
 public class Main {
 
 	private Model model;
@@ -5,13 +12,17 @@ public class Main {
 	private Controller controller;
 	
 	private Main() {
-		this.model = new Model(8); //TODO dovrà essere modificato per gestire nro giocatore a seconda degli utenti connessi
+		this.model = new Model(8); //TODO dovrÃ  essere modificato per gestire nro giocatore a seconda degli utenti connessi
 		this.view = new View(System.in, System.out); //NOSONAR si vuole usare System.out per interagire con l'utente
 		this.controller = new Controller(this.model, this.view);
 		view.addObserver(controller);
 		model.addObserver(view);
 	}
 
+	public static void main(String[] args) {
+		Main main = new Main();
+		main.run();		
+	}
 
 	private void run() {		
 		(new Thread(view)).start();		
