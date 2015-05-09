@@ -251,4 +251,12 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 		return matcher.matches();
 	}
 
+    /**
+     * comunica al giocatore che lo spostamento è stato effettuato
+     * @param settore
+     */
+	public void comunicaSpostamento(String settore) {
+	    print(String.format("Ti sei spostato nel settore %s", settore));
+    }
+
 }

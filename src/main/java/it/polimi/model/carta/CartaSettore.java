@@ -53,5 +53,13 @@ public class CartaSettore extends Carta {
 	    }
 	    return listaCarteSettore;
 	}
+	
+	/**
+	 * @return il nome ufficiale del tipo di carta settore
+	 */
+	@Override
+	public String nome(){
+	    return this.tipo.nome();
+	}
 
 }

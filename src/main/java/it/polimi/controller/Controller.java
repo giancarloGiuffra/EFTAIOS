@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
+import it.polimi.common.observer.ModelMoveDoneEvent;
 import it.polimi.common.observer.UserMoveEvent;
 import it.polimi.model.Model;
 import it.polimi.model.exceptions.GameException;
@@ -47,31 +48,55 @@ public class Controller implements BaseObserver {
 	
 	@Override
 	public void notifyRicevuto(BaseObservable source, Event event) {
-		if(!(source instanceof View)) throw new IllegalObservableForController(String.format("%s non è un observable valido per Classe Controller", source.getClass().getName()));
-		switch(event.name()){
-			case "UserStartEvent":
-				this.startTurn();
-				break;
-			case "UserMoveEvent":
-				this.moveCurrentPlayer( ((UserMoveEvent) event).settoreDestinazione() );
-				this.chiediAzione(this.getValidActionsForCurrentPlayer());
-				break;
-			case "UserPicksCardEvent":
-				this.currentPlayerPescaCartaSettore();
-				break;
-			case "UserAttackEvent":
-				this.currentPlayerAttacca();
-				break;
-			case "UserTurnoFinitoEvent":
-				this.finishTurn();
-				this.startTurn();
-				break;
-			default:
-				throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
+		if(!(source instanceof View) && !(source instanceof Model)) throw new IllegalObservableForController(String.format("%s non è un observable valido per Classe Controller", source.getClass().getName()));
+		if(source instanceof View){
+    		switch(event.name()){
+    			case "UserStartEvent":
+    				this.startTurn();
+    				break;
+    			case "UserMoveEvent":
+    				this.moveCurrentPlayer( ((UserMoveEvent) event).settoreDestinazione() );
+    				break;
+    			case "UserPicksCardEvent":
+    				this.currentPlayerPescaCartaSettore();
+    				break;
+    			case "UserAttackEvent":
+    				this.currentPlayerAttacca();
+    				break;
+    			case "UserTurnoFinitoEvent":
+    				this.finishTurn();
+    				this.startTurn();
+    				break;
+    			default:
+    				throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
+    		}		
+		} else { //i.e. source instanceof Model
+		    switch(event.name()){
+    		    case "ModelMoveDoneEvent":
+    		        this.comunicaSpostamento( ( (ModelMoveDoneEvent) event).settoreDestinazione());
+    		        this.chiediAzione(this.getValidActionsForCurrentPlayer());
+    		        break;
+    		    case "ModelCartaPescataEvent":
+    		        break;
+    		    case "ModelDichiaratoSilenzioEvent": case "ModelAnnunciatoSettoreEvent":
+    		        break;
+    		    case "ModelCartaAnnunciaSettoreQualunqueEvent":
+    		        break;
+    		    default:
+    		        throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
+		    }
 		}
 	}
 	
 	/**
+	 * comunica spostamento effettuato al giocatore
+	 * @param settoreDestinazione
+	 */
+	private void comunicaSpostamento(String settore) {
+        this.view.comunicaSpostamento(settore);     
+    }
+
+    /**
 	 * Fa attaccare al giocatore corrente
 	 */
 	private void currentPlayerAttacca() {

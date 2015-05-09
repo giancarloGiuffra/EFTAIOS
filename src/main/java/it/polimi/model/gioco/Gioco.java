@@ -1,6 +1,7 @@
 package it.polimi.model.gioco;
 
 import it.polimi.common.observer.BaseObservable;
+import it.polimi.common.observer.ModelMoveDoneEvent;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
 import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
@@ -66,7 +67,7 @@ public class Gioco extends BaseObservable {
     	if(!player.isMoveValid(positions.get(player), settore)) throw new IllegalMoveException("Mossa non valida!");
     	this.positions.remove(player);
     	this.positions.put(player, settore);
-    	//TODO forse qua sarà inserito un notify alla view
+    	this.notify(new ModelMoveDoneEvent(settore.getNome()));
     }
     
     /**

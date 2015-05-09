@@ -1,6 +1,7 @@
 package it.polimi.model.carta;
 
 import it.polimi.model.exceptions.IllegalTipoCartaSettore;
+import it.polimi.model.exceptions.TipoCartaSettoreNonRiconsociuto;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 
@@ -29,5 +30,22 @@ public enum TipoCartaSettore {
 	public AzioneGiocatore azione() {
         return this.azione;
     }
+	
+	/**
+	 * Restituisce il nome ufficiale del tipo di carta
+	 * @return
+	 */
+	public String nome(){
+	    switch(this){
+    	    case RUMORE_MIO:
+    	        return new StringBuilder().append("RUMORE NEL TUO SETTORE").toString();
+    	    case RUMORE_QUALUNQUE:
+    	        return new StringBuilder().append("RUMORE IN QUALUNQUE SETTORE").toString();
+    	    case SILENZIO:
+    	        return new StringBuilder().append("SILENZIO").toString();
+	        default:
+	            throw new TipoCartaSettoreNonRiconsociuto("Tipo di Carta Settore Sconosciuto"); 
+	    }
+	}
 	
 }
