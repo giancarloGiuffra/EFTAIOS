@@ -1,6 +1,5 @@
 package it.polimi.model.player;
 
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,6 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
 import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
+import it.polimi.model.exceptions.InvalidSectorForAnnouncement;
 import it.polimi.model.sector.Settore;
 
 /**
@@ -20,7 +20,6 @@ abstract public class Player {
     
     private final Personaggio personaggio;
     private Mazzo mazzo;
-    private Settore settore;
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
     
     /**
@@ -30,16 +29,6 @@ abstract public class Player {
     Player(Personaggio personaggio){
         this.personaggio=personaggio;
         this.mazzo = new Mazzo();
-    }
-    
-    /**
-     * Costruttore di Copia - !FORSE MEGLIO LASCIARE CHE SI COPI LA REFERENCE! 
-     * @param another
-     */
-    public Player(Player another){
-    	this.personaggio = another.personaggio;
-    	this.mazzo = another.mazzo;
-    	this.settore = another.settore;
     }
     
     /**
@@ -80,22 +69,11 @@ abstract public class Player {
     }
 
 	/**
-	 * Metodo per annunciare il settore in cui si trova il giocatore
-	 */
-    public void annunciaSettoreMio() {
-        LOGGER.log(Level.INFO, String.format("RUMORE IN SETTORE [%s,%d]",this.settore.getColonna(),this.settore.getRiga()) );
-	}
-
-	/**
 	 * Metodo per chiedere un settore al giocatore e annunciarlo
 	 */
-    public void annunciaSettore() {
-        LOGGER.log(Level.INFO,"Inserire il nome del Settore da annunciare: ");
-		Scanner scanner = new Scanner(System.in);
-		String nome = scanner.nextLine();
-		scanner.close();
-		Settore.checkIfValidSectorName(nome);
-		LOGGER.log(Level.INFO,String.format("RUMORE IN SETTORE [%s,%d]", Settore.getColonnaFromName(nome),Settore.getRigaFromName(nome)));
+    public void annunciaSettore(Settore settore){
+		if(!settore.isValidSectorForAnnouncement()) throw new InvalidSectorForAnnouncement("Non si può dichiarare rumore in questo settore");
+		LOGGER.log(Level.INFO,String.format("RUMORE IN SETTORE [%s,%d]", settore.getColonna(), settore.getRiga()));
 	}
 
 	/**
@@ -105,36 +83,6 @@ abstract public class Player {
         LOGGER.log(Level.INFO, "SILENZIO");
 	}
 	
-	/**
-	 * Metodo per usare una carta
-	 * @param carta
-	 */
-    public void usaCarta(Carta carta){
-		//carta.effetto(this); -->vecchia implementazione
-        this.azione(carta);
-	}
-	
-    /**
-     * Chiama l'azione che il giocatore deve compiere all'usare la carta
-     * @param carta
-     */
-	private void azione(Carta carta) {
-        switch(carta.azione()){
-            case ANNUNCIA_SETTORE:
-                this.annunciaSettore();
-                break;
-            case ANNUNCIA_SETTORE_MIO:
-                this.annunciaSettoreMio();
-                break;
-            case DICHIARA_SILENZIO:
-                this.dichiaraSilenzio();
-                break;
-            default:
-                throw new IllegalAzioneGiocatoreException("Azione Giocatore non valida");
-        }
-        
-    }
-
     /**
 	 * Metodo per dichiarare di essere morto
 	 */
@@ -145,8 +93,8 @@ abstract public class Player {
     /**
      * Metodo per attaccare
      */
-    public void attacca(){
-    	LOGGER.log(Level.INFO, String.format("ATTACCO IN SETTORE [%s,%d]",this.settore.getColonna(),this.settore.getRiga()));
+    public void attacca(Settore settore){
+    	LOGGER.log(Level.INFO, String.format("ATTACCO IN SETTORE [%s,%d]", settore.getColonna(), settore.getRiga()));
     }
 	
 	/**
@@ -185,5 +133,9 @@ abstract public class Player {
 		return new EqualsBuilder().
 				append(this.personaggio,other.personaggio).
 				isEquals();
+	}
+
+	public Mazzo mazzo() {
+		return this.mazzo;
 	}
 }

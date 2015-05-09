@@ -82,6 +82,14 @@ public class Settore {
     }
     
     /**
+     * Verifica se il settore può essere annunciato
+     * @return
+     */
+    public boolean isValidSectorForAnnouncement(){
+        return this.isPericoloso() || this.isSicuro();
+    }
+    
+    /**
      * Verifica se il settore è inaccessibile
      * @return true se il settore è inaccessibile, false altrimenti
      */

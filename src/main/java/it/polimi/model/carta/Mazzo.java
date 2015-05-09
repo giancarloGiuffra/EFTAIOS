@@ -48,7 +48,7 @@ public class Mazzo {
 	/**
 	 * @return true se il mazzo è vuoto, false altrimenti
 	 */
-	private boolean isEmpty(){
+	public boolean isEmpty(){
 		return carte.isEmpty();
 	}
 	
@@ -82,9 +82,32 @@ public class Mazzo {
 	 * Aggiunge le carte al mazzo e rimischia
 	 * Si pensa di utilizzarla quando il mazzo sia vuoto
 	 * @param listaCarte lista di carte da aggiungere al mazzo
+	 * @deprecated
 	 */
+	@Deprecated
 	public void rimischia(List<Carta> listaCarte){
 	    Collections.shuffle(listaCarte);
         this.carte.addAll(listaCarte);
+	}
+	
+	/**
+	 * Aggiunge a questo mazzo le carte dell'altro mazzo
+	 * @param other
+	 */
+	public void addMazzo(Mazzo other){
+		this.carte.addAll(other.carte);
+	}
+	
+	/**
+	 * Mischia le carte del mazzo
+	 */
+	public void rimischia(){
+		if(!this.isEmpty()){
+			List<Carta> listaCarte = new ArrayList<Carta>();
+			listaCarte.addAll(this.carte);
+			this.carte.removeAll(listaCarte);
+			Collections.shuffle(listaCarte);
+			this.carte.addAll(listaCarte);
+		}
 	}
 }

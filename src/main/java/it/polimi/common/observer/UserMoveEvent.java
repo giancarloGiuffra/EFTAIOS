@@ -7,7 +7,6 @@ package it.polimi.common.observer;
 public final class UserMoveEvent extends Event {
 	
 	private final String SETTORE_DESTINO;
-	public static final String CLASS_NAME = UserMoveEvent.class.getSimpleName();
 	
 	/**
 	 * Costruttore

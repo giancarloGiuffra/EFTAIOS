@@ -7,5 +7,5 @@ public interface BaseObserver {
 	 * @param source
 	 * @param event
 	 */
-	void notify(BaseObservable source, Event event);
+	void notifyRicevuto(BaseObservable source, Event event);
 }
