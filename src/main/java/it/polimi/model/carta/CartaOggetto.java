@@ -1,7 +1,6 @@
 package it.polimi.model.carta;
 
 import it.polimi.model.player.AzioneGiocatore;
-import it.polimi.model.player.Player;
 
 /**
  * Classe per rappresentare la carta oggetto

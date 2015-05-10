@@ -3,8 +3,6 @@ package it.polimi.model.carta;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.polimi.model.player.Player;
-
 /**
  * Classe per rappresentare la carta settore
  *

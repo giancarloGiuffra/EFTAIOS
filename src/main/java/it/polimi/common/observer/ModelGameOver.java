@@ -8,7 +8,7 @@ import it.polimi.model.player.PlayerFactory;
 public final class ModelGameOver extends Event {
 
     private final TipoGameOver tipo;
-    private Player player = PlayerFactory.createPlayer();;
+    private Player player = PlayerFactory.createPlayer();
     
     /**
      * Costruttore

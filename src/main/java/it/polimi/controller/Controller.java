@@ -46,65 +46,83 @@ public class Controller implements BaseObserver {
 	public void notifyRicevuto(BaseObservable source, Event event) {
 		if(!(source instanceof View) && !(source instanceof Model)) throw new IllegalObservableForController(String.format("%s non è un observable valido per Classe Controller", source.getClass().getName()));
 		if(source instanceof View){
-    		switch(event.name()){
-    			case "UserStartEvent":
-    				this.startTurn();
-    				break;
-    			case "UserMoveEvent":
-    				this.moveCurrentPlayer( ((UserMoveEvent) event).settoreDestinazione() );
-    				break;
-    			case "UserPicksCardEvent":
-    				this.currentPlayerPescaCartaSettore();
-    				break;
-    			case "UserAttackEvent":
-    				this.currentPlayerAttacca();
-    				break;
-    			case "UserAnnounceSectorEvent":
-    			    this.currentPlayerAnnunciaSettore( ( (UserAnnounceSectorEvent) event).settoreDaAnnunciare() );
-    			    break;
-    			case "UserTurnoFinitoEvent":
-    				this.finishTurn();
-    				break;
-    			default:
-    				throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
-    		}		
-		} else { //i.e. source instanceof Model
-		    switch(event.name()){
-    		    case "ModelMoveDoneEvent":
-    		        this.comunicaSpostamento( ( (ModelMoveDoneEvent) event).settoreDestinazione());
-    		        this.chiediAzione(this.getValidActionsForCurrentPlayer());
-    		        break;
-    		    case "ModelCartaPescataEvent":
-    		        this.comunicaCartaPescata( ( (ModelCartaPescataEvent) event).carta().nome() );
-    		        this.currentPlayerUsaCarta( ( (ModelCartaPescataEvent) event).carta() );
-    		        break;
-    		    case "ModelDichiaratoSilenzioEvent":
-    		        this.comunicaSilenzioDichiarato();
-    		        this.comunicaTurnoFinito();
-    		        break;
-    		    case "ModelAnnunciatoSettoreEvent":
-    		        this.comunicaSettoreAnnunciato( ( (ModelAnnunciatoSettoreEvent) event).settore() );
-    		        this.comunicaTurnoFinito();
-    		        break;
-    		    case "ModelCartaAnnunciaSettoreQualunqueEvent":
-    		        this.chiediSettoreDaAnnunciare();
-    		        break;
-    		    case "ModelAttaccoEvent":
-    		        this.comunicaAttaccoEffettuato( (ModelAttaccoEvent) event );
-    		        this.comunicaTurnoFinito();
-    		        break;
-    		    case "ModelGameOver":
-    		        this.comunicaGiocoFinito( ( (ModelGameOver) event) );
-    		        break;
-    		    case "ModelGameContinues":
-    		        this.startTurn();
-    		    default:
-    		        throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
-		    }
+		    this.gestisceNotifyDaView(event);
+    	} else { //i.e. source instanceof Model
+    	    this.gestisceNotifyDaModel(event);    
 		}
 	}
 	
 	/**
+	 * Gestisce evento lanciato da Model
+	 * @param event
+	 */
+	private void gestisceNotifyDaModel(Event event) {
+	    switch(event.name()){
+        case "ModelMoveDoneEvent":
+            this.comunicaSpostamento( ( (ModelMoveDoneEvent) event).settoreDestinazione());
+            this.chiediAzione(this.getValidActionsForCurrentPlayer());
+            break;
+        case "ModelCartaPescataEvent":
+            this.comunicaCartaPescata( ( (ModelCartaPescataEvent) event).carta().nome() );
+            this.currentPlayerUsaCarta( ( (ModelCartaPescataEvent) event).carta() );
+            break;
+        case "ModelDichiaratoSilenzioEvent":
+            this.comunicaSilenzioDichiarato();
+            this.comunicaTurnoFinito();
+            break;
+        case "ModelAnnunciatoSettoreEvent":
+            this.comunicaSettoreAnnunciato( ( (ModelAnnunciatoSettoreEvent) event).settore() );
+            this.comunicaTurnoFinito();
+            break;
+        case "ModelCartaAnnunciaSettoreQualunqueEvent":
+            this.chiediSettoreDaAnnunciare();
+            break;
+        case "ModelAttaccoEvent":
+            this.comunicaAttaccoEffettuato( (ModelAttaccoEvent) event );
+            this.comunicaTurnoFinito();
+            break;
+        case "ModelGameOver":
+            this.comunicaGiocoFinito( (ModelGameOver) event );
+            break;
+        case "ModelGameContinues":
+            this.startTurn();
+            break;
+        default:
+            throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
+	    } 
+    }
+
+    /**
+	 * Gestisce l'evento lanciato dalla view
+	 * @param event
+	 */
+	private void gestisceNotifyDaView(Event event) {
+	    switch(event.name()){
+        case "UserStartEvent":
+            this.startTurn();
+            break;
+        case "UserMoveEvent":
+            this.moveCurrentPlayer( ((UserMoveEvent) event).settoreDestinazione() );
+            break;
+        case "UserPicksCardEvent":
+            this.currentPlayerPescaCartaSettore();
+            break;
+        case "UserAttackEvent":
+            this.currentPlayerAttacca();
+            break;
+        case "UserAnnounceSectorEvent":
+            this.currentPlayerAnnunciaSettore( ( (UserAnnounceSectorEvent) event).settoreDaAnnunciare() );
+            break;
+        case "UserTurnoFinitoEvent":
+            this.finishTurn();
+            break;
+        default:
+            throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
+	    }
+        
+    }
+
+    /**
 	 * Comunica che il gioco è finito
 	 * @param event
 	 */

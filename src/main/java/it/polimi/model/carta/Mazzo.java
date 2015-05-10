@@ -80,18 +80,6 @@ public class Mazzo {
 	}
 	
 	/**
-	 * Aggiunge le carte al mazzo e rimischia
-	 * Si pensa di utilizzarla quando il mazzo sia vuoto
-	 * @param listaCarte lista di carte da aggiungere al mazzo
-	 * @deprecated
-	 */
-	@Deprecated
-	public void rimischia(List<Carta> listaCarte){
-	    Collections.shuffle(listaCarte);
-        this.carte.addAll(listaCarte);
-	}
-	
-	/**
 	 * Aggiunge a questo mazzo le carte dell'altro mazzo
 	 * @param other
 	 */

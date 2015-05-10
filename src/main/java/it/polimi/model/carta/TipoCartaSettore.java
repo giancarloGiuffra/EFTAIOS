@@ -1,9 +1,7 @@
 package it.polimi.model.carta;
 
-import it.polimi.model.exceptions.IllegalTipoCartaSettore;
 import it.polimi.model.exceptions.TipoCartaSettoreNonRiconsociuto;
 import it.polimi.model.player.AzioneGiocatore;
-import it.polimi.model.player.Player;
 
 /**
  * Enumeration type per rappresentare il tipo di carta settore

@@ -8,7 +8,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
-import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
 import it.polimi.model.exceptions.InvalidSectorForAnnouncement;
 import it.polimi.model.sector.Settore;
 

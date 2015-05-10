@@ -13,7 +13,7 @@ import java.util.Queue;
  */
 public class Turno {
 
-	private final int nro_max_turni = 39;
+	private static final int nro_max_turni = 39;
 	private int turn_counter = 0;
 	private final int nro_players;
 	private Queue<Player> players;

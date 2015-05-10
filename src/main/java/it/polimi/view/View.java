@@ -8,12 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.polimi.common.observer.BaseObservable;
-import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserAttackEvent;
@@ -272,7 +270,7 @@ public class View extends BaseObservable implements Runnable {
      * @param settore
      */
 	public void comunicaSettoreAnnunciato(String settore) {
-        print(String.format("Hai annunciato rumore nel settore ", settore));
+        print(String.format("Hai annunciato rumore nel settore %s", settore));
     }
 
 }
