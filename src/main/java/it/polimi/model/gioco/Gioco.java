@@ -6,9 +6,12 @@ import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.ModelCartaAnnunciaSettoreQualunqueEvent;
 import it.polimi.common.observer.ModelCartaPescataEvent;
 import it.polimi.common.observer.ModelDichiaratoSilenzioEvent;
+import it.polimi.common.observer.ModelGameContinues;
+import it.polimi.common.observer.ModelGameOver;
 import it.polimi.common.observer.ModelMoveDoneEvent;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
+import it.polimi.model.exceptions.FalsoGameOver;
 import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
 import it.polimi.model.exceptions.IllegalMoveException;
 import it.polimi.model.player.AzioneGiocatore;
@@ -53,6 +56,22 @@ public class Gioco extends BaseObservable {
      */
     private Player currentPlayer(){
     	return this.turni.currentPlayer();
+    }
+    
+    /**
+     * 
+     * @return il nome del giocatore corrente
+     */
+    public String currentPlayerName(){
+        return this.currentPlayer().nome();
+    }
+    
+    /**
+     * 
+     * @return il turno, cioè giro, corrente
+     */
+    public int currentTurnNumber(){
+        return this.turni.currentTurn();
     }
     
     /**
@@ -108,8 +127,61 @@ public class Gioco extends BaseObservable {
      */
     public void finishTurn(){
     	this.turni.finishTurn();
+    	this.checkIfGameOver();
     }
     
+    /**
+     * Controlla se il gioco è finito
+     */
+    private void checkIfGameOver() {
+        if(this.isUmanoInScialuppa()){
+            this.notify(new ModelGameOver(this.umanoInScialuppa()));
+        } else if(this.isUmaniMorti()){
+            this.notify(new ModelGameOver(TipoGameOver.UMANI_MORTI));
+        } else if(this.isTurniFiniti()){
+            this.notify(new ModelGameOver(TipoGameOver.TURNI_FINITI));
+        } else {
+            this.notify(new ModelGameContinues("Il gioco continua..."));
+        }
+    }
+
+    private Player umanoInScialuppa() {
+        for(Player player : this.positions.keySet()){
+            if(player.isHuman() && this.positions.get(player).isScialuppa()) return player;
+        }
+        throw new FalsoGameOver("La funzione umanoInScialuppa è stata chiamata erroneamente");
+    }
+
+    /**
+     * Controlla se uno degli umani è arrivato a una scialuppa
+     * @return
+     */
+    private boolean isUmanoInScialuppa() {
+        for(Player player : this.positions.keySet()){
+            if(player.isHuman() && this.positions.get(player).isScialuppa()) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Controlla se tutti gli umani sono morti
+     * @return
+     */
+    private boolean isUmaniMorti() {
+        for(Player player : this.positions.keySet()){
+            if(player.isHuman()) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Verifica se i turno sono finiti
+     * @return
+     */
+    private boolean isTurniFiniti() {
+        return this.turni.turnsOver();
+    }
+
     /**
      * Fa pescare carta al giocatore corrente
      */

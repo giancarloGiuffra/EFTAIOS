@@ -11,6 +11,7 @@ import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.ModelCartaPescataEvent;
+import it.polimi.common.observer.ModelGameOver;
 import it.polimi.common.observer.ModelMoveDoneEvent;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserMoveEvent;
@@ -63,7 +64,6 @@ public class Controller implements BaseObserver {
     			    break;
     			case "UserTurnoFinitoEvent":
     				this.finishTurn();
-    				this.startTurn();
     				break;
     			default:
     				throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
@@ -93,6 +93,11 @@ public class Controller implements BaseObserver {
     		        this.comunicaAttaccoEffettuato( (ModelAttaccoEvent) event );
     		        this.comunicaTurnoFinito();
     		        break;
+    		    case "ModelGameOver":
+    		        this.comunicaGiocoFinito( ( (ModelGameOver) event) );
+    		        break;
+    		    case "ModelGameContinues":
+    		        this.startTurn();
     		    default:
     		        throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
 		    }
@@ -100,6 +105,14 @@ public class Controller implements BaseObserver {
 	}
 	
 	/**
+	 * Comunica che il gioco è finito
+	 * @param event
+	 */
+	private void comunicaGiocoFinito(ModelGameOver event) {
+        this.view.print(event.getMsg());
+    }
+
+    /**
 	 * Comunica al giocatore l'attacco effettuato e la lista di morti
 	 */
 	private void comunicaAttaccoEffettuato(ModelAttaccoEvent event) {
@@ -195,11 +208,23 @@ public class Controller implements BaseObserver {
      * Inizia un turno
      */
     private void startTurn(){
-    	this.view.print("Tocca a te.");
+    	this.view.print(String.format("Tocca a te %s - Turno numero %d", this.currentPlayerName(), this.currentTurnNumber()));
         this.view.chiediMossa(); //bisogna capire poi come viene girata alla view corrispondente al giocatore currentPlayer
     }
 
 	/**
+	 * 
+	 * @return il numero di turno corrente
+	 */
+    private int currentTurnNumber() {
+        return this.model.currentTurnNumber();
+    }
+
+    private String currentPlayerName() {
+        return this.model.currentPlayerName();
+    }
+
+    /**
 	 * Finisce il turno
 	 */
 	private void finishTurn() {
