@@ -25,8 +25,8 @@ import it.polimi.model.player.AzioneGiocatore;
 
 public class View extends BaseObservable implements Runnable {
 
-	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.)");
-	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.)");
+	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.{3})");
+	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
 	private Scanner scanner;
 	private PrintStream output;
 	
@@ -184,7 +184,8 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	private void sendMossa(String mossa){
 		Matcher matcher = PATTERN_MOSSA.matcher(mossa);
-		Event event = new UserMoveEvent(matcher.group("nomeSettore"));
+		matcher.matches();
+		Event event = new UserMoveEvent(matcher.group("nomeSettore").toUpperCase());
 		this.notify(event);
 	}
 	

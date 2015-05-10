@@ -194,8 +194,29 @@ public class Settore {
      * @return true se il settore è uno dei due a sinistra oppure uno dei due a destra
      */
     private boolean isLeftOrRight(Settore settore){
-        return Math.abs(this.distanceColonna(settore))==1 && 
-                (this.distanceRiga(settore)==-1 || this.distanceRiga(settore)==0 );
+        if(this.hasEvenColumn()){
+            return Math.abs(this.distanceColonna(settore))==1 && 
+                    (this.distanceRiga(settore)==-1 || this.distanceRiga(settore)==0 );
+        } else { //this.hasOddColumn()
+            return Math.abs(this.distanceColonna(settore))==1 && 
+                    (this.distanceRiga(settore)==1 || this.distanceRiga(settore)==0 );
+        }
+    }
+
+    /**
+     * Verifica se la colonna è "pari", A è dispari, B è pari
+     * @return
+     */
+    private boolean hasEvenColumn() {
+        return (this.col-'A'+1)%2 == 0;
+    }
+    
+    /**
+     * Verifica se la colonna è "dispari", A è dispari, B è pari
+     * @return
+     */
+    private boolean hasOddColumn(){
+        return (this.col-'A'+1)%2 != 0;
     }
 
     /**
@@ -244,8 +265,13 @@ public class Settore {
      * @return true se soddisfa la condizione
      */
     private boolean isTwoSectorAwayInAdjacentColumns(Settore settore){
-        return Math.abs(this.distanceColonna(settore))==1 && 
-                ( this.distanceRiga(settore)==-2 || this.distanceRiga(settore)==1);
+        if( this.hasEvenColumn() ){
+            return Math.abs(this.distanceColonna(settore))==1 && 
+                    ( this.distanceRiga(settore)==-2 || this.distanceRiga(settore)==1);
+        } else { //this.hasOddColumn()
+            return Math.abs(this.distanceColonna(settore))==1 && 
+                    ( this.distanceRiga(settore)==2 || this.distanceRiga(settore)==-1);
+        }
     }
     
     /**
@@ -263,7 +289,7 @@ public class Settore {
 	 * @thow BadSectorPositionNameException
 	 */
     public static void checkIfValidSectorName(String nome){
-    	final String regex = "[A-W](0[1-9]|1[0-4])";
+    	final String regex = "[a-wA-W](0[1-9]|1[0-4])";
     	if( !nome.matches(regex)) throw new BadSectorPositionNameException(String.format("%s non è un nome di settore valido", nome));
     }
     
