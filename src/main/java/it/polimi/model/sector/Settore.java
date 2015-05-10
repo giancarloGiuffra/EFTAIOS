@@ -244,7 +244,7 @@ public class Settore {
      * @param settore settore in input
      * @return true se il settore è a due settori di distanza
      */
-    private boolean isTwoSectorAway(Settore settore) {
+    public boolean isTwoSectorAway(Settore settore) {
 		return isUpOrDownTwo(settore) ||
 		       isLeftOrRightTwo(settore) ||
 		       isTwoSectorAwayInAdjacentColumns(settore);
@@ -325,4 +325,72 @@ public class Settore {
         return listaSettori;
     }
     
+    /**
+     * 
+     * @return lista con i nomi dei settori adiacenti
+     */
+    public List<String> getSettoriAdiacenti(){
+        List<String> vicini = new ArrayList<String>();
+        if(!this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col,this.riga-1));
+        if(!this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col,this.riga+1));
+        if(!this.isPrimaColonna()) vicini.add(buildNomeSettore(this.col-1,this.riga));
+        if(!this.isUltimaColonna()) vicini.add(buildNomeSettore(this.col+1,this.riga));
+        if(this.hasEvenColumn()){
+            if(!this.isPrimaColonna() && !this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col-1,this.riga-1));
+            if(!this.isUltimaColonna() && !this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col+1,this.riga-1));
+        } else{
+            if(!this.isPrimaColonna() && !this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col-1,this.riga+1));
+            if(!this.isUltimaColonna() && !this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col+1,this.riga+1));
+        }
+        return vicini;
+    }
+    
+    /**
+     * 
+     * @return true se appartiene all'ultima colonna
+     */
+    private boolean isUltimaColonna() {
+        return this.col == this.ULTIMA_COLONNA;
+    }
+
+    /**
+     * 
+     * @return true se appartiene alla prima colonna
+     */
+    private boolean isPrimaColonna() {
+        return this.col == 'A';
+    }
+
+    /**
+     * 
+     * @return true se il settore appartiene all'ultima riga
+     */
+    private boolean isUltimaRiga() {
+        return this.riga == this.ULTIMA_RIGA;
+    }
+
+    /**
+     * 
+     * @return true se il settore appartiene alla prima riga
+     */
+    private boolean isPrimaRiga() {
+        return this.riga == 1;
+    }
+
+    /**
+     * costruisce il nome del settore corrispondente
+     * @param col
+     * @param riga
+     * @return
+     */
+    private static String buildNomeSettore(char col, int riga){
+        return new StringBuilder().
+                append( new Character(col).toString().toUpperCase()).
+                append(String.format("%02d", riga)).
+                toString();
+    }
+    
+    private static String buildNomeSettore(int col, int riga){
+        return buildNomeSettore((char) col, riga);
+    }
 }
