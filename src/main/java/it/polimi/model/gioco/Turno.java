@@ -31,8 +31,8 @@ public class Turno {
 	/**
 	 * @return lista di giocatori
 	 */
-	public List<Player> players(){
-		return this.players();
+	public Queue<Player> players(){
+		return this.players;
 	}
 	
 	/**

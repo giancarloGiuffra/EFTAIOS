@@ -282,7 +282,7 @@ public class Settore {
      */
     public static int getRigaFromName(String nome){
     	checkIfValidSectorName(nome);
-        return Integer.parseInt(nome.substring(1, 2));
+        return Integer.parseInt(nome.substring(1));
     }
     
     /**

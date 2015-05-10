@@ -21,6 +21,7 @@ public class Mazzo {
      * @param lista di carte
      */
     private Mazzo(List<Carta> lista){
+        this();
         Collections.shuffle(lista);
         this.carte.addAll(lista);
     }
