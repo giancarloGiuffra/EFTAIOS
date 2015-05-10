@@ -47,6 +47,14 @@ abstract public class Player {
 		return personaggio;
 	}
     
+    public String nome(){
+        return new StringBuilder().
+                append(this.personaggio.nome()).
+                append(" (").
+                append(this.personaggio.toString()).
+                append(")").toString();
+    }
+    
     /**
      * @return true se il personaggio del giocatore è alieno 
      */

@@ -8,11 +8,19 @@ import java.util.logging.Logger;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
+import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
+import it.polimi.common.observer.ModelAttaccoEvent;
+import it.polimi.common.observer.ModelCartaPescataEvent;
 import it.polimi.common.observer.ModelMoveDoneEvent;
+import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserMoveEvent;
 import it.polimi.model.Model;
+import it.polimi.model.carta.Carta;
+import it.polimi.model.exceptions.BadSectorPositionNameException;
 import it.polimi.model.exceptions.GameException;
+import it.polimi.model.exceptions.IllegalMoveException;
 import it.polimi.model.exceptions.IllegalObservableForController;
+import it.polimi.model.exceptions.InvalidSectorForAnnouncement;
 import it.polimi.model.exceptions.UnknownEventForController;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.view.View;
@@ -63,6 +71,9 @@ public class Controller implements BaseObserver {
     			case "UserAttackEvent":
     				this.currentPlayerAttacca();
     				break;
+    			case "UserAnnounceSectorEvent":
+    			    this.currentPlayerAnnunciaSettore( ( (UserAnnounceSectorEvent) event).settoreDaAnnunciare() );
+    			    break;
     			case "UserTurnoFinitoEvent":
     				this.finishTurn();
     				this.startTurn();
@@ -77,10 +88,23 @@ public class Controller implements BaseObserver {
     		        this.chiediAzione(this.getValidActionsForCurrentPlayer());
     		        break;
     		    case "ModelCartaPescataEvent":
+    		        this.comunicaCartaPescata( ( (ModelCartaPescataEvent) event).carta().nome() );
+    		        this.currentPlayerUsaCarta( ( (ModelCartaPescataEvent) event).carta() );
     		        break;
-    		    case "ModelDichiaratoSilenzioEvent": case "ModelAnnunciatoSettoreEvent":
+    		    case "ModelDichiaratoSilenzioEvent":
+    		        this.comunicaSilenzioDichiarato();
+    		        this.comunicaTurnoFinito();
+    		        break;
+    		    case "ModelAnnunciatoSettoreEvent":
+    		        this.comunicaSettoreAnnunciato( ( (ModelAnnunciatoSettoreEvent) event).settore() );
+    		        this.comunicaTurnoFinito();
     		        break;
     		    case "ModelCartaAnnunciaSettoreQualunqueEvent":
+    		        this.chiediSettoreDaAnnunciare();
+    		        break;
+    		    case "ModelAttaccoEvent":
+    		        this.comunicaAttaccoEffettuato( (ModelAttaccoEvent) event );
+    		        this.comunicaTurnoFinito();
     		        break;
     		    default:
     		        throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
@@ -89,6 +113,79 @@ public class Controller implements BaseObserver {
 	}
 	
 	/**
+	 * Comunica al giocatore l'attacco effettuato e la lista di morti
+	 */
+	private void comunicaAttaccoEffettuato(ModelAttaccoEvent event) {
+        this.view.print(event.getMsg());
+    }
+
+    /**
+	 * Fa annunciare al giocatore il settore
+	 * @param settoreAnnunciato
+	 */
+	private void currentPlayerAnnunciaSettore(String settore) {
+        try{
+            this.model.currentPlayerAnnunciaSettore(settore);
+        } catch (BadSectorPositionNameException | InvalidSectorForAnnouncement ex){
+            LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
+            this.comunicaMessaggio(ex.getMsg());
+            this.chiediSettoreDaAnnunciare();
+        } catch (GameException ex){
+            LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
+        }
+    }
+
+    /**
+     * Comunica messaggio al giocatore
+     * @param msg
+     */
+	private void comunicaMessaggio(String msg) {
+        this.view.print(msg);
+    }
+
+    /**
+	 * Comunica al giocatore che il settore è stato annunciato
+	 * @param settore
+	 */
+	private void comunicaSettoreAnnunciato(String settore) {
+        this.view.comunicaSettoreAnnunciato(settore);
+    }
+
+    /**
+	 * Comunica al giocatore che il suo turno è finito
+	 */
+	private void comunicaTurnoFinito() {
+        this.view.comunicaTurnoFinito();
+    }
+
+    /**
+	 * Comunica al giocatore che ha dichiarato silenzio
+	 */
+	private void comunicaSilenzioDichiarato() {
+        this.view.comunicaSilenzioDichiarato();
+    }
+
+    /**
+	 * Fa usare la carta al giocatore corrente
+	 * @param carta
+	 */
+	private void currentPlayerUsaCarta(Carta carta) {
+        try{
+            this.model.currentPlayerUsaCarta(carta);
+        } catch (GameException ex){
+            LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
+        }
+    }
+
+    /**
+	 * Communica carta pescata al giocatore
+	 * @param carta
+	 */
+	private void comunicaCartaPescata(String nomeCarta) {
+        this.view.comunicaCartaPescata(nomeCarta);
+    }
+
+    /**
 	 * comunica spostamento effettuato al giocatore
 	 * @param settoreDestinazione
 	 */
@@ -111,7 +208,8 @@ public class Controller implements BaseObserver {
      * Inizia un turno
      */
     private void startTurn(){
-    	this.view.chiediMossa(); //bisogna capire poi come viene girata alla view corrispondente al giocatore currentPlayer
+    	this.view.print("Tocca a te.");
+        this.view.chiediMossa(); //bisogna capire poi come viene girata alla view corrispondente al giocatore currentPlayer
     }
 
 	/**
@@ -132,12 +230,23 @@ public class Controller implements BaseObserver {
 	private void moveCurrentPlayer(String nomeSettore){
 		try {
 			this.model.moveCurrentPlayer(nomeSettore);
+		} catch(IllegalMoveException|BadSectorPositionNameException ex){
+		    LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
+		    this.comunicaMessaggio(ex.getMsg());
+		    this.chiediMossa();
 		} catch (GameException ex){
 			LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
 		}
 	}
 	
 	/**
+	 * Chiedi mossa al giocatore
+	 */
+	private void chiediMossa() {
+        this.view.chiediMossa();
+    }
+
+    /**
 	 * 
 	 * @return lista di azioni valide per giocatore corrente
 	 */
@@ -179,11 +288,7 @@ public class Controller implements BaseObserver {
 	 * chiede al giocatore un settore da annunciare 
 	 */
 	private void chiediSettoreDaAnnunciare(){
-		try{
 			this.view.chiediSettoreDaAnnunciare();
-		} catch (GameException ex){
-			LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
-		}
 	}
 
 }

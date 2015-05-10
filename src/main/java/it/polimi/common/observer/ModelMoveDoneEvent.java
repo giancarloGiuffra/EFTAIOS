@@ -19,7 +19,7 @@ public final class ModelMoveDoneEvent extends Event {
      * @return
      */
     private static String buildMsg(String to){
-        return new StringBuilder().append("Giocatoro spostato a ").append(to).toString();
+        return new StringBuilder().append("Giocatore spostato a ").append(to).toString();
     }
     
     /**

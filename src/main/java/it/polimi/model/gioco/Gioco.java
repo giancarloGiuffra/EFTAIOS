@@ -1,6 +1,11 @@
 package it.polimi.model.gioco;
 
 import it.polimi.common.observer.BaseObservable;
+import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
+import it.polimi.common.observer.ModelAttaccoEvent;
+import it.polimi.common.observer.ModelCartaAnnunciaSettoreQualunqueEvent;
+import it.polimi.common.observer.ModelCartaPescataEvent;
+import it.polimi.common.observer.ModelDichiaratoSilenzioEvent;
 import it.polimi.common.observer.ModelMoveDoneEvent;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
@@ -119,9 +124,16 @@ public class Gioco extends BaseObservable {
     private void pescaCartaSettore(Player player) {
 		if(this.mazzoDiCarteSettore.isEmpty()) this.ricostruisciMazzoCarteSettore();
 		Carta carta = player.pescaCarta(this.mazzoDiCarteSettore);
-		//TODO notify da mettere per comunicare la carta pescata
-		this.usaCarta(player, carta);
+		this.notify(new ModelCartaPescataEvent(carta));
 	}
+    
+    /**
+     * Fa usare la carta al player corrente
+     * @param carta
+     */
+    public void currentPlayerUsaCarta(Carta carta){
+        this.usaCarta(this.currentPlayer(), carta);
+    }
     
     /**
      * Fa utilizzare a player la carta
@@ -131,7 +143,7 @@ public class Gioco extends BaseObservable {
     private void usaCarta(Player player, Carta carta){
         switch(carta.azione()){
         case ANNUNCIA_SETTORE:
-            //TODO notify per chiedere un settore
+            this.notify(new ModelCartaAnnunciaSettoreQualunqueEvent());
             break;
         case ANNUNCIA_SETTORE_MIO:
             this.annunciaSettore(player, this.positions.get(player));
@@ -150,7 +162,7 @@ public class Gioco extends BaseObservable {
 	 */
     private void dichiaraSilenzio(Player player) {
 		player.dichiaraSilenzio();
-		//TODO notify di averlo fatto
+		this.notify(new ModelDichiaratoSilenzioEvent());
 	}
 
 	/**
@@ -171,7 +183,7 @@ public class Gioco extends BaseObservable {
      */
     private void annunciaSettore(Player player, Settore settore){
     	player.annunciaSettore(settore);
-    	//TODO notify che il settore è stato annunciato
+    	this.notify(new ModelAnnunciatoSettoreEvent(settore.getNome()));
     }
     
     /**
@@ -200,23 +212,23 @@ public class Gioco extends BaseObservable {
     }
     
     /**
-     * fa attaccare a player
+     * Fa attaccare a player
      * @param player
      * @param settore
      */
     private void attacca(Player player){
     	player.attacca(this.positions.get(player));
     	List<Player> playersMorti = new ArrayList<Player>();
-    	for(Player possibileVictima : this.positions.keySet()){
-    		if(this.positions.get(possibileVictima) == this.positions.get(player) &&
-    				!player.equals(possibileVictima)){
-    			possibileVictima.muore();
-    			this.positions.remove(possibileVictima);
-    			this.turni.remove(possibileVictima);
-    			playersMorti.add(possibileVictima);
+    	for(Player possibileVittima : this.positions.keySet()){
+    		if(this.positions.get(possibileVittima) == this.positions.get(player) &&
+    				!player.equals(possibileVittima)){
+    		    possibileVittima.muore();
+    			this.positions.remove(possibileVittima);
+    			this.turni.remove(possibileVittima);
+    			playersMorti.add(possibileVittima);
     		}
     	}
-    	//TODO notify l'attacco ed eventuali morti
+    	this.notify(new ModelAttaccoEvent(player, this.positions.get(player), playersMorti));
     }
     
 }

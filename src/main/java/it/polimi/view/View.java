@@ -48,7 +48,7 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	 * Stampa messaggio nello stream di output
 	 * @param message
 	 */
-	private void print(String message) {
+	public void print(String message) {
 		output.println(message);		
 	}
 	
@@ -58,7 +58,7 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	 * dopodicchè comunica la mossa agli observers
 	 */
 	public void chiediMossa(){
-		print("Tocca a te. Indica la tua mossa:");
+		print("Indica la tua mossa:");
 		print("Ricorda che il formato da utlizzare è:");
 		print(PATTERN_MOSSA.pattern());
 		String mossa = this.scanner.nextLine();
@@ -89,7 +89,7 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	/**
 	 * Comunica all'utente che il turno è finito
 	 */
-	private void comunicaTurnoFinito() {
+	public void comunicaTurnoFinito() {
 		print("Il tuo turno è finito.");
 		this.notify(new UserTurnoFinitoEvent());
 	}
@@ -257,6 +257,29 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
      */
 	public void comunicaSpostamento(String settore) {
 	    print(String.format("Ti sei spostato nel settore %s", settore));
+    }
+
+    /**
+     * Stampa il nome della carta pescata
+     * @param nomeCarta
+     */
+	public void comunicaCartaPescata(String nomeCarta) {
+        print(String.format("Hai pescata una carta %s", nomeCarta));
+    }
+
+    /**
+     * Stampa il messaggio comunicando che il silenzio è stato dichiarato
+     */
+	public void comunicaSilenzioDichiarato() {
+        print("Hai dichiarato silenzio.");
+    }
+
+    /**
+     * Comunica al giocatore che ha annunciato rumore nel settore indicato
+     * @param settore
+     */
+	public void comunicaSettoreAnnunciato(String settore) {
+        print(String.format("Hai annunciato rumore nel settore ", settore));
     }
 
 }
