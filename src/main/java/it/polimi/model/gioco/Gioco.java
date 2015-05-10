@@ -88,8 +88,8 @@ public class Gioco extends BaseObservable {
      * @param settore
      */
     private void move(Player player, Settore settore){
-    	if(!player.isMoveValid(positions.get(player), settore) &&
-    	        this.tabellone.esisteSentieroValido(positions.get(player), settore)) throw new IllegalMoveException("Mossa non valida!");
+    	if(!player.isMoveValid(positions.get(player), settore) ||
+    	        !this.tabellone.esisteSentieroValido(positions.get(player), settore)) throw new IllegalMoveException("Mossa non valida!");
     	this.positions.remove(player);
     	this.positions.put(player, settore);
     	this.notify(new ModelMoveDoneEvent(settore.getNome()));

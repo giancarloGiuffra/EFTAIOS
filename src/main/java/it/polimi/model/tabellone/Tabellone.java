@@ -59,6 +59,7 @@ public abstract class Tabellone {
             for(String nome : listaIntersezione){
                 if(!this.sectors.get(nome).isInaccessibile()) return true;
             }
+            return false;
         }
         return true;
     }

@@ -229,7 +229,8 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	private void sendAnnouncement(String announce) {
 		Matcher matcher = PATTERN_ANNOUNCE.matcher(announce);
-		Event event = new UserAnnounceSectorEvent(matcher.group("nomeSettore"));
+		matcher.matches();
+		Event event = new UserAnnounceSectorEvent(matcher.group("nomeSettore").toUpperCase());
 		this.notify(event);	
 	}
 
@@ -256,7 +257,7 @@ public class View extends BaseObservable implements Runnable {
      * @param nomeCarta
      */
 	public void comunicaCartaPescata(String nomeCarta) {
-        print(String.format("Hai pescata una carta %s", nomeCarta));
+        print(String.format("Hai pescato una carta %s", nomeCarta));
     }
 
     /**
