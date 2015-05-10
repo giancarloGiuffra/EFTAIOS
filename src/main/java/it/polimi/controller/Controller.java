@@ -27,19 +27,6 @@ import it.polimi.view.View;
 
 public class Controller implements BaseObserver { 
 	
-	//TODO 
-	/*valutare l'idea di far diventare il controller observer del model al posto
-	 * della view, forse si riesce a coordinare meglio l'iterazione tra la view
-	 * e il model
-	 */
-	
-	/*
-	 * i metodi chiamati dal model e dall view devono essere racchiusi in un try/catch block
-	 * per permettere al controller di gestirle. prima le lasciamo generali, del tipo GameException
-	 * e poi quando facciamo le prove li modifichiamo per gestire sole le exception che possono
-	 * essere lanciate. Forse model non dovrebbe lanciare exception , pensarci 
-	 */
-	
 	private static final Logger LOGGER = Logger.getLogger(Controller.class.getName());
 	private Model model;
 	private View view;

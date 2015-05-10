@@ -5,9 +5,12 @@ import it.polimi.model.player.Player;
 
 public class Model extends Gioco {
 
-	public Model(int numGiocatori) {
+	/**
+	 * Costruttore
+	 * @param numGiocatori
+	 */
+    public Model(int numGiocatori) {
 		super(numGiocatori);
-		// TODO Auto-generated constructor stub
 	}
 
 

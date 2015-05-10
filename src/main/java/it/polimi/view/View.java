@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,13 +25,12 @@ import it.polimi.model.exceptions.AzioneSceltaInaspettataException;
 import it.polimi.model.exceptions.IterazioneNonPrevistaException;
 import it.polimi.model.player.AzioneGiocatore;
 
-public class View extends BaseObservable implements BaseObserver, Runnable {
+public class View extends BaseObservable implements Runnable {
 
 	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.)");
 	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.)");
 	private Scanner scanner;
 	private PrintStream output;
-	private static final Logger LOGGER = Logger.getLogger(View.class.getName());
 	
 	/**
 	 * Costruttore
@@ -198,11 +196,6 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	private void printWelcomeMessage(){
 		print("Benvenuto nel gioco Fuga dagli Alieni nello Spazio Profondo.");
 		print("(premi invio per iniziare)");
-	}
-	
-	@Override
-	public void notifyRicevuto(BaseObservable source, Event event) {
-		// TODO Auto-generated method stub
 	}
 
 	/**
