@@ -23,6 +23,7 @@ public class Gioco extends BaseObservable {
     private Mazzo mazzoDiCarteSettore;
     private Map<Player,Settore> positions;
     private Turno turni; //Per gestire i turni
+    private List<Player> playersMorti = new ArrayList<Player>();
     
     /**
      * Costruttore
@@ -205,7 +206,6 @@ public class Gioco extends BaseObservable {
      */
     private void attacca(Player player){
     	player.attacca(this.positions.get(player));
-    	List<Player> playersMorti = new ArrayList<Player>();
     	for(Player possibileVictima : this.positions.keySet()){
     		if(this.positions.get(possibileVictima) == this.positions.get(player) &&
     				!player.equals(possibileVictima)){
@@ -216,6 +216,10 @@ public class Gioco extends BaseObservable {
     		}
     	}
     	//TODO notify l'attacco ed eventuali morti
+    }
+    
+    public List<Player> getListaGiocatoriMorti() {
+    	return this.playersMorti;
     }
     
 }

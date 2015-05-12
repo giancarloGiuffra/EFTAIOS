@@ -22,21 +22,23 @@ public class Principale {
 
 	public static void main(String[] args) {
 		
-		Principale main = new Principale();
-		main.run();	
+		/*Principale main = new Principale();
+		main.run();	*/
 		
 		Partita nuovaPartita = new Partita(7);  // far sì che il numero di giocatori (qui 7) 
 		// 										venga inserito dall'utente (rimando ad interfaccia grafica)
 		Turno nuovoTurno = new Turno(nuovaPartita.getNumeroGiocatori(), nuovaPartita.getListaGiocatori());
-		while (nuovaPartita.endGame(nuovoTurno.getTurniGiocati(), nuovaPartita.contaUmaniInGioco()) == false) {
+		while (nuovaPartita.endGame(nuovoTurno.getTurniGiocati(), nuovaPartita.contaUmaniInGioco(), nuovoTurno.umanoSuScialuppa) == false) {
 			nuovoTurno.svolgimentoTurno();
-			nuovaPartita.endGame(nuovoTurno.getTurniGiocati(), nuovaPartita.contaUmaniInGioco());
+			//nuovaPartita.aggiornaListaGiocatori();
+			nuovaPartita.endGame(nuovoTurno.getTurniGiocati(), nuovaPartita.contaUmaniInGioco(), nuovoTurno.umanoSuScialuppa);
 		}
+		nuovaPartita.vincitore();
 		
 	}
 	
-	private void run() {		
+	/*private void run() {		
 		(new Thread(view)).start();		
-	}
+	} */
 
 }
