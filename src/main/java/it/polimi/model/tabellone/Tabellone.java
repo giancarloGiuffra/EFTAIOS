@@ -57,7 +57,7 @@ public abstract class Tabellone {
             List<String> listaIntersezione = from.getSettoriAdiacenti();
             listaIntersezione.retainAll(to.getSettoriAdiacenti()); //adesso contiene l'intersezione
             for(String nome : listaIntersezione){
-                if(!this.sectors.get(nome).isInaccessibile()) return true;
+                if(!this.getSettore(nome).isInaccessibile()) return true;
             }
             return false;
         }

@@ -128,15 +128,14 @@ public class View extends BaseObservable implements Runnable {
 		Pattern indexPattern = Pattern.compile("\\d+");
 		String scelta = this.scanner.nextLine();
 		Matcher matcher = indexPattern.matcher(scelta);
-		while(!matcher.matches() &&
-				( Integer.parseInt(scelta) >= Collections.min(mappa.keySet()) ) &&
-				( Integer.parseInt(scelta) <= Collections.max(mappa.keySet()) ) ){
-			print("Scelta non valida");
+		while(!matcher.matches() ||
+		        mappa.containsKey(Integer.parseInt(scelta)) ){
+		    print("Scelta non valida");
 			scelta = this.scanner.nextLine();
 		}
 		return mappa.get(Integer.parseInt(scelta));
 	}
-
+	
 	/**
 	 * Fa il print della lista di azioni e restituisce una mappa dove a ciascuna azione
 	 * corrisponde un indice intero

@@ -197,6 +197,7 @@ public class Gioco extends BaseObservable {
     private void pescaCartaSettore(Player player) {
 		if(this.mazzoDiCarteSettore.isEmpty()) this.ricostruisciMazzoCarteSettore();
 		Carta carta = player.pescaCarta(this.mazzoDiCarteSettore);
+		player.salvaCarta(carta); //salviamo nel mazzo del giocatore prima di lanciare il notify per semplicità di gestione
 		this.notify(new ModelCartaPescataEvent(carta));
 	}
     

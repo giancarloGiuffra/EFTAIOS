@@ -12,8 +12,8 @@ import java.util.List;
  */
 public class Settore {
     
-    private final char col;
-    private final int riga;
+    private final Character col;
+    private final Integer riga;
     private final TipoSettore tipo;
     
     private static final char ULTIMA_COLONNA = 'W';
@@ -44,14 +44,14 @@ public class Settore {
     /**
      * @return colonna del settore
      */
-    public char getColonna(){
+    public Character getColonna(){
         return this.col;
     }
     
     /**
      * @return riga del settore
      */
-    public int getRiga(){
+    public Integer getRiga(){
         return this.riga;
     }
     
