@@ -1,5 +1,6 @@
 package it.polimi.model.tabellone;
 
+import it.polimi.model.exceptions.BadSectorException;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
 
@@ -44,14 +45,14 @@ public abstract class Tabellone {
     }
     
     /**
-     * Controlla se esiste un sentiero valido tra i due settori
-     * nel caso di settori a distanza più di due return true
+     * Controlla se esiste un sentiero valido tra i due settori (distanza tra di loro al massimo due)
+     * NB: nel caso di settori a distanza più di due return true
      * @param from
      * @param to
      * @return
      */
     public boolean esisteSentieroValido(Settore from, Settore to){
-        if(from.isInaccessibile() || to.isInaccessibile()) return false;
+        if(from.isInaccessibile() || to.isInaccessibile()) throw new BadSectorException(String.format("uno o entrambi settori %s, %s sono inacessibili ", to.getNome(),from.getNome()));
         if(from.isOneSectorAway(to)) return true;
         if(from.isTwoSectorAway(to)){
             List<String> listaIntersezione = from.getSettoriAdiacenti();
@@ -59,8 +60,8 @@ public abstract class Tabellone {
             for(String nome : listaIntersezione){
                 if(!this.getSettore(nome).isInaccessibile()) return true;
             }
-            return false;
+            throw new BadSectorException(String.format("Non esiste un sentiero valido tra i settori %s e %s", from.getNome(),to.getNome()));
         }
-        return true;
+        return true; //settori a più di due di distanza
     }
 }

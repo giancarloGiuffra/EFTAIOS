@@ -1,5 +1,9 @@
 package it.polimi.main;
 
+import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import it.polimi.controller.Controller;
 import it.polimi.model.Model;
 import it.polimi.view.View;
@@ -15,6 +19,7 @@ public class Main {
 	 * Costruttore
 	 */
 	private Main() {
+	    
 		this.model = new Model(4); //TODO dovrà essere modificato per gestire nro giocatore a seconda degli utenti connessi
 		this.view = new View(System.in, System.out); //NOSONAR si vuole usare System.out per interagire con l'utente
 		this.controller = new Controller(this.model, this.view);
@@ -36,6 +41,6 @@ public class Main {
 	 */
 	private void run() {		
 		(new Thread(view)).start();		
-	}	
+	}
 
 }

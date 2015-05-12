@@ -39,6 +39,7 @@ public class Controller implements BaseObserver {
 	 * @param view
 	 */
 	public Controller(Model model, View view){
+	    LOGGER.setLevel(Level.INFO);
 		this.model = model;
 		this.view = view;
 	}
