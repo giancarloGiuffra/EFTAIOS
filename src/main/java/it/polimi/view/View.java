@@ -72,9 +72,9 @@ public class View extends BaseObservable implements Runnable {
 	public void chiediAzione(List<AzioneGiocatore> azioni){
 		if (azioni.isEmpty()){
 		    this.comunicaTurnoFinito();
-		} else if (azioni.size() == 1 && azioni.get(0) == AzioneGiocatore.PESCA_CARTA){
+		} else if (onlyActionIsPescaCarta(azioni)){
 		    this.chiediDiPescareCarta();
-		} else if (azioni.size() >= 2){
+		} else if (moreThanOneAction(azioni)){
 		    this.chiediDiScegliereAzione(azioni);
 		} else
 		{
@@ -83,10 +83,28 @@ public class View extends BaseObservable implements Runnable {
 	}
 	
 	/**
+	 * Controlla se ci sono più di un'azione
+	 * @param azioni
+	 * @return
+	 */
+	private boolean moreThanOneAction(List<AzioneGiocatore> azioni) {
+        return azioni.size() >= 2;
+    }
+
+    /**
+	 * Controlla se l'unica azione presente nella lista è Pescare una Carta
+	 * @param azioni
+	 * @return true se la condizione è vera
+	 */
+	private boolean onlyActionIsPescaCarta(List<AzioneGiocatore> azioni) {
+        return azioni.size() == 1 && azioni.get(0) == AzioneGiocatore.PESCA_CARTA;
+    }
+
+    /**
 	 * Comunica all'utente che il turno è finito
 	 */
 	public void comunicaTurnoFinito() {
-		print("Il tuo turno è finito.");
+		print("Il tuo turno è finito.\n\n");
 		this.notify(new UserTurnoFinitoEvent());
 	}
 
@@ -102,6 +120,9 @@ public class View extends BaseObservable implements Runnable {
         case ATTACCA:
         	this.notify(new UserAttackEvent());
         	break;
+        case NON_ATTACCA:
+            this.comunicaTurnoFinito();
+            break;
         default:
         	throw new AzioneSceltaInaspettataException("Azione Scelta Non Prevista");
         }
@@ -129,9 +150,10 @@ public class View extends BaseObservable implements Runnable {
 		String scelta = this.scanner.nextLine();
 		Matcher matcher = indexPattern.matcher(scelta);
 		while(!matcher.matches() ||
-		        mappa.containsKey(Integer.parseInt(scelta)) ){
+		        !mappa.containsKey(Integer.parseInt(scelta)) ){
 		    print("Scelta non valida");
 			scelta = this.scanner.nextLine();
+			matcher.reset(scelta);
 		}
 		return mappa.get(Integer.parseInt(scelta));
 	}

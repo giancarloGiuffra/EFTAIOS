@@ -5,7 +5,8 @@ public enum AzioneGiocatore {
     ANNUNCIA_SETTORE_MIO("Annunciare il tuo settore"),
     DICHIARA_SILENZIO("Dichiarare silenzio"),
     PESCA_CARTA("Pescare una carta"),
-    ATTACCA("Attaccare");
+    ATTACCA("Attaccare"),
+    NON_ATTACCA("Non Attaccare");
     
     private final String nome;
     

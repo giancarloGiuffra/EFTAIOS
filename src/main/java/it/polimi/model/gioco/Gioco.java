@@ -131,6 +131,7 @@ public class Gioco extends BaseObservable {
         List<AzioneGiocatore> listAzioni = new ArrayList<AzioneGiocatore>();
         if(this.positions.get(player).isPericoloso()) listAzioni.add(AzioneGiocatore.PESCA_CARTA);
         if(player.isAlien()) listAzioni.add(AzioneGiocatore.ATTACCA);
+        if(player.isAlien() && positions.get(player).isSicuro()) listAzioni.add(AzioneGiocatore.NON_ATTACCA);
         return listAzioni;
     }
     
@@ -304,8 +305,8 @@ public class Gioco extends BaseObservable {
     private void attacca(Player player){
     	player.attacca(this.positions.get(player));
     	List<Player> playersMorti = new ArrayList<Player>();
-    	for(Player possibileVittima : this.positions.keySet()){
-    		if(this.positions.get(possibileVittima) == this.positions.get(player) &&
+    	for(Player possibileVittima : new ArrayList<Player>(this.positions.keySet())){ //to avoid ConcurrentModificationException
+    		if(this.positions.get(possibileVittima).equals(this.positions.get(player)) &&
     				!player.equals(possibileVittima)){
     		    possibileVittima.muore();
     			this.positions.remove(possibileVittima);

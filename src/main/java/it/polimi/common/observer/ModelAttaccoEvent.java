@@ -43,7 +43,7 @@ public final class ModelAttaccoEvent extends Event {
         msg.
         append("Attacco in settore ").
         append(settore.getNome()).
-        append("effettuato da ").
+        append(" effettuato da ").
         append(player.nome()).append("\n");
         
         if(nomiMorti.toString().isEmpty()){

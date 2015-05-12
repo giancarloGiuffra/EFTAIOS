@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import it.polimi.common.logger.FilterAllLogs;
+import it.polimi.common.logger.FilterHigherThanInfoLevelLogs;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
@@ -33,13 +35,17 @@ public class Controller implements BaseObserver {
 	private Model model;
 	private View view;
 	
+	//static block
+	static{
+	    LOGGER.setFilter(new FilterAllLogs());
+	}
+	
 	/**
 	 * Costruttore
 	 * @param model
 	 * @param view
 	 */
 	public Controller(Model model, View view){
-	    LOGGER.setLevel(Level.INFO);
 		this.model = model;
 		this.view = view;
 	}
