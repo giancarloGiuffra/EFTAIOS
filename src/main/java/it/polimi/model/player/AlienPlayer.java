@@ -1,5 +1,6 @@
 package it.polimi.model.player;
 
+import it.polimi.model.exceptions.BadSectorException;
 import it.polimi.model.sector.Settore;
 
 /**
@@ -25,6 +26,8 @@ public class AlienPlayer extends Player {
      */
     @Override
     public boolean isMoveValid(Settore from, Settore to) {
+        if(from.equals(to)) throw new BadSectorException("Ti devi spostare!");
+        if(!to.isAtMostTwoSectorAway(from)) throw new BadSectorException(String.format("Il settore %s si trova a più di due settore di distanza da %s", to.getNome(),from.getNome()));
         return to.isValidDestinationForAlien() && to.isAtMostTwoSectorAway(from);
     }
 
