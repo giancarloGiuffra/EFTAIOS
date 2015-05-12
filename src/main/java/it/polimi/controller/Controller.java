@@ -17,6 +17,7 @@ import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserMoveEvent;
 import it.polimi.model.Model;
 import it.polimi.model.carta.Carta;
+import it.polimi.model.exceptions.BadSectorException;
 import it.polimi.model.exceptions.BadSectorPositionNameException;
 import it.polimi.model.exceptions.GameException;
 import it.polimi.model.exceptions.IllegalMoveException;
@@ -260,7 +261,7 @@ public class Controller implements BaseObserver {
 	private void moveCurrentPlayer(String nomeSettore){
 		try {
 			this.model.moveCurrentPlayer(nomeSettore);
-		} catch(IllegalMoveException|BadSectorPositionNameException ex){
+		} catch(BadSectorException | BadSectorPositionNameException ex){
 		    LOGGER.log(Level.SEVERE, ex.getMsg());
 		    this.comunicaMessaggio(ex.getMsg());
 		    this.chiediMossa();
