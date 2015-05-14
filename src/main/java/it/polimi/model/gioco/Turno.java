@@ -3,6 +3,7 @@ package it.polimi.model.gioco;
 import it.polimi.model.player.Player;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -13,9 +14,9 @@ import java.util.Queue;
  */
 public class Turno {
 
-	private static final int nro_max_turni = 39;
-	private int turn_counter = 0;
-	private final int nro_players;
+	private static final int MAX_TURNI = 39;
+	private int turn_counter = 1;
+	private Player firstPlayer;
 	private Queue<Player> players;
 	
 	/**
@@ -25,7 +26,7 @@ public class Turno {
 	public Turno(List<Player> listOfPlayers) {
 		Collections.shuffle(listOfPlayers); //primo giocatore random
 		this.players = new LinkedList<Player>(listOfPlayers);
-		this.nro_players = this.players.size();
+		this.firstPlayer = this.players.peek();
 	}
 	
 	/**
@@ -41,7 +42,7 @@ public class Turno {
 	 */
 	public void finishTurn(){
 		this.players.add(this.players.remove());
-		this.turn_counter++;
+		if(this.players.peek().equals(firstPlayer)) this.turn_counter++;
 	}
 	
 	/**
@@ -49,14 +50,14 @@ public class Turno {
 	 * @return true in quel caso
 	 */
 	public boolean turnsOver(){
-		return this.turn_counter == this.nro_max_turni*this.nro_players;
+		return this.turn_counter > MAX_TURNI;
 	}
 	
 	/**
 	 * @return il turno corrente, cioè il giro corrente
 	 */
 	public int currentTurn(){
-		return this.turn_counter/this.nro_players+1;
+		return this.turn_counter;
 	}
 
 	/**
@@ -72,7 +73,29 @@ public class Turno {
 	 * @param player
 	 */
 	public void remove(Player player){
+		if(player.equals(firstPlayer)) firstPlayer = this.getNextFirstPlayer();
 		this.players.remove(player);
+	}
+
+	/**
+	 * restituisce il giocatore successivo al giocatore che inizia i turni (i.e. firstPlayer)
+	 * @return
+	 */
+	private Player getNextFirstPlayer() {
+		Iterator<Player> iterator = this.players.iterator();
+		while(iterator.hasNext()){
+			if(iterator.equals(firstPlayer)) return iterator.next();
+			iterator.next();
+		}
+		return this.players.peek(); //se ha percorso tutta la queue vuol dire che il next è in testa
+	}
+	
+	/**
+	 * restituisce il numero massimo di turni
+	 * @return
+	 */
+	public Integer numeroMassimoDiTurni(){
+		return MAX_TURNI;
 	}
 
 }
