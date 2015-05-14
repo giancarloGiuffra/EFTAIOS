@@ -1,9 +1,9 @@
 package it.polimi.view;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.Collections;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,15 @@ public class View extends BaseObservable implements Runnable {
 	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.{3})");
 	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
 	private Scanner scanner;
-	private PrintStream output;
+	private PrintWriter output;
+	
+	
+	/**
+	 * Costruttore
+	 */
+	public View(){
+	    //solo per per crearle e poi usare i setter per lo scanner e l'output
+	}
 	
 	/**
 	 * Costruttore
@@ -37,7 +45,7 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	public View(InputStream inputStream, OutputStream output) {
 		this.scanner = new Scanner(inputStream);
-		this.output = new PrintStream(output);
+		this.output = new PrintWriter(output, true);
 	}	
 	
 	/**
@@ -295,5 +303,21 @@ public class View extends BaseObservable implements Runnable {
 	public void comunicaSettoreAnnunciato(String settore) {
         print(String.format("Hai annunciato rumore nel settore %s", settore));
     }
+	
+	/**
+	 * setter per lo scanner
+	 * @param inputstream
+	 */
+	public void setScanner(InputStream inputstream){
+	    this.scanner = new Scanner(inputstream);
+	}
+	
+	/**
+	 * setter per l'output
+	 * @param outputstream
+	 */
+	public void setOutput(OutputStream outputstream){
+	    this.output = new PrintWriter(output, true);
+	}
 
 }

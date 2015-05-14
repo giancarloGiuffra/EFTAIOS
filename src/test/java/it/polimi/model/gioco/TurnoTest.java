@@ -27,7 +27,7 @@ public class TurnoTest{
 	}
 
 	@Test
-	public void testFinishTurnPutsNextPlayerInHead() {
+	public void testFinishTurn() {
 		turno.finishTurn();
 		assertTrue(turno.currentPlayer().equals(lista.get(1)));
 	}
