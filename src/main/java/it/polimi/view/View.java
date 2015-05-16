@@ -56,7 +56,7 @@ public class View extends BaseObservable implements Runnable {
 	 * @param client
 	 * @throws IOException
 	 */
-	private void setScannerAndOutput(Client client) throws IOException {
+	public void setScannerAndOutput(Client client) throws IOException {
         this.setScanner(client.inputstream());
         this.setOutput(client.outputstream());
     }
@@ -322,7 +322,6 @@ public class View extends BaseObservable implements Runnable {
 	 * @param inputstream
 	 */
 	public void setScanner(InputStream inputstream){
-	    this.scanner.close();
 	    this.scanner = new Scanner(inputstream);
 	}
 	
@@ -331,8 +330,7 @@ public class View extends BaseObservable implements Runnable {
 	 * @param outputstream
 	 */
 	public void setOutput(OutputStream outputstream){
-	    this.output.close();
-	    this.output = new PrintWriter(output, true);
+	    this.output = new PrintWriter(outputstream, true);
 	}
 
 }
