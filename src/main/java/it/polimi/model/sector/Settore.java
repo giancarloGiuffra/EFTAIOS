@@ -387,7 +387,7 @@ public class Settore {
      */
     private static String buildNomeSettore(char col, int riga){
         return new StringBuilder().
-                append( new Character(col).toString().toUpperCase()).
+                append( Character.toString(col).toUpperCase()).
                 append(String.format("%02d", riga)).
                 toString();
     }

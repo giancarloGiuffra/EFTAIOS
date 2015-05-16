@@ -1,5 +1,6 @@
 package it.polimi.view;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -22,6 +23,7 @@ import it.polimi.common.observer.UserTurnoFinitoEvent;
 import it.polimi.model.exceptions.AzioneSceltaInaspettataException;
 import it.polimi.model.exceptions.IterazioneNonPrevistaException;
 import it.polimi.model.player.AzioneGiocatore;
+import it.polimi.socket.Client;
 
 public class View extends BaseObservable implements Runnable {
 
@@ -29,14 +31,6 @@ public class View extends BaseObservable implements Runnable {
 	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
 	private Scanner scanner;
 	private PrintWriter output;
-	
-	
-	/**
-	 * Costruttore
-	 */
-	public View(){
-	    //solo per per crearle e poi usare i setter per lo scanner e l'output
-	}
 	
 	/**
 	 * Costruttore
@@ -46,9 +40,28 @@ public class View extends BaseObservable implements Runnable {
 	public View(InputStream inputStream, OutputStream output) {
 		this.scanner = new Scanner(inputStream);
 		this.output = new PrintWriter(output, true);
-	}	
+	}
 	
 	/**
+	 * Costruttore per Client
+	 * @param client
+	 * @throws IOException 
+	 */
+	public View(Client client) throws IOException{
+	    this.setScannerAndOutput(client);
+	}
+	
+	/**
+	 * Associa alla view gli stream del Client
+	 * @param client
+	 * @throws IOException
+	 */
+	private void setScannerAndOutput(Client client) throws IOException {
+        this.setScanner(client.inputstream());
+        this.setOutput(client.outputstream());
+    }
+
+    /**
 	 * Stampa messaggio nello stream di output
 	 * @param message
 	 */
@@ -309,6 +322,7 @@ public class View extends BaseObservable implements Runnable {
 	 * @param inputstream
 	 */
 	public void setScanner(InputStream inputstream){
+	    this.scanner.close();
 	    this.scanner = new Scanner(inputstream);
 	}
 	
@@ -317,6 +331,7 @@ public class View extends BaseObservable implements Runnable {
 	 * @param outputstream
 	 */
 	public void setOutput(OutputStream outputstream){
+	    this.output.close();
 	    this.output = new PrintWriter(output, true);
 	}
 
