@@ -124,6 +124,8 @@ public class Controller implements BaseObserver {
         case "UserTurnoFinitoEvent":
             this.finishTurn();
             break;
+        case "ModelAttaccoEvent":
+            break;
         default:
             throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
 	    }
@@ -142,7 +144,7 @@ public class Controller implements BaseObserver {
 	 * Comunica al giocatore l'attacco effettuato e la lista di morti
 	 */
 	private void comunicaAttaccoEffettuato(ModelAttaccoEvent event) {
-        this.view.print(event.getMsg());
+        this.view.comunicaAttaccoEffettuato(event);
     }
 
     /**
@@ -153,11 +155,11 @@ public class Controller implements BaseObserver {
         try{
             this.model.currentPlayerAnnunciaSettore(settore);
         } catch (BadSectorPositionNameException | InvalidSectorForAnnouncement ex){
-            LOGGER.log(Level.SEVERE, ex.getMsg());
+            LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
             this.comunicaMessaggio(ex.getMsg());
             this.chiediSettoreDaAnnunciare();
         } catch (GameException ex){
-            LOGGER.log(Level.SEVERE, ex.getMsg());
+            LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
         }
     }
 
@@ -199,7 +201,7 @@ public class Controller implements BaseObserver {
         try{
             this.model.currentPlayerUsaCarta(carta);
         } catch (GameException ex){
-            LOGGER.log(Level.SEVERE, ex.getMsg());
+            LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
         }
     }
 
@@ -226,7 +228,7 @@ public class Controller implements BaseObserver {
 		try{
 			this.model.currentPlayerAttacca();
 		} catch (GameException ex){
-			LOGGER.log(Level.SEVERE, ex.getMsg());
+			LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
 		}
 	}
 
@@ -257,7 +259,7 @@ public class Controller implements BaseObserver {
 		try {
 			this.model.finishTurn();
 		} catch (GameException ex){
-			LOGGER.log(Level.SEVERE, ex.getMsg());
+			LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
 		}
 	}
 	
@@ -269,11 +271,11 @@ public class Controller implements BaseObserver {
 		try {
 			this.model.moveCurrentPlayer(nomeSettore);
 		} catch(BadSectorException | BadSectorPositionNameException ex){
-		    LOGGER.log(Level.SEVERE, ex.getMsg());
+		    LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
 		    this.comunicaMessaggio(ex.getMsg());
 		    this.chiediMossa();
 		} catch (GameException ex){
-			LOGGER.log(Level.SEVERE, ex.getMsg());
+			LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
 		}
 	}
 	
@@ -293,7 +295,7 @@ public class Controller implements BaseObserver {
 		try{
 			lista =  this.model.getValidActionsForCurrentPlayer();
 		} catch (GameException ex){
-			LOGGER.log(Level.SEVERE, ex.getMsg());
+			LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
 		}
 		return lista;
 	}
@@ -306,7 +308,7 @@ public class Controller implements BaseObserver {
 		try{
 			this.view.chiediAzione(azioni);
 		} catch (GameException ex){
-			LOGGER.log(Level.SEVERE, ex.getMsg());
+			LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
 		}
 	}
 	
@@ -318,7 +320,7 @@ public class Controller implements BaseObserver {
 		try{
 			this.model.currentPlayerPescaCartaSettore();
 		} catch (GameException ex){
-			LOGGER.log(Level.SEVERE, ex.getMsg());
+			LOGGER.log(Level.SEVERE, ex.getMsg(), ex);
 		}
 	}
 	

@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.Event;
+import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserAttackEvent;
 import it.polimi.common.observer.UserMoveEvent;
@@ -332,5 +333,15 @@ public class View extends BaseObservable implements Runnable {
 	public void setOutput(OutputStream outputstream){
 	    this.output = new PrintWriter(outputstream, true);
 	}
+
+    /**
+     * comunica l'attacco effettuato al giocatore
+     * @param event
+     */
+	public void comunicaAttaccoEffettuato(ModelAttaccoEvent event) {
+        this.print(event.getMsg());
+        this.notify(event); //notify per ClientManager
+        
+    }
 
 }

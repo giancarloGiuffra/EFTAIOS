@@ -12,14 +12,19 @@ import java.util.Scanner;
 public class Client {
     
     private Socket socket;
+    private BufferedReader in;
+    private PrintWriter out;
     
     /**
      * Costruttore
      * @param inputstream
      * @param outputstream
+     * @throws IOException 
      */
-    public Client(Socket socket){
+    public Client(Socket socket) throws IOException{
         this.socket = socket;
+        this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+        this.out = new PrintWriter(this.socket.getOutputStream(), true);
     }
     
     /**
@@ -38,5 +43,22 @@ public class Client {
      */
     public OutputStream outputstream() throws IOException{
         return this.socket.getOutputStream();
+    }
+    
+    /**
+     * scrive messaggio nel outputstream del client
+     * @param message
+     */
+    public void write(String message){
+        this.out.println(message);
+    }
+    
+    /**
+     * legge dal inputstream del client
+     * @return
+     * @throws IOException
+     */
+    public String read() throws IOException{
+        return this.in.readLine();
     }
 }

@@ -75,6 +75,14 @@ public class Gioco extends BaseObservable {
     }
     
     /**
+     * lista dei giocatori
+     * @return
+     */
+    public List<Player> players(){
+        return this.turni.players();
+    }
+    
+    /**
      * Sposta il giocatore corrente nella posizione indicata
      * @param nomeSettore
      */

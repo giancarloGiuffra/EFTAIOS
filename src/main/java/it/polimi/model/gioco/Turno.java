@@ -2,6 +2,7 @@ package it.polimi.model.gioco;
 
 import it.polimi.model.player.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,8 +33,8 @@ public class Turno {
 	/**
 	 * @return lista di giocatori
 	 */
-	public Queue<Player> players(){
-		return this.players;
+	public List<Player> players(){
+		return new ArrayList<Player>(this.players);
 	}
 	
 	/**

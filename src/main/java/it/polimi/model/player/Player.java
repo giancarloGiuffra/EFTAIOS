@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import it.polimi.common.logger.FilterAllLogs;
 import it.polimi.common.logger.FilterHigherThanInfoLevelLogs;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
@@ -24,7 +25,7 @@ abstract public class Player {
     
     //static block
     static{
-        LOGGER.setFilter(new FilterHigherThanInfoLevelLogs());
+        LOGGER.setFilter(new FilterAllLogs());
     }
     
     /**
