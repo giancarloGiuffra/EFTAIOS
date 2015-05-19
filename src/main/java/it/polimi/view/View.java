@@ -358,14 +358,4 @@ public class View extends BaseObservable implements Runnable {
         this.print(event.getMsg());
         this.notify(event); //notify per ClientManager   
     }
-    /**
-     * comunica l'attacco effettuato al giocatore
-     * @param event
-     */
-	public void comunicaAttaccoEffettuato(ModelAttaccoEvent event) {
-        this.print(event.getMsg());
-        this.notify(event); //notify per ClientManager
-        
-    }
-
 }
