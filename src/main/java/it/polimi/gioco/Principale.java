@@ -5,6 +5,7 @@ import it.polimi.model.Model;
 import it.polimi.view.View;
 import it.polimi.gioco.Partita;
 import it.polimi.gioco.Turno;
+import it.polimi.gui.*;
 
 public class Principale {
 	
@@ -17,7 +18,7 @@ public class Principale {
 		this.view = new View(System.in, System.out); //NOSONAR si vuole usare System.out per interagire con l'utente
 		this.controller = new Controller(this.model, this.view);
 		view.addObserver(controller);
-		model.addObserver(controller);
+		//model.addObserver(view);
 	}
 
 	public static void main(String[] args) {
@@ -25,13 +26,15 @@ public class Principale {
 		/*Principale main = new Principale();
 		main.run();	*/
 		
-		Partita nuovaPartita = new Partita(7);  // far sì che il numero di giocatori (qui 7) 
-		// 										venga inserito dall'utente (rimando ad interfaccia grafica)
+		GUI.ricavaSettori();
+		GUI.setNumeroGiocatori();
+		Partita nuovaPartita = new Partita(7); //modificare 
+		//Partita nuovaPartita = GUI.creaNuovaPartita();
 		Turno nuovoTurno = new Turno(nuovaPartita.getNumeroGiocatori(), nuovaPartita.getListaGiocatori());
 		while (nuovaPartita.endGame(nuovoTurno.getTurniGiocati(), nuovaPartita.contaUmaniInGioco(), nuovoTurno.umanoSuScialuppa) == false) {
 			nuovoTurno.svolgimentoTurno();
 			//nuovaPartita.aggiornaListaGiocatori();
-			nuovaPartita.endGame(nuovoTurno.getTurniGiocati(), nuovaPartita.contaUmaniInGioco(), nuovoTurno.umanoSuScialuppa);
+			//nuovaPartita.endGame(nuovoTurno.getTurniGiocati(), nuovaPartita.contaUmaniInGioco(), nuovoTurno.umanoSuScialuppa);
 		}
 		nuovaPartita.vincitore();
 		

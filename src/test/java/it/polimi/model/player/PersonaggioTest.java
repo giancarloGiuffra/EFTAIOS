@@ -37,11 +37,5 @@ public class PersonaggioTest {
         boolean q = p.isAlien();
         assertFalse(q);
     }
-    
-    @Test
-    public void testToString(){
-        assertEquals(p.toString(),"CAPITANO");
-    }
-    
 
 }

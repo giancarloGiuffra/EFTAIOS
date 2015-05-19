@@ -21,7 +21,6 @@ public class Mazzo {
      * @param lista di carte
      */
     private Mazzo(List<Carta> lista){
-        this();
         Collections.shuffle(lista);
         this.carte.addAll(lista);
     }
@@ -77,6 +76,18 @@ public class Mazzo {
      */
 	public static Mazzo creaNuovoMazzoCarteSettore(){
 	    return creaNuovoMazzoCarteSettore(DistribuzioneCarteSettore.EQUIDISTRIBUITA);
+	}
+	
+	/**
+	 * Aggiunge le carte al mazzo e rimischia
+	 * Si pensa di utilizzarla quando il mazzo sia vuoto
+	 * @param listaCarte lista di carte da aggiungere al mazzo
+	 * @deprecated
+	 */
+	@Deprecated
+	public void rimischia(List<Carta> listaCarte){
+	    Collections.shuffle(listaCarte);
+        this.carte.addAll(listaCarte);
 	}
 	
 	/**

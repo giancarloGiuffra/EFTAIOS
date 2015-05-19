@@ -6,7 +6,7 @@ package it.polimi.common.observer;
  */
 public final class UserAnnounceSectorEvent extends Event {
 
-	private final String SETTORE_DA_ANNUNCIARE;
+	private final String SETTORE_ANNUNCIATO;
 	
 	/**
 	 * Costruttore
@@ -14,7 +14,7 @@ public final class UserAnnounceSectorEvent extends Event {
 	 */
 	public UserAnnounceSectorEvent(String settore){
 		super(buildMsg(settore));
-		this.SETTORE_DA_ANNUNCIARE = settore;
+		this.SETTORE_ANNUNCIATO = settore;
 	}
 	
 	/**
@@ -23,14 +23,14 @@ public final class UserAnnounceSectorEvent extends Event {
 	 * @return
 	 */
 	private static String buildMsg(String settore){
-		return new StringBuilder().append("Settore da annunciare: ").append(settore).toString();
+		return new StringBuilder().append("Settore annunciato: ").append(settore).toString();
 	}
 	
 	/**
 	 * @return il nome del settore annunciato
 	 */
-	public String settoreDaAnnunciare(){
-		return this.SETTORE_DA_ANNUNCIARE;
+	public String settoreAnnunciato(){
+		return this.SETTORE_ANNUNCIATO;
 	}
 
 }
