@@ -4,6 +4,8 @@ import it.polimi.model.exceptions.BadSectorException;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -63,5 +65,35 @@ public abstract class Tabellone {
             throw new BadSectorException(String.format("Non esiste un sentiero valido tra i settori %s e %s", from.getNome(),to.getNome()));
         }
         return true; //settori a più di due di distanza
+    }
+    
+    /**
+     * Restituisce la lista di settori del tipo indicato di questo tabellone
+     * @param tipo
+     * @return
+     */
+    public List<Settore> getSettoriDiTipo(TipoSettore tipo){
+        List<Character> colonne = Arrays.asList('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W');
+        List<Integer> righe = Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+        List<Settore> lista = new ArrayList<Settore>();
+        switch(tipo){
+            case BASE_HUMAN: 
+                lista.add(this.baseUmana);
+                break;
+            case BASE_ALIEN:
+                lista.add(this.baseAliena);
+                break;
+            case INACCESSIBILE: case SICURO: case PERICOLOSO: case SCIALUPPA:
+                for(Character colonna : colonne){
+                    for(Integer riga : righe){
+                        if(tipo == this.getSettore(Settore.buildNomeSettore( colonna, riga)).getTipo())
+                            lista.add(this.getSettore(Settore.buildNomeSettore( colonna, riga)));
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        return lista;
     }
 }

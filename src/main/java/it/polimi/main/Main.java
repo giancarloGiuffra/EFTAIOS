@@ -1,11 +1,14 @@
 package it.polimi.main;
 
 import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import it.polimi.controller.Controller;
 import it.polimi.model.Model;
+import it.polimi.model.sector.Settore;
+import it.polimi.model.sector.TipoSettore;
 import it.polimi.view.View;
 
 
@@ -32,7 +35,11 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		Main main = new Main();
-		main.run();		
+		List<Settore> lista = main.model.tabellone().getSettoriDiTipo(TipoSettore.INACCESSIBILE);
+		for(Settore settore : lista){
+		    System.out.println(settore.getNome());
+		}
+		//main.run();		
 	}
 
 	/**

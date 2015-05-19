@@ -13,7 +13,6 @@ import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
 import it.polimi.model.exceptions.FalsoGameOver;
 import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
-import it.polimi.model.exceptions.IllegalMoveException;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 import it.polimi.model.player.PlayerFactory;
@@ -323,11 +322,24 @@ public class Gioco extends BaseObservable {
     			playersMorti.add(possibileVittima);
     		}
     	}
+    	this.playersMorti.addAll(playersMorti);
     	this.notify(new ModelAttaccoEvent(player, this.positions.get(player), playersMorti));
     }
     
+    /**
+     * restituisce lista con i giocatori morti
+     * @return
+     */
     public List<Player> getListaGiocatoriMorti() {
     	return this.playersMorti;
+    }
+    
+    /**
+     * restituisce il tabellone
+     * @return
+     */
+    public Tabellone tabellone(){
+        return this.tabellone;
     }
     
 }
