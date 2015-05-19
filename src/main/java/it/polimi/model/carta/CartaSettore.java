@@ -3,8 +3,6 @@ package it.polimi.model.carta;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.polimi.model.player.Player;
-
 /**
  * Classe per rappresentare la carta settore
  *
@@ -52,6 +50,14 @@ public class CartaSettore extends Carta {
 	        listaCarteSettore.add(new CartaSettore(tipo,defaultIconaOggetto));
 	    }
 	    return listaCarteSettore;
+	}
+	
+	/**
+	 * @return il nome ufficiale del tipo di carta settore
+	 */
+	@Override
+	public String nome(){
+	    return this.tipo.nome();
 	}
 
 }

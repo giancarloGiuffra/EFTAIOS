@@ -6,9 +6,10 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import it.polimi.common.logger.FilterAllLogs;
+import it.polimi.common.logger.FilterHigherThanInfoLevelLogs;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
-import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
 import it.polimi.model.exceptions.InvalidSectorForAnnouncement;
 import it.polimi.model.sector.Settore;
 
@@ -21,6 +22,11 @@ abstract public class Player {
     private final Personaggio personaggio;
     private Mazzo mazzo;
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
+    
+    //static block
+    static{
+        LOGGER.setFilter(new FilterAllLogs());
+    }
     
     /**
      * Costruttore
@@ -46,6 +52,14 @@ abstract public class Player {
     public Personaggio personaggio() {
 		return personaggio;
 	}
+    
+    public String nome(){
+        return new StringBuilder().
+                append(this.personaggio.nome()).
+                append(" (").
+                append(this.personaggio.toString()).
+                append(")").toString();
+    }
     
     /**
      * @return true se il personaggio del giocatore è alieno 
@@ -73,28 +87,28 @@ abstract public class Player {
 	 */
     public void annunciaSettore(Settore settore){
 		if(!settore.isValidSectorForAnnouncement()) throw new InvalidSectorForAnnouncement("Non si può dichiarare rumore in questo settore");
-		LOGGER.log(Level.INFO,String.format("RUMORE IN SETTORE [%s,%d]", settore.getColonna(), settore.getRiga()));
+		LOGGER.log(Level.INFO,String.format("%s dichiara RUMORE IN SETTORE [%s,%d]", this.nome(), settore.getColonna(), settore.getRiga()));
 	}
 
 	/**
 	 * Metodo per dichiarare silenzio
 	 */
     public void dichiaraSilenzio() {
-        LOGGER.log(Level.INFO, "SILENZIO");
+        LOGGER.log(Level.INFO, String.format("%s dichiara SILENZIO", this.nome()));
 	}
 	
     /**
 	 * Metodo per dichiarare di essere morto
 	 */
     public void muore(){
-        LOGGER.log(Level.INFO, String.format("%s è morto",this.personaggio.nome()));
+        LOGGER.log(Level.INFO, String.format("%s è morto",this.nome()));
 	}
     
     /**
      * Metodo per attaccare
      */
     public void attacca(Settore settore){
-    	LOGGER.log(Level.INFO, String.format("ATTACCO IN SETTORE [%s,%d]", settore.getColonna(), settore.getRiga()));
+    	LOGGER.log(Level.INFO, String.format("%s dichiara ATTACCO IN SETTORE [%s,%d]", this.nome(), settore.getColonna(), settore.getRiga()));
     }
 	
 	/**

@@ -1,21 +1,20 @@
 package it.polimi.view;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.Collections;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.polimi.common.observer.BaseObservable;
-import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
+import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserAttackEvent;
 import it.polimi.common.observer.UserMoveEvent;
@@ -25,14 +24,14 @@ import it.polimi.common.observer.UserTurnoFinitoEvent;
 import it.polimi.model.exceptions.AzioneSceltaInaspettataException;
 import it.polimi.model.exceptions.IterazioneNonPrevistaException;
 import it.polimi.model.player.AzioneGiocatore;
+import it.polimi.socket.Client;
 
-public class View extends BaseObservable implements BaseObserver, Runnable {
+public class View extends BaseObservable implements Runnable {
 
-	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.)");
-	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.)");
+	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.{3})");
+	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
 	private Scanner scanner;
-	private PrintStream output;
-	private static final Logger LOGGER = Logger.getLogger(View.class.getName());
+	private PrintWriter output;
 	
 	/**
 	 * Costruttore
@@ -41,14 +40,33 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	 */
 	public View(InputStream inputStream, OutputStream output) {
 		this.scanner = new Scanner(inputStream);
-		this.output = new PrintStream(output);
-	}	
+		this.output = new PrintWriter(output, true);
+	}
 	
 	/**
+	 * Costruttore per Client
+	 * @param client
+	 * @throws IOException 
+	 */
+	public View(Client client) throws IOException{
+	    this.setScannerAndOutput(client);
+	}
+	
+	/**
+	 * Associa alla view gli stream del Client
+	 * @param client
+	 * @throws IOException
+	 */
+	public void setScannerAndOutput(Client client) throws IOException {
+        this.setScanner(client.inputstream());
+        this.setOutput(client.outputstream());
+    }
+
+    /**
 	 * Stampa messaggio nello stream di output
 	 * @param message
 	 */
-	private void print(String message) {
+	public void print(String message) {
 		output.println(message);		
 	}
 	
@@ -58,7 +76,7 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	 * dopodicchè comunica la mossa agli observers
 	 */
 	public void chiediMossa(){
-		print("Tocca a te. Indica la tua mossa:");
+		print("Indica la tua mossa:");
 		print("Ricorda che il formato da utlizzare è:");
 		print(PATTERN_MOSSA.pattern());
 		String mossa = this.scanner.nextLine();
@@ -76,9 +94,9 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	public void chiediAzione(List<AzioneGiocatore> azioni){
 		if (azioni.isEmpty()){
 		    this.comunicaTurnoFinito();
-		} else if (azioni.size() == 1 && azioni.get(0) == AzioneGiocatore.PESCA_CARTA){
+		} else if (onlyActionIsPescaCarta(azioni)){
 		    this.chiediDiPescareCarta();
-		} else if (azioni.size() >= 2){
+		} else if (moreThanOneAction(azioni)){
 		    this.chiediDiScegliereAzione(azioni);
 		} else
 		{
@@ -87,10 +105,28 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	}
 	
 	/**
+	 * Controlla se ci sono più di un'azione
+	 * @param azioni
+	 * @return
+	 */
+	private boolean moreThanOneAction(List<AzioneGiocatore> azioni) {
+        return azioni.size() >= 2;
+    }
+
+    /**
+	 * Controlla se l'unica azione presente nella lista è Pescare una Carta
+	 * @param azioni
+	 * @return true se la condizione è vera
+	 */
+	private boolean onlyActionIsPescaCarta(List<AzioneGiocatore> azioni) {
+        return azioni.size() == 1 && azioni.get(0) == AzioneGiocatore.PESCA_CARTA;
+    }
+
+    /**
 	 * Comunica all'utente che il turno è finito
 	 */
-	private void comunicaTurnoFinito() {
-		print("Il tuo turno è finito.");
+	public void comunicaTurnoFinito() {
+		print("Il tuo turno è finito.\n\n");
 		this.notify(new UserTurnoFinitoEvent());
 	}
 
@@ -106,6 +142,9 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
         case ATTACCA:
         	this.notify(new UserAttackEvent());
         	break;
+        case NON_ATTACCA:
+            this.comunicaTurnoFinito();
+            break;
         default:
         	throw new AzioneSceltaInaspettataException("Azione Scelta Non Prevista");
         }
@@ -132,15 +171,15 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 		Pattern indexPattern = Pattern.compile("\\d+");
 		String scelta = this.scanner.nextLine();
 		Matcher matcher = indexPattern.matcher(scelta);
-		while(!matcher.matches() &&
-				( Integer.parseInt(scelta) >= Collections.min(mappa.keySet()) ) &&
-				( Integer.parseInt(scelta) <= Collections.max(mappa.keySet()) ) ){
-			print("Scelta non valida");
+		while(!matcher.matches() ||
+		        !mappa.containsKey(Integer.parseInt(scelta)) ){
+		    print("Scelta non valida");
 			scelta = this.scanner.nextLine();
+			matcher.reset(scelta);
 		}
 		return mappa.get(Integer.parseInt(scelta));
 	}
-
+	
 	/**
 	 * Fa il print della lista di azioni e restituisce una mappa dove a ciascuna azione
 	 * corrisponde un indice intero
@@ -188,7 +227,8 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	 */
 	private void sendMossa(String mossa){
 		Matcher matcher = PATTERN_MOSSA.matcher(mossa);
-		Event event = new UserMoveEvent(matcher.group("nomeSettore"));
+		matcher.matches();
+		Event event = new UserMoveEvent(matcher.group("nomeSettore").toUpperCase());
 		this.notify(event);
 	}
 	
@@ -198,11 +238,6 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	private void printWelcomeMessage(){
 		print("Benvenuto nel gioco Fuga dagli Alieni nello Spazio Profondo.");
 		print("(premi invio per iniziare)");
-	}
-	
-	@Override
-	public void notifyRicevuto(BaseObservable source, Event event) {
-		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -237,7 +272,8 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 	 */
 	private void sendAnnouncement(String announce) {
 		Matcher matcher = PATTERN_ANNOUNCE.matcher(announce);
-		Event event = new UserAnnounceSectorEvent(matcher.group("nomeSettore"));
+		matcher.matches();
+		Event event = new UserAnnounceSectorEvent(matcher.group("nomeSettore").toUpperCase());
 		this.notify(event);	
 	}
 
@@ -250,5 +286,62 @@ public class View extends BaseObservable implements BaseObserver, Runnable {
 		Matcher matcher = PATTERN_ANNOUNCE.matcher(announce);
 		return matcher.matches();
 	}
+
+    /**
+     * comunica al giocatore che lo spostamento è stato effettuato
+     * @param settore
+     */
+	public void comunicaSpostamento(String settore) {
+	    print(String.format("Ti sei spostato nel settore %s", settore));
+    }
+
+    /**
+     * Stampa il nome della carta pescata
+     * @param nomeCarta
+     */
+	public void comunicaCartaPescata(String nomeCarta) {
+        print(String.format("Hai pescato una carta %s", nomeCarta));
+    }
+
+    /**
+     * Stampa il messaggio comunicando che il silenzio è stato dichiarato
+     */
+	public void comunicaSilenzioDichiarato() {
+        print("Hai dichiarato silenzio.");
+    }
+
+    /**
+     * Comunica al giocatore che ha annunciato rumore nel settore indicato
+     * @param settore
+     */
+	public void comunicaSettoreAnnunciato(String settore) {
+        print(String.format("Hai annunciato rumore nel settore %s", settore));
+    }
+	
+	/**
+	 * setter per lo scanner
+	 * @param inputstream
+	 */
+	public void setScanner(InputStream inputstream){
+	    this.scanner = new Scanner(inputstream);
+	}
+	
+	/**
+	 * setter per l'output
+	 * @param outputstream
+	 */
+	public void setOutput(OutputStream outputstream){
+	    this.output = new PrintWriter(outputstream, true);
+	}
+
+    /**
+     * comunica l'attacco effettuato al giocatore
+     * @param event
+     */
+	public void comunicaAttaccoEffettuato(ModelAttaccoEvent event) {
+        this.print(event.getMsg());
+        this.notify(event); //notify per ClientManager
+        
+    }
 
 }

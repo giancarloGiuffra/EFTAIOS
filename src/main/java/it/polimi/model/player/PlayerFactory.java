@@ -35,6 +35,14 @@ public class PlayerFactory {
     }
     
     /**
+     * 
+     * @return il giocatore capitano
+     */
+    public static Player createPlayer(){
+        return new HumanPlayer(Personaggio.CAPITANO);
+    }
+    
+    /**
      * Metodo per generare una lista di giocatori della cardinalità indicata.
      * @param numero numero di giocatori
      */

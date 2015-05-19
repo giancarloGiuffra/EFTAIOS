@@ -18,7 +18,7 @@ public class Principale {
 		this.view = new View(System.in, System.out); //NOSONAR si vuole usare System.out per interagire con l'utente
 		this.controller = new Controller(this.model, this.view);
 		view.addObserver(controller);
-		model.addObserver(view);
+		//model.addObserver(view);
 	}
 
 	public static void main(String[] args) {

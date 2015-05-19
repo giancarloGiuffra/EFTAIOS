@@ -85,7 +85,7 @@ public class Partita {
 		else if (umanoSuScialuppa == true) { 
 			terminePartita = true;
 			Gioco gioco = new Gioco(numeroGiocatori);
-			vincitorePartita.add(gioco.umanoVincitore().personaggio());
+			//vincitorePartita.add(gioco.umanoVincitore().personaggio());
 		} 
 		return terminePartita;
 	}

@@ -1,7 +1,6 @@
 package it.polimi.model.carta;
 
 import it.polimi.model.player.AzioneGiocatore;
-import it.polimi.model.player.Player;
 
 /**
  * Classe per rappresentare la carta oggetto
@@ -10,18 +9,18 @@ import it.polimi.model.player.Player;
 public class CartaOggetto extends Carta {
 
 	
-	CartaOggetto(AzioneGiocatore azione){
+	/**
+	 * Costruttore
+	 * @param azione
+	 */
+    CartaOggetto(AzioneGiocatore azione){
 	    super(azione);
 	}
-    
-    /**
-     * @deprecated
-     */
-	@Deprecated
-	@Override
-	public void effetto(Player player) {
-		// TODO Auto-generated method stub
 
-	}
+    @Override
+    public String nome() {
+        // TODO Auto-generated method stub
+        return null;
+    }  
 
 }

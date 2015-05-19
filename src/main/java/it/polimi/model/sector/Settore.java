@@ -2,9 +2,13 @@ package it.polimi.model.sector;
 
 import it.polimi.model.exceptions.BadSectorException;
 import it.polimi.model.exceptions.BadSectorPositionNameException;
+import it.polimi.model.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Classe per rappresentare i settori.
@@ -12,8 +16,8 @@ import java.util.List;
  */
 public class Settore {
     
-    private final char col;
-    private final int riga;
+    private final Character col;
+    private final Integer riga;
     private final TipoSettore tipo;
     
     private static final char ULTIMA_COLONNA = 'W';
@@ -37,27 +41,21 @@ public class Settore {
      * @param nome nome del settore, formato a 3 caratteri, eg: A01, W14
      * @param tipo tipo del settore
      */
-    /*public Settore(String nome, TipoSettore tipo){
+    public Settore(String nome, TipoSettore tipo){
         this(getColonnaFromName(nome), getRigaFromName(nome), tipo);
-    }  */
-    
-    public Settore(String nome, TipoSettore tipo) {
-    	this.col = getColonnaFromName(nome);
-    	this.riga = getRigaFromName(nome);
-    	this.tipo = tipo;
-    } 
+    }
     
     /**
      * @return colonna del settore
      */
-    public char getColonna(){
+    public Character getColonna(){
         return this.col;
     }
     
     /**
      * @return riga del settore
      */
-    public int getRiga(){
+    public Integer getRiga(){
         return this.riga;
     }
     
@@ -155,16 +153,22 @@ public class Settore {
      * Verifica se il settore è una destinazione valida per un giocatore umano
      * @return true se il settore è una destinazione valida per un giocatore umano, false altrimenti
      */
-    public boolean isValidDestinationForHuman(){return  this.isSicuro() ||
-                                                        this.isPericoloso() ||
-                                                        this.isScialuppa();}
+    public boolean isValidDestinationForHuman(){
+        if(!this.isSicuro() &&
+           !this.isPericoloso() &&
+           !this.isScialuppa()) throw new BadSectorException(String.format("Il settore %s no è una destinazione valida per umani, è di tipo %s", this.getNome(),this.getTipo().toString()));
+        return true;
+    }
     
     /**
      * Verifica se il settore è una destinazione valida per un giocatore alieno
      * @return true se il settore è una destinazione valida per un giocatore alieno, false altrimenti
      */
-    public boolean isValidDestinationForAlien(){return  this.isSicuro() || 
-                                                        this.isPericoloso();}
+    public boolean isValidDestinationForAlien(){
+        if(!this.isPericoloso() &&
+           !this.isSicuro()) throw new BadSectorException(String.format("Il settore %s no è una destinazione valida per alieni, è di tipo %s", this.getNome(),this.getTipo().toString()));
+        return true;
+    }
     
     /**
      * Verifica se il settore è a un settore di distanza
@@ -200,8 +204,21 @@ public class Settore {
      * @return true se il settore è uno dei due a sinistra oppure uno dei due a destra
      */
     private boolean isLeftOrRight(Settore settore){
-        return Math.abs(this.distanceColonna(settore))==1 && 
-                (this.distanceRiga(settore)==-1 || this.distanceRiga(settore)==0 );
+        if(this.hasEvenColumn()){
+            return Math.abs(this.distanceColonna(settore))==1 && 
+                    (this.distanceRiga(settore)==-1 || this.distanceRiga(settore)==0 );
+        } else { //this.hasOddColumn()
+            return Math.abs(this.distanceColonna(settore))==1 && 
+                    (this.distanceRiga(settore)==1 || this.distanceRiga(settore)==0 );
+        }
+    }
+
+    /**
+     * Verifica se la colonna è "pari", A è dispari, B è pari
+     * @return
+     */
+    private boolean hasEvenColumn() {
+        return (this.col-'A'+1)%2 == 0;
     }
 
     /**
@@ -229,7 +246,7 @@ public class Settore {
      * @param settore settore in input
      * @return true se il settore è a due settori di distanza
      */
-    private boolean isTwoSectorAway(Settore settore) {
+    public boolean isTwoSectorAway(Settore settore) {
 		return isUpOrDownTwo(settore) ||
 		       isLeftOrRightTwo(settore) ||
 		       isTwoSectorAwayInAdjacentColumns(settore);
@@ -250,8 +267,13 @@ public class Settore {
      * @return true se soddisfa la condizione
      */
     private boolean isTwoSectorAwayInAdjacentColumns(Settore settore){
-        return Math.abs(this.distanceColonna(settore))==1 && 
-                ( this.distanceRiga(settore)==-2 || this.distanceRiga(settore)==1);
+        if( this.hasEvenColumn() ){
+            return Math.abs(this.distanceColonna(settore))==1 && 
+                    ( this.distanceRiga(settore)==-2 || this.distanceRiga(settore)==1);
+        } else { //this.hasOddColumn()
+            return Math.abs(this.distanceColonna(settore))==1 && 
+                    ( this.distanceRiga(settore)==2 || this.distanceRiga(settore)==-1);
+        }
     }
     
     /**
@@ -269,7 +291,7 @@ public class Settore {
 	 * @thow BadSectorPositionNameException
 	 */
     public static void checkIfValidSectorName(String nome){
-    	final String regex = "[A-W](0[1-9]|1[0-4])";
+    	final String regex = "[a-wA-W](0[1-9]|1[0-4])";
     	if( !nome.matches(regex)) throw new BadSectorPositionNameException(String.format("%s non è un nome di settore valido", nome));
     }
     
@@ -305,4 +327,95 @@ public class Settore {
         return listaSettori;
     }
     
+    /**
+     * 
+     * @return lista con i nomi dei settori adiacenti
+     */
+    public List<String> getSettoriAdiacenti(){
+        List<String> vicini = new ArrayList<String>();
+        if(!this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col,this.riga-1));
+        if(!this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col,this.riga+1));
+        if(!this.isPrimaColonna()) vicini.add(buildNomeSettore(this.col-1,this.riga));
+        if(!this.isUltimaColonna()) vicini.add(buildNomeSettore(this.col+1,this.riga));
+        if(this.hasEvenColumn()){
+            if(!this.isPrimaColonna() && !this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col-1,this.riga+1));
+            if(!this.isUltimaColonna() && !this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col+1,this.riga+1));
+        } else{
+            if(!this.isPrimaColonna() && !this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col-1,this.riga-1));
+            if(!this.isUltimaColonna() && !this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col+1,this.riga-1));
+        }
+        return vicini;
+    }
+    
+    /**
+     * 
+     * @return true se appartiene all'ultima colonna
+     */
+    private boolean isUltimaColonna() {
+        return this.col == ULTIMA_COLONNA;
+    }
+
+    /**
+     * 
+     * @return true se appartiene alla prima colonna
+     */
+    private boolean isPrimaColonna() {
+        return this.col == 'A';
+    }
+
+    /**
+     * 
+     * @return true se il settore appartiene all'ultima riga
+     */
+    private boolean isUltimaRiga() {
+        return this.riga == ULTIMA_RIGA;
+    }
+
+    /**
+     * 
+     * @return true se il settore appartiene alla prima riga
+     */
+    private boolean isPrimaRiga() {
+        return this.riga == 1;
+    }
+
+    /**
+     * costruisce il nome del settore corrispondente
+     * @param col
+     * @param riga
+     * @return
+     */
+    public static String buildNomeSettore(char col, int riga){
+        return new StringBuilder().
+                append( Character.toString(col).toUpperCase()).
+                append(String.format("%02d", riga)).
+                toString();
+    }
+    
+    private static String buildNomeSettore(int col, int riga){
+        return buildNomeSettore((char) col, riga);
+    }
+    
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(11, 17).
+                append(this.col).
+                append(this.riga).
+                toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof Settore))
+            return false;
+        Settore other = (Settore) obj;
+        return new EqualsBuilder().
+                append(this.col,other.col).
+                append(this.riga,other.riga).
+                isEquals();
+    }
 }

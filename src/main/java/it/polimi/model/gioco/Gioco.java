@@ -1,10 +1,18 @@
 package it.polimi.model.gioco;
 
 import it.polimi.common.observer.BaseObservable;
+import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
+import it.polimi.common.observer.ModelAttaccoEvent;
+import it.polimi.common.observer.ModelCartaAnnunciaSettoreQualunqueEvent;
+import it.polimi.common.observer.ModelCartaPescataEvent;
+import it.polimi.common.observer.ModelDichiaratoSilenzioEvent;
+import it.polimi.common.observer.ModelGameContinues;
+import it.polimi.common.observer.ModelGameOver;
+import it.polimi.common.observer.ModelMoveDoneEvent;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
+import it.polimi.model.exceptions.FalsoGameOver;
 import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
-import it.polimi.model.exceptions.IllegalMoveException;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 import it.polimi.model.player.PlayerFactory;
@@ -24,7 +32,6 @@ public class Gioco extends BaseObservable {
     private Map<Player,Settore> positions;
     private Turno turni; //Per gestire i turni
     private List<Player> playersMorti = new ArrayList<Player>();
-    private Player umanoSuScialuppa;
     
     /**
      * Costruttore
@@ -52,6 +59,30 @@ public class Gioco extends BaseObservable {
     }
     
     /**
+     * 
+     * @return il nome del giocatore corrente
+     */
+    public String currentPlayerName(){
+        return this.currentPlayer().nome();
+    }
+    
+    /**
+     * 
+     * @return il turno, cioè giro, corrente
+     */
+    public int currentTurnNumber(){
+        return this.turni.currentTurn();
+    }
+    
+    /**
+     * lista dei giocatori
+     * @return
+     */
+    public List<Player> players(){
+        return this.turni.players();
+    }
+    
+    /**
      * Sposta il giocatore corrente nella posizione indicata
      * @param nomeSettore
      */
@@ -65,13 +96,22 @@ public class Gioco extends BaseObservable {
      * @param settore
      */
     private void move(Player player, Settore settore){
-    	if(!player.isMoveValid(positions.get(player), settore)) throw new IllegalMoveException("Mossa non valida!");
+    	if(this.isMoveValid(player, settore)){
     	this.positions.remove(player);
     	this.positions.put(player, settore);
-    	/* if (this.positions.get(player).isScialuppa() == true) {
-    		this.umanoSuScialuppa = player;
-    	} */
-    	//TODO forse qua sarà inserito un notify alla view
+    	this.notify(new ModelMoveDoneEvent(settore.getNome()));
+    	}
+    }
+    
+    /**
+     * Controlla se lo spostamento è valido per il player
+     * @param player
+     * @param settore
+     * @return
+     */
+    private boolean isMoveValid(Player player, Settore settore){
+        return player.isMoveValid(positions.get(player), settore) &&
+                this.tabellone.esisteSentieroValido(positions.get(player), settore);
     }
     
     /**
@@ -82,9 +122,6 @@ public class Gioco extends BaseObservable {
     private void move(Player player, String nomeSettore){
     	Settore settore = this.tabellone.getSettore(nomeSettore);
     	this.move(player, settore);
-    	if(this.positions.get(player).isScialuppa()) {  // parte aggiunta
-    		this.umanoSuScialuppa = player;
-    	}
     }
     
     /**
@@ -102,6 +139,7 @@ public class Gioco extends BaseObservable {
         List<AzioneGiocatore> listAzioni = new ArrayList<AzioneGiocatore>();
         if(this.positions.get(player).isPericoloso()) listAzioni.add(AzioneGiocatore.PESCA_CARTA);
         if(player.isAlien()) listAzioni.add(AzioneGiocatore.ATTACCA);
+        if(player.isAlien() && positions.get(player).isSicuro()) listAzioni.add(AzioneGiocatore.NON_ATTACCA);
         return listAzioni;
     }
     
@@ -110,8 +148,61 @@ public class Gioco extends BaseObservable {
      */
     public void finishTurn(){
     	this.turni.finishTurn();
+    	this.checkIfGameOver();
     }
     
+    /**
+     * Controlla se il gioco è finito
+     */
+    private void checkIfGameOver() {
+        if(this.isUmanoInScialuppa()){
+            this.notify(new ModelGameOver(this.umanoInScialuppa()));
+        } else if(this.isUmaniMorti()){
+            this.notify(new ModelGameOver(TipoGameOver.UMANI_MORTI));
+        } else if(this.isTurniFiniti()){
+            this.notify(new ModelGameOver(TipoGameOver.TURNI_FINITI));
+        } else {
+            this.notify(new ModelGameContinues("Il gioco continua..."));
+        }
+    }
+
+    private Player umanoInScialuppa() {
+        for(Player player : this.positions.keySet()){
+            if(player.isHuman() && this.positions.get(player).isScialuppa()) return player;
+        }
+        throw new FalsoGameOver("La funzione umanoInScialuppa è stata chiamata erroneamente");
+    }
+
+    /**
+     * Controlla se uno degli umani è arrivato a una scialuppa
+     * @return
+     */
+    private boolean isUmanoInScialuppa() {
+        for(Player player : this.positions.keySet()){
+            if(player.isHuman() && this.positions.get(player).isScialuppa()) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Controlla se tutti gli umani sono morti
+     * @return
+     */
+    private boolean isUmaniMorti() {
+        for(Player player : this.positions.keySet()){
+            if(player.isHuman()) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Verifica se i turno sono finiti
+     * @return
+     */
+    private boolean isTurniFiniti() {
+        return this.turni.turnsOver();
+    }
+
     /**
      * Fa pescare carta al giocatore corrente
      */
@@ -126,9 +217,17 @@ public class Gioco extends BaseObservable {
     private void pescaCartaSettore(Player player) {
 		if(this.mazzoDiCarteSettore.isEmpty()) this.ricostruisciMazzoCarteSettore();
 		Carta carta = player.pescaCarta(this.mazzoDiCarteSettore);
-		//TODO notify da mettere per comunicare la carta pescata
-		this.usaCarta(player, carta);
+		player.salvaCarta(carta); //salviamo nel mazzo del giocatore prima di lanciare il notify per semplicità di gestione
+		this.notify(new ModelCartaPescataEvent(carta));
 	}
+    
+    /**
+     * Fa usare la carta al player corrente
+     * @param carta
+     */
+    public void currentPlayerUsaCarta(Carta carta){
+        this.usaCarta(this.currentPlayer(), carta);
+    }
     
     /**
      * Fa utilizzare a player la carta
@@ -138,7 +237,7 @@ public class Gioco extends BaseObservable {
     private void usaCarta(Player player, Carta carta){
         switch(carta.azione()){
         case ANNUNCIA_SETTORE:
-            //TODO notify per chiedere un settore
+            this.notify(new ModelCartaAnnunciaSettoreQualunqueEvent());
             break;
         case ANNUNCIA_SETTORE_MIO:
             this.annunciaSettore(player, this.positions.get(player));
@@ -157,7 +256,7 @@ public class Gioco extends BaseObservable {
 	 */
     private void dichiaraSilenzio(Player player) {
 		player.dichiaraSilenzio();
-		//TODO notify di averlo fatto
+		this.notify(new ModelDichiaratoSilenzioEvent());
 	}
 
 	/**
@@ -178,7 +277,7 @@ public class Gioco extends BaseObservable {
      */
     private void annunciaSettore(Player player, Settore settore){
     	player.annunciaSettore(settore);
-    	//TODO notify che il settore è stato annunciato
+    	this.notify(new ModelAnnunciatoSettoreEvent(settore.getNome()));
     }
     
     /**
@@ -207,30 +306,40 @@ public class Gioco extends BaseObservable {
     }
     
     /**
-     * fa attaccare a player
+     * Fa attaccare a player
      * @param player
      * @param settore
      */
     private void attacca(Player player){
     	player.attacca(this.positions.get(player));
-    	for(Player possibileVictima : this.positions.keySet()){
-    		if(this.positions.get(possibileVictima) == this.positions.get(player) &&
-    				!player.equals(possibileVictima)){
-    			possibileVictima.muore();
-    			this.positions.remove(possibileVictima);
-    			this.turni.remove(possibileVictima);
-    			playersMorti.add(possibileVictima);
+    	List<Player> playersMorti = new ArrayList<Player>();
+    	for(Player possibileVittima : new ArrayList<Player>(this.positions.keySet())){ //to avoid ConcurrentModificationException
+    		if(this.positions.get(possibileVittima).equals(this.positions.get(player)) &&
+    				!player.equals(possibileVittima)){
+    		    possibileVittima.muore();
+    			this.positions.remove(possibileVittima);
+    			this.turni.remove(possibileVittima);
+    			playersMorti.add(possibileVittima);
     		}
     	}
-    	//TODO notify l'attacco ed eventuali morti
+    	this.playersMorti.addAll(playersMorti);
+    	this.notify(new ModelAttaccoEvent(player, this.positions.get(player), playersMorti));
     }
     
+    /**
+     * restituisce lista con i giocatori morti
+     * @return
+     */
     public List<Player> getListaGiocatoriMorti() {
     	return this.playersMorti;
     }
     
-    public Player umanoVincitore() {
-    	return umanoSuScialuppa;
+    /**
+     * restituisce il tabellone
+     * @return
+     */
+    public Tabellone tabellone(){
+        return this.tabellone;
     }
     
 }
