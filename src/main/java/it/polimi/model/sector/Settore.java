@@ -37,9 +37,15 @@ public class Settore {
      * @param nome nome del settore, formato a 3 caratteri, eg: A01, W14
      * @param tipo tipo del settore
      */
-    public Settore(String nome, TipoSettore tipo){
+    /*public Settore(String nome, TipoSettore tipo){
         this(getColonnaFromName(nome), getRigaFromName(nome), tipo);
-    }
+    }  */
+    
+    public Settore(String nome, TipoSettore tipo) {
+    	this.col = getColonnaFromName(nome);
+    	this.riga = getRigaFromName(nome);
+    	this.tipo = tipo;
+    } 
     
     /**
      * @return colonna del settore
@@ -282,7 +288,7 @@ public class Settore {
      */
     public static int getRigaFromName(String nome){
     	checkIfValidSectorName(nome);
-        return Integer.parseInt(nome.substring(1, 2));
+        return Integer.parseInt(nome.substring(1));
     }
     
     /**

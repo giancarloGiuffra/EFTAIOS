@@ -21,7 +21,7 @@ public class Turno {
 	}
 	
 	public void svolgimentoTurno(){  // aggiornare listaGiocatori in caso un giocatore muoia
-		int j = this.primoGiocatore; //j = indice giocatore
+		int indiceGiocatore = this.primoGiocatore; 
 		do {
 			//listaGiocatori[j].azione();
 			// if (positions.get(player).isScialuppa() == true) // controllo razza non necessario: alieni non possono andare su scialuppe
@@ -30,20 +30,20 @@ public class Turno {
 			 * di controllo, ci si deve accertare di non essere arrivati all'ultimo elemento
 			 * di "listaGiocatori" (che ha indice "listaGiocatori.length-1"). 
 			 */
-			if (j != listaGiocatori.size()-1) { 
-				j++;
+			if (indiceGiocatore != listaGiocatori.size()-1) { 
+				indiceGiocatore++;
 			}
 			else {
-				j = 0;
+				indiceGiocatore = 0;
 			}
-			if (j == this.primoGiocatore) { // "j" è stato già incrementato con l'istruzione precedente. Qui punta al prossimo giocatore
+			if (indiceGiocatore == this.primoGiocatore) { // "j" è stato già incrementato con l'istruzione precedente. Qui punta al prossimo giocatore
 				turniGiocati++;
 				//riga seguente da eliminare
-				System.out.println("G: " + listaGiocatori.get(j).personaggio() + "\tturno: " + turniGiocati);
+				System.out.println("G: " + listaGiocatori.get(indiceGiocatore).personaggio() + "\tturno: " + turniGiocati);
 			}
 			
 		}
-		while (j != this.primoGiocatore);   // quando "j" indica nuovamente "primoGiocatore" vuol dire che il turno è finito
+		while (indiceGiocatore != this.primoGiocatore);   // quando "j" indica nuovamente "primoGiocatore" vuol dire che il turno è finito
 	}
 	
 	public int getTurniGiocati(){

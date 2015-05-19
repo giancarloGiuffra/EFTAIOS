@@ -24,6 +24,7 @@ public class Gioco extends BaseObservable {
     private Map<Player,Settore> positions;
     private Turno turni; //Per gestire i turni
     private List<Player> playersMorti = new ArrayList<Player>();
+    private Player umanoSuScialuppa;
     
     /**
      * Costruttore
@@ -67,6 +68,9 @@ public class Gioco extends BaseObservable {
     	if(!player.isMoveValid(positions.get(player), settore)) throw new IllegalMoveException("Mossa non valida!");
     	this.positions.remove(player);
     	this.positions.put(player, settore);
+    	/* if (this.positions.get(player).isScialuppa() == true) {
+    		this.umanoSuScialuppa = player;
+    	} */
     	//TODO forse qua sarà inserito un notify alla view
     }
     
@@ -78,6 +82,9 @@ public class Gioco extends BaseObservable {
     private void move(Player player, String nomeSettore){
     	Settore settore = this.tabellone.getSettore(nomeSettore);
     	this.move(player, settore);
+    	if(this.positions.get(player).isScialuppa()) {  // parte aggiunta
+    		this.umanoSuScialuppa = player;
+    	}
     }
     
     /**
@@ -220,6 +227,10 @@ public class Gioco extends BaseObservable {
     
     public List<Player> getListaGiocatoriMorti() {
     	return this.playersMorti;
+    }
+    
+    public Player umanoVincitore() {
+    	return umanoSuScialuppa;
     }
     
 }

@@ -1,6 +1,7 @@
 package it.polimi.gioco;
 
 import java.util.ArrayList;
+import it.polimi.model.player.Personaggio;
 import it.polimi.model.player.Player;
 import it.polimi.model.player.PlayerFactory;
 import it.polimi.model.gioco.Gioco;
@@ -13,11 +14,7 @@ public class Partita {
 	private ArrayList<Player> listaGiocatoriMorti; 
 	private boolean terminePartita = false; 
 	private final int numeroMassimoTurni = 39;
-	private possibiliVincitori vincitorePartita;
-	
-	private enum possibiliVincitori {
-		ALIENI, CAPITANO, PILOTA, PSICOLOGO, SOLDATO
-	}
+	private ArrayList<Personaggio> vincitorePartita = new ArrayList<Personaggio>();
 	
 	public Partita (int numeroGiocatori) {
 		/* vedere classe "Personaggio": una volta noto il numero dei giocatori partecipanti alla
@@ -72,27 +69,38 @@ public class Partita {
 	
 	
 	/* il metodo "endGame" verificherà il soddisfacimento di ciascuna delle 3 condizioni
-	 * che determinano la fine di una partita. Il metodo richiede come parametro di ingresso
-	 * il numero di turni giocati (che gli verrà poi fornito dal metodo "getTurniGiocati"
-	 * della classe "Turno") e il numero di giocatori umani ancora presenti sul tabellone
+	 * che determinano la fine di una partita. 
+	 * Il numero di turni giocati viene fornito dal metodo "getTurniGiocati"
+	 * della classe "Turno"
 	 */
 	public boolean endGame(int turniGiocati, int umaniInGioco, boolean umanoSuScialuppa){    
 		if (turniGiocati == numeroMassimoTurni) {
 			terminePartita = true;
-			vincitorePartita = possibiliVincitori.ALIENI;
+			vincitorePartita = alieniVincitori();
 		}
-		if (umaniInGioco == 0) {
+		else if (umaniInGioco == 0) {
 			terminePartita = true;
-			vincitorePartita = possibiliVincitori.ALIENI;
+			vincitorePartita = alieniVincitori();
 		}
-		if (umanoSuScialuppa == true) { 
+		else if (umanoSuScialuppa == true) { 
 			terminePartita = true;
-			// solo l'umano è il vincitore
+			Gioco gioco = new Gioco(numeroGiocatori);
+			vincitorePartita.add(gioco.umanoVincitore().personaggio());
 		} 
 		return terminePartita;
 	}
 	
-	public possibiliVincitori vincitore(){
+	private ArrayList<Personaggio> alieniVincitori() {
+		Personaggio listaPersonaggi[] = Personaggio.values();
+		for (int i = 0; i < listaPersonaggi.length; i++) {
+			if (listaPersonaggi[i].isAlien() == true) {
+				vincitorePartita.add(listaPersonaggi[i]);
+			}
+		}
+		return vincitorePartita;
+	}
+	
+	public ArrayList<Personaggio> vincitore(){
 		System.out.println("Vincitore: " + vincitorePartita.toString());  // eliminare
 		return vincitorePartita;
 	}
