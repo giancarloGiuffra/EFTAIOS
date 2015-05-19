@@ -33,14 +33,14 @@ public class Main {
 	 * main
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		Main main = new Main();
 		List<Settore> lista = main.model.tabellone().getSettoriDiTipo(TipoSettore.INACCESSIBILE);
 		for(Settore settore : lista){
 		    System.out.println(settore.getNome());
 		}
 		//main.run();		
-	}
+	}*/
 
 	/**
 	 * inizia il gioco
