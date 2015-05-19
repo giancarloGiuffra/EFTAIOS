@@ -313,7 +313,6 @@ public class Gioco extends BaseObservable {
      */
     private void attacca(Player player){
     	player.attacca(this.positions.get(player));
-<<<<<<< HEAD
     	List<Player> playersMorti = new ArrayList<Player>();
     	for(Player possibileVittima : new ArrayList<Player>(this.positions.keySet())){ //to avoid ConcurrentModificationException
     		if(this.positions.get(possibileVittima).equals(this.positions.get(player)) &&
@@ -322,15 +321,6 @@ public class Gioco extends BaseObservable {
     			this.positions.remove(possibileVittima);
     			this.turni.remove(possibileVittima);
     			playersMorti.add(possibileVittima);
-=======
-    	for(Player possibileVictima : this.positions.keySet()){
-    		if(this.positions.get(possibileVictima) == this.positions.get(player) &&
-    				!player.equals(possibileVictima)){
-    			possibileVictima.muore();
-    			this.positions.remove(possibileVictima);
-    			this.turni.remove(possibileVictima);
-    			playersMorti.add(possibileVictima);
->>>>>>> refs/remotes/origin/master
     		}
     	}
     	this.notify(new ModelAttaccoEvent(player, this.positions.get(player), playersMorti));

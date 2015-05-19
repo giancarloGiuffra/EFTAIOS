@@ -19,12 +19,7 @@ public class Main {
 	 * Costruttore
 	 */
 	private Main() {
-<<<<<<< HEAD
-	    
 		this.model = new Model(4); //TODO dovrà essere modificato per gestire nro giocatore a seconda degli utenti connessi
-=======
-		this.model = new Model(8); //TODO dovrÃ  essere modificato per gestire nro giocatore a seconda degli utenti connessi
->>>>>>> refs/remotes/origin/master
 		this.view = new View(System.in, System.out); //NOSONAR si vuole usare System.out per interagire con l'utente
 		this.controller = new Controller(this.model, this.view);
 		view.addObserver(controller);
