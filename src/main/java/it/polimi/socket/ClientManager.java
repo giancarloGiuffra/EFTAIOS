@@ -26,12 +26,14 @@ public class ClientManager implements BaseObserver{
     private static final Integer MAX_CLIENTS = 8;
     private Queue<Client> clients;
     private Map<Player,Client> players;
+    private List<Client> clientsMorti;
     
     /**
      * Costruttore
      */
     public ClientManager(Client client){
         this.clients = new LinkedList<Client>();
+        this.clientsMorti = new ArrayList<Client>();
         this.addClient(client);
     }
     
@@ -97,8 +99,10 @@ public class ClientManager implements BaseObserver{
         if( !((ModelAttaccoEvent) event).morti().isEmpty() ){
             for(Player player : ((ModelAttaccoEvent) event).morti()){
                 this.removePlayer(player);
+                this.clientsMorti.add(this.players.get(player));
             }
         }
+        this.broadcastAllButCurrentClient(event.getMsg());
     }
 
     /**
@@ -145,13 +149,53 @@ public class ClientManager implements BaseObserver{
     }
     
     /**
-     * scrive nel outputsream di tutti i client
+     * scrive nel outputsream dei client in gioco
      * @param message
      */
-    public void broadcast(String message){
+    public void broadcastVivi(String message){
         for(Client client : this.clients){
             client.write(message);
         }
+    }
+    
+    /**
+     * scrive nel ouputstream dei client morti (nel senso del gioco)
+     * @param message
+     */
+    public void broadcastMorti(String message){
+        for(Client client: this.clientsMorti){
+            client.write(message);
+        }
+    }
+    
+    /**
+     * scrive nel outputstream di tutti i client siano in gioco o siano morti
+     * @param message
+     */
+    public void broadcast(String message){
+        this.broadcastVivi(message);
+        this.broadcastMorti(message);
+    }
+    
+    /**
+     * scrive nel outputstream di tutti i client ad eccezione di quello indicato
+     * @param player
+     * @param message
+     */
+    public void broadcastAllButPlayer(Client ignore, String message){
+        for(Client client: this.clients){
+            if(!client.equals(ignore))
+                client.write(message);
+        }
+        this.broadcastMorti(message);
+    }
+    
+    /**
+     * scrive nel outputstream di tutti i client ad eccezione di quello corrente
+     * @param message
+     */
+    public void broadcastAllButCurrentClient(String message){
+        this.broadcastAllButPlayer(this.currentClient(), message);
     }
     
     /**
