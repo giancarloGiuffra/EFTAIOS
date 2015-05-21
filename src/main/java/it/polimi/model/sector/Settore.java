@@ -338,11 +338,11 @@ public class Settore {
         if(!this.isPrimaColonna()) vicini.add(buildNomeSettore(this.col-1,this.riga));
         if(!this.isUltimaColonna()) vicini.add(buildNomeSettore(this.col+1,this.riga));
         if(this.hasEvenColumn()){
-            if(!this.isPrimaColonna() && !this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col-1,this.riga+1));
-            if(!this.isUltimaColonna() && !this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col+1,this.riga+1));
+            if(!this.isPrimaColonna() && !this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col-1,this.riga+1));
+            if(!this.isUltimaColonna() && !this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col+1,this.riga+1));
         } else{
-            if(!this.isPrimaColonna() && !this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col-1,this.riga-1));
-            if(!this.isUltimaColonna() && !this.isUltimaRiga()) vicini.add(buildNomeSettore(this.col+1,this.riga-1));
+            if(!this.isPrimaColonna() && !this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col-1,this.riga-1));
+            if(!this.isUltimaColonna() && !this.isPrimaRiga()) vicini.add(buildNomeSettore(this.col+1,this.riga-1));
         }
         return vicini;
     }

@@ -67,6 +67,14 @@ public class Gioco extends BaseObservable {
     }
     
     /**
+     * nome del settore dove si trova il giocatore corrente
+     * @return
+     */
+    public String currentPlayerPosition(){
+    	return this.positions.get(this.currentPlayer()).getNome();
+    }
+    
+    /**
      * 
      * @return il turno, cioè giro, corrente
      */

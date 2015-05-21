@@ -137,7 +137,8 @@ public class Controller implements BaseObserver {
 	 * @param event
 	 */
 	private void comunicaGiocoFinito(ModelGameOver event) {
-        this.view.print(event.getMsg());
+        this.view.print("Il gioco è finito");
+		this.view.print(event.getMsg());
     }
 
     /**
@@ -236,7 +237,7 @@ public class Controller implements BaseObserver {
      * Inizia un turno
      */
     private void startTurn(){
-    	this.view.print(String.format("Tocca a te %s - Turno numero %d", this.currentPlayerName(), this.currentTurnNumber()));
+    	this.view.print(String.format("Tocca a te %s - Turno numero %d - Posizione %s", this.currentPlayerName(), this.currentTurnNumber(), this.model.currentPlayerPosition()));
         this.view.chiediMossa(); //bisogna capire poi come viene girata alla view corrispondente al giocatore currentPlayer
     }
 

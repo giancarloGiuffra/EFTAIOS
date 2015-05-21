@@ -15,7 +15,7 @@ import java.util.Queue;
  */
 public class Turno {
 
-	private static final int MAX_TURNI = 39;
+	private static final int MAX_TURNI = 11;
 	private int turn_counter = 1;
 	private Player firstPlayer;
 	private Queue<Player> players;
@@ -74,7 +74,7 @@ public class Turno {
 	 * @param player
 	 */
 	public void remove(Player player){
-		if(player.equals(firstPlayer)) firstPlayer = this.getNextFirstPlayer();
+		if(player.equals(firstPlayer)) this.firstPlayer = this.getNextFirstPlayer();
 		this.players.remove(player);
 	}
 
