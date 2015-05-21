@@ -48,8 +48,12 @@ public class View extends BaseObservable implements Runnable {
 	 * @param client
 	 * @throws IOException 
 	 */
-	public View(Client client) throws IOException{
-	    this.setScannerAndOutput(client);
+	public View(Client client) {
+		try{
+			this.setScannerAndOutput(client);
+		} catch(IOException ex){
+			
+		}
 	}
 	
 	/**

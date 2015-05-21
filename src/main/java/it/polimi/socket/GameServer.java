@@ -10,13 +10,14 @@ public class GameServer {
     
     private static final Logger LOGGER = Logger.getLogger(GameServer.class.getName());
     private static final Integer MAX_GAMEROOMS = 2;
-    private static final Integer PORTNUMBER = 4321;
+    private final Integer port;
+    private ServerSocket serverSocket;
     
     /**
      * Costruttore
      */
-    private GameServer(){
-        //consigliato da sonar 
+    public GameServer(int port){
+        this.port = port; 
     }
     
     /**
@@ -24,20 +25,26 @@ public class GameServer {
      * @param args
      */
     public static void main(String[] args) {
-        
-        try{                
-            ServerSocket serverSocket = new ServerSocket(PORTNUMBER);
-            while(GameRoom.numberOfRooms() < MAX_GAMEROOMS){
-                Socket clientSocket = serverSocket.accept();
-                GameRoom gameRoom = new GameRoom(new ClientManager(new Client(clientSocket)));
-                while(!gameRoom.isFull()){
-                    gameRoom.addClient(new Client(serverSocket.accept()));
-                }
-                gameRoom.start();
-            }
+    	GameServer server = new GameServer(1337);
+    	try{                
+            server.startServer();
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-        //serverSocket.close()
+    }
+    
+    public void startServer() throws IOException {
+    	// apre connessione
+    	this.serverSocket = new ServerSocket(this.port);
+    	LOGGER.log(Level.INFO, String.format("GameServer pronto in porta: ", this.port));
+    	//si mette ad ascoltare finchè ci sono GameRooms disponibili
+        while(GameRoom.numberOfRooms() < MAX_GAMEROOMS){
+            Socket clientSocket = serverSocket.accept();
+            GameRoom gameRoom = new GameRoom(new ClientManager(new Client(clientSocket)));
+            while(!gameRoom.isFull()){
+                gameRoom.addClient(new Client(serverSocket.accept()));
+            }
+            gameRoom.start();
+        }
     }
 }

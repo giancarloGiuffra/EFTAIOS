@@ -8,41 +8,55 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Client {
     
     private Socket socket;
     private Scanner in;
     private PrintWriter out;
+    private static final Logger LOGGER = Logger.getLogger(ClientManager.class.getName().concat(Client.class.getSimpleName()));
     
     /**
      * Costruttore
      * @param inputstream
      * @param outputstream
-     * @throws IOException 
      */
-    public Client(Socket socket) throws IOException{
+    public Client(Socket socket) {
         this.socket = socket;
-        this.in = new Scanner(this.socket.getInputStream());
-        this.out = new PrintWriter(this.socket.getOutputStream(), true);
+        try{
+        	this.in = new Scanner(this.socket.getInputStream());
+        	this.out = new PrintWriter(this.socket.getOutputStream(), true);
+        } catch (IOException ex){
+        	LOGGER.log(Level.SEVERE, String.format("Errore nell'ottenere stream dal socket %s", this.socket.toString()), ex);
+        }
     }
     
     /**
      * restituisce un InputStream per il client
      * @return
-     * @throws IOException 
      */
-    public InputStream inputstream() throws IOException{
-        return this.socket.getInputStream();
+    public InputStream inputstream() {
+    	try {
+    		return this.socket.getInputStream();
+    	} catch (IOException ex){
+        	LOGGER.log(Level.SEVERE, String.format("Errore nell'ottenere inputstream dal socket %s", this.socket.toString()), ex);
+        }
+		return null; //TODO forse gestire in modo diverso
     }
     
     /**
      * restituisce un OutputStream per questo client 
      * @return
-     * @throws IOException
      */
-    public OutputStream outputstream() throws IOException{
-        return this.socket.getOutputStream();
+    public OutputStream outputstream(){
+    	try{
+    		return this.socket.getOutputStream();
+    	} catch (IOException ex){
+        	LOGGER.log(Level.SEVERE, String.format("Errore nell'ottenere inputstream dal socket %s", this.socket.toString()), ex);
+        }
+		return null; //TODO forse gestire in modo diverso
     }
     
     /**
@@ -56,9 +70,8 @@ public class Client {
     /**
      * legge dal inputstream del client
      * @return
-     * @throws IOException
      */
-    public String read() throws IOException{
+    public String read(){
         return this.in.nextLine();
     }
     

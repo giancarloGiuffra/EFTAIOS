@@ -11,22 +11,26 @@ import it.polimi.model.player.Player;
 import it.polimi.view.View;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ClientManager implements BaseObserver{
     
-    private static final Logger LOGGER = Logger.getLogger(ClientManager.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GameServer.class.getName().concat(ClientManager.class.getSimpleName()));
     private static final Integer MAX_CLIENTS = 8;
     private Queue<Client> clients;
     private Map<Player,Client> players;
     private List<Client> clientsMorti;
+    private Scanner scanner;
+    private PrintWriter output;
     
     /**
      * Costruttore
@@ -182,7 +186,7 @@ public class ClientManager implements BaseObserver{
      * @param player
      * @param message
      */
-    public void broadcastAllButPlayer(Client ignore, String message){
+    public void broadcastAllButClient(Client ignore, String message){
         for(Client client: this.clients){
             if(!client.equals(ignore))
                 client.write(message);
@@ -195,7 +199,7 @@ public class ClientManager implements BaseObserver{
      * @param message
      */
     public void broadcastAllButCurrentClient(String message){
-        this.broadcastAllButPlayer(this.currentClient(), message);
+        this.broadcastAllButClient(this.currentClient(), message);
     }
     
     /**
