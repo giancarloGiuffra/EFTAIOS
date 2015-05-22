@@ -97,5 +97,10 @@ public class Client {
     public void close() {
 		this.in.close();
 		this.out.close();
+		try {
+			this.socket.close();
+		} catch (IOException e) {
+			LOGGER.log(Level.INFO, "Errore nel chiudere il scoket", e);
+		}
 	}
 }
