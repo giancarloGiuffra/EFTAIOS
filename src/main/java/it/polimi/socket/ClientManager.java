@@ -10,7 +10,9 @@ import it.polimi.model.exceptions.IllegalObservableForClientManager;
 import it.polimi.model.player.Player;
 import it.polimi.view.View;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +31,8 @@ public class ClientManager implements BaseObserver{
     private Queue<Client> clients;
     private Map<Player,Client> players;
     private List<Client> clientsMorti;
-    private Scanner scanner;
-    private PrintWriter output;
+    private File fileIn;
+    private File fileOut;
     
     /**
      * Costruttore
@@ -38,7 +40,26 @@ public class ClientManager implements BaseObserver{
     public ClientManager(Client client){
         this.clients = new LinkedList<Client>();
         this.clientsMorti = new ArrayList<Client>();
+        this.fileIn = new File(this.toString().concat("IN"));
+        this.fileOut = new File(this.toString().concat("OUT"));
         this.addClient(client);
+        this.welcome(client);
+    }
+    
+    /**
+     * getter di fileIn
+     * @return
+     */
+    public File fileIn(){
+        return this.fileIn;
+    }
+    
+    /**
+     * getter di fileOut
+     * @return
+     */
+    public File fileOut(){
+        return this.fileOut;
     }
     
     /**
@@ -125,11 +146,7 @@ public class ClientManager implements BaseObserver{
      */
     private void gestisceUserTurnoFinitoEvent(BaseObservable source) {
         this.finishClientTurn();
-        try {
-            ( (View) source).setScannerAndOutput(this.currentClient());
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);;
-        }
+        ( (View) source).setScannerAndOutput(this.currentClient());
     }
 
     /**
@@ -150,6 +167,15 @@ public class ClientManager implements BaseObserver{
         for(int i=0; i<playersList.size(); i++){
             players.put(playersList.get(i), clientsList.get(i));
         }
+    }
+    
+    /**
+     * inizializza il client manager
+     * @param playersList
+     */
+    public void inizializza(List<Player> playersList){
+        this.createMap(playersList);
+        this.broadcast("Siamo al completo, il gioco inizia!");
     }
     
     /**
@@ -208,5 +234,6 @@ public class ClientManager implements BaseObserver{
      */
     public void welcome(Client client){
         client.write("Benvenuto nel gioco Fuga dagli Alieni nello Spazio Profondo.");
+        client.write(String.format("(Al momento ci sono %d giocatori incluso te)", this.numeroGiocatori()));
     }
 }

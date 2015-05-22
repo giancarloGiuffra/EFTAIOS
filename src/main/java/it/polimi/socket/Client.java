@@ -30,6 +30,7 @@ public class Client {
         	this.out = new PrintWriter(this.socket.getOutputStream(), true);
         } catch (IOException ex){
         	LOGGER.log(Level.SEVERE, String.format("Errore nell'ottenere stream dal socket %s", this.socket.toString()), ex);
+        	System.exit(0); //TODO ci sarà un metodo migliore
         }
     }
     

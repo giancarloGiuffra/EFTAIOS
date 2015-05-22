@@ -27,14 +27,14 @@ public class GameRoom {
      * inizializza il gioco e lo lancia
      * @throws IOException
      */
-    public void start() throws IOException{
+    public void start() {
         this.model = new Model(this.manager.numeroGiocatori());
-        this.manager.createMap(this.model.players());
-        this.view = new View(this.manager.currentClient());
+        this.manager.inizializza(this.model.players());
+        this.view = new View(this.manager.fileIn(), this.manager.fileOut());
         this.controller = new Controller(model,view);
         this.model.addObserver(controller);
+        this.view.addObserver(this.manager); //importante che manager sia il primo observer
         this.view.addObserver(controller);
-        this.view.addObserver(this.manager);
         NUMBER_OF_GAMEROOMS++;
         this.run();
     }

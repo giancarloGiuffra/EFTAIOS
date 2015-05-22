@@ -1,14 +1,16 @@
 package it.polimi.view;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,13 +27,17 @@ import it.polimi.model.exceptions.AzioneSceltaInaspettataException;
 import it.polimi.model.exceptions.IterazioneNonPrevistaException;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.socket.Client;
+import it.polimi.socket.ClientManager;
+import it.polimi.socket.GameServer;
 
 public class View extends BaseObservable implements Runnable {
 
+    private static final Logger LOGGER = Logger.getLogger(View.class.getName());    
 	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.{3})");
 	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
 	private Scanner scanner;
 	private PrintWriter output;
+	private Boolean streamsAreFiles = false;
 	
 	/**
 	 * Costruttore
@@ -44,15 +50,18 @@ public class View extends BaseObservable implements Runnable {
 	}
 	
 	/**
-	 * Costruttore per Client
-	 * @param client
-	 * @throws IOException 
+	 * Costruttore per File
+	 * @param in
+	 * param out
 	 */
-	public View(Client client) {
+	public View(File in, File out) {
 		try{
-			this.setScannerAndOutput(client);
+		    this.scanner = new Scanner(in);
+		    this.output = new PrintWriter(out);
+		    this.streamsAreFiles = true;
 		} catch(IOException ex){
-			
+		    LOGGER.log(Level.SEVERE, String.format("Errore nel aprire file %s o file %s", in.toString(), out.toString()), ex);
+		    System.exit(0); //TODO forse c'è un miglior metodo
 		}
 	}
 	
@@ -61,9 +70,9 @@ public class View extends BaseObservable implements Runnable {
 	 * @param client
 	 * @throws IOException
 	 */
-	public void setScannerAndOutput(Client client) throws IOException {
-        this.setScanner(client.in());
-        this.setOutput(client.out());
+	public void setScannerAndOutput(Client client) {
+	    this.setScanner(client.in());
+	    this.setOutput(client.out());
     }
 
     /**
@@ -250,8 +259,10 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	@Override
 	public void run() {
-		this.printWelcomeMessage();
-		this.scanner.nextLine(); // verifica se utente ha premuto invio
+	    if(!this.streamsAreFiles){
+	        this.printWelcomeMessage();
+	        this.scanner.nextLine(); // verifica se utente ha premuto invio
+	    }
 		this.notify(new UserStartEvent());
 	}
 
@@ -320,6 +331,7 @@ public class View extends BaseObservable implements Runnable {
      */
 	public void comunicaSettoreAnnunciato(String settore) {
         print(String.format("Hai annunciato rumore nel settore %s", settore));
+        //this.notify(new ); //TODO
     }
 	
 	/**
