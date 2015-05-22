@@ -14,7 +14,7 @@ public class ClientCLI implements Runnable{
 	private Scanner in;
 	private PrintWriter out;
 	private Scanner stdIn = new Scanner(System.in);
-	private PrintWriter stdOut = new PrintWriter(System.out);
+	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 1337;
     private static final Logger LOGGER = Logger.getLogger(ClientCLI.class.getName());
     private static final String close = "CHIUSURA";
@@ -39,8 +39,8 @@ public class ClientCLI implements Runnable{
 		} catch (UnknownHostException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage());
-			stdOut.println("Errore nel cercare di connettersi");
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			print("Errore nel cercare di connettersi");
 		}
 	}
 	
@@ -110,7 +110,7 @@ public class ClientCLI implements Runnable{
     public static void main(String[] args) {
     	ClientCLI client = new ClientCLI();
     	client.connectToServer();
-		client.run();
+		(new Thread(client)).start();;
     }
 	
 }

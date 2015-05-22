@@ -74,7 +74,8 @@ public class View extends BaseObservable implements Runnable {
 		    this.printWelcomeMessagge = false;
 		} catch(IOException ex){
 		    LOGGER.log(Level.SEVERE, String.format("Errore nel aprire file %s o file %s", in.toString(), out.toString()), ex);
-		    System.exit(0); //TODO forse c'è un miglior metodo
+		    System.exit(0); //NOSONAR
+		    //TODO forse c'è un miglior metodo
 		}
 	}
 	

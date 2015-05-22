@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 
 public class ClientManager extends BaseObservable implements BaseObserver{
     
-    private static final Logger LOGGER = Logger.getLogger(GameServer.class.getName().concat(ClientManager.class.getSimpleName()));
     private static final Integer MAX_CLIENTS = 3;
     private Queue<Client> clients;
     private Map<Player,Client> players;
