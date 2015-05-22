@@ -75,22 +75,22 @@ public class Controller implements BaseObserver {
             this.currentPlayerUsaCarta( ( (ModelCartaPescataEvent) event).carta() );
             break;
         case "ModelDichiaratoSilenzioEvent":
-            this.comunicaSilenzioDichiarato();
+            this.comunicaSilenzioDichiarato(event);
             this.comunicaTurnoFinito();
             break;
         case "ModelAnnunciatoSettoreEvent":
-            this.comunicaSettoreAnnunciato( ( (ModelAnnunciatoSettoreEvent) event).settore() );
+            this.comunicaSettoreAnnunciato(event);
             this.comunicaTurnoFinito();
             break;
         case "ModelCartaAnnunciaSettoreQualunqueEvent":
             this.chiediSettoreDaAnnunciare();
             break;
         case "ModelAttaccoEvent":
-            this.comunicaAttaccoEffettuato( (ModelAttaccoEvent) event );
+            this.comunicaAttaccoEffettuato(event);
             this.comunicaTurnoFinito();
             break;
         case "ModelGameOver":
-            this.comunicaGiocoFinito( (ModelGameOver) event );
+            this.comunicaGiocoFinito(event );
             break;
         case "ModelGameContinues":
             this.startTurn();
@@ -124,10 +124,8 @@ public class Controller implements BaseObserver {
         case "UserTurnoFinitoEvent":
             this.finishTurn();
             break;
-        case "ModelAttaccoEvent":
-            break;
         default:
-            throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
+            break;
 	    }
         
     }
@@ -136,15 +134,14 @@ public class Controller implements BaseObserver {
 	 * Comunica che il gioco è finito
 	 * @param event
 	 */
-	private void comunicaGiocoFinito(ModelGameOver event) {
-        this.view.print("Il gioco è finito");
-		this.view.print(event.getMsg());
+	private void comunicaGiocoFinito(Event event) {
+        this.view.comunicaGiocoFinito(event);
     }
 
     /**
 	 * Comunica al giocatore l'attacco effettuato e la lista di morti
 	 */
-	private void comunicaAttaccoEffettuato(ModelAttaccoEvent event) {
+	private void comunicaAttaccoEffettuato(Event event) {
         this.view.comunicaAttaccoEffettuato(event);
     }
 
@@ -174,10 +171,10 @@ public class Controller implements BaseObserver {
 
     /**
 	 * Comunica al giocatore che il settore è stato annunciato
-	 * @param settore
+	 * @param event
 	 */
-	private void comunicaSettoreAnnunciato(String settore) {
-        this.view.comunicaSettoreAnnunciato(settore);
+	private void comunicaSettoreAnnunciato(Event event) {
+        this.view.comunicaSettoreAnnunciato(event);
     }
 
     /**
@@ -190,8 +187,8 @@ public class Controller implements BaseObserver {
     /**
 	 * Comunica al giocatore che ha dichiarato silenzio
 	 */
-	private void comunicaSilenzioDichiarato() {
-        this.view.comunicaSilenzioDichiarato();
+	private void comunicaSilenzioDichiarato(Event event) {
+        this.view.comunicaSilenzioDichiarato(event);
     }
 
     /**

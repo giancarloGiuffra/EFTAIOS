@@ -2,8 +2,11 @@ package it.polimi.socket;
 
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
+import it.polimi.common.observer.CloseGameRoom;
 import it.polimi.common.observer.Event;
+import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
+import it.polimi.common.observer.ModelDichiaratoSilenzioEvent;
 import it.polimi.controller.Controller;
 import it.polimi.model.exceptions.IllegalEventForClientManager;
 import it.polimi.model.exceptions.IllegalObservableForClientManager;
@@ -24,10 +27,10 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ClientManager implements BaseObserver{
+public class ClientManager extends BaseObservable implements BaseObserver{
     
     private static final Logger LOGGER = Logger.getLogger(GameServer.class.getName().concat(ClientManager.class.getSimpleName()));
-    private static final Integer MAX_CLIENTS = 8;
+    private static final Integer MAX_CLIENTS = 3;
     private Queue<Client> clients;
     private Map<Player,Client> players;
     private List<Client> clientsMorti;
@@ -111,12 +114,76 @@ public class ClientManager implements BaseObserver{
             case "ModelAttaccoEvent":
                 this.gestisceModelAttaccoEvent(event);
                 break;
+            case "ModelDichiaratoSilenzioEvent":
+            	this.gestisceModelDichiaratoSilenzioEvent(event);
+            	break;
+            case "ModelAnnunciatoSettoreEvent":
+            	this.gestisceModelAnnunciatoSettoreEvent(event);
+            	break;
+            case "ModelGameOver":
+            	this.gestisceModelGameOver(event);
+            	break;
             default:
                 throw new IllegalEventForClientManager(String.format("%s non è un evento riconosciuto dalla classe ClientManager", event.name()));
         }
     }
     
     /**
+     * comunica ai giocatori che il gioco è finito
+     * @param event
+     */
+    private void gestisceModelGameOver(Event event) {
+		this.broadcastAllButCurrentClient(event.getMsg());
+		this.broadcast("La connessione si chiuderà tra breve");
+		this.close();
+		this.notify(new CloseGameRoom());
+	}
+
+	/**
+	 * chiude le connessioni con i client
+	 */
+    private void close() {
+		this.closeClients();
+		this.closeClientsMorti();
+	}
+
+	/**
+	 * chiude le connessioni con i client morti
+	 */
+    private void closeClientsMorti() {
+		for(Client client : this.clientsMorti){
+			client.close();
+		}
+	}
+
+	/**
+	 * chiude le connessioni con i client vivi
+	 */
+    private void closeClients() {
+		for(Client client : this.clients){
+			client.close();
+		}
+	}
+
+	/**
+     * comunica ai giocatori chi ha annunciato rumore in quale settore
+     * @param event
+     */
+    private void gestisceModelAnnunciatoSettoreEvent(Event event) {
+    	ModelAnnunciatoSettoreEvent annuncioEvent = (ModelAnnunciatoSettoreEvent) event;
+    	this.broadcastAllButCurrentClient(String.format("%s dichiara RUMORE IN SETTORE %s", annuncioEvent.player(), annuncioEvent.settore()));
+	}
+
+	/**
+     * comunica ai giocatori chi ha dichiarato silenzio
+     * @param event
+     */
+    private void gestisceModelDichiaratoSilenzioEvent(Event event) {
+    	ModelDichiaratoSilenzioEvent silenzioEvent = (ModelDichiaratoSilenzioEvent) event;
+    	this.broadcastAllButCurrentClient(String.format("%s dichiara SILENZIO", silenzioEvent.player()));
+	}
+
+	/**
      * Gestisce il risultato di un attacco
      * @param event
      */
@@ -128,6 +195,7 @@ public class ClientManager implements BaseObserver{
             }
         }
         this.broadcastAllButCurrentClient(event.getMsg());
+        this.broadcastMorti("Sei Morto :( la connessione rimarrà comunque aperta finchè il gioco non finisce");
     }
 
     /**

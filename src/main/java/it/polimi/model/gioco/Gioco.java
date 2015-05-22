@@ -264,7 +264,7 @@ public class Gioco extends BaseObservable {
 	 */
     private void dichiaraSilenzio(Player player) {
 		player.dichiaraSilenzio();
-		this.notify(new ModelDichiaratoSilenzioEvent());
+		this.notify(new ModelDichiaratoSilenzioEvent(player.nome()));
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class Gioco extends BaseObservable {
      */
     private void annunciaSettore(Player player, Settore settore){
     	player.annunciaSettore(settore);
-    	this.notify(new ModelAnnunciatoSettoreEvent(settore.getNome()));
+    	this.notify(new ModelAnnunciatoSettoreEvent(settore.getNome(), player.nome()));
     }
     
     /**

@@ -38,9 +38,15 @@ public class GameServer {
     	this.serverSocket = new ServerSocket(this.port);
     	LOGGER.log(Level.INFO, String.format("GameServer pronto in porta: ", this.port));
     	//si mette ad ascoltare finchè ci sono GameRooms disponibili
-        while(GameRoom.numberOfRooms() < MAX_GAMEROOMS){
-            Socket clientSocket = serverSocket.accept();
-            GameRoom gameRoom = new GameRoom(new ClientManager(new Client(clientSocket)));
+        while(true){
+        	while(!(GameRoom.numberOfRooms() < MAX_GAMEROOMS)){
+        		try {
+					wait();
+				} catch (InterruptedException e) {
+					LOGGER.log(Level.WARNING, "Exception in blocco wait che aspetta finche si liberi una GAMEROOM");;
+				}
+        	}
+            GameRoom gameRoom = new GameRoom(new ClientManager(new Client(serverSocket.accept())));
             while(!gameRoom.isFull()){
                 gameRoom.addClient(new Client(serverSocket.accept()));
             }

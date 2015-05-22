@@ -16,7 +16,9 @@ import java.util.regex.Pattern;
 
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.Event;
+import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
+import it.polimi.common.observer.ModelGameOver;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserAttackEvent;
 import it.polimi.common.observer.UserMoveEvent;
@@ -37,7 +39,7 @@ public class View extends BaseObservable implements Runnable {
 	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
 	private Scanner scanner;
 	private PrintWriter output;
-	private Boolean streamsAreFiles = false;
+	private Boolean printWelcomeMessagge = true;
 	
 	/**
 	 * Costruttore
@@ -50,6 +52,17 @@ public class View extends BaseObservable implements Runnable {
 	}
 	
 	/**
+	 * Costruttore
+	 * @param scanner
+	 * @param printwriter
+	 */
+	public View(Scanner scanner, PrintWriter printwriter){
+		this.scanner = scanner;
+		this.output = printwriter;
+		this.printWelcomeMessagge = false;
+	}
+	
+	/**
 	 * Costruttore per File
 	 * @param in
 	 * param out
@@ -58,7 +71,7 @@ public class View extends BaseObservable implements Runnable {
 		try{
 		    this.scanner = new Scanner(in);
 		    this.output = new PrintWriter(out);
-		    this.streamsAreFiles = true;
+		    this.printWelcomeMessagge = false;
 		} catch(IOException ex){
 		    LOGGER.log(Level.SEVERE, String.format("Errore nel aprire file %s o file %s", in.toString(), out.toString()), ex);
 		    System.exit(0); //TODO forse c'è un miglior metodo
@@ -259,7 +272,7 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	@Override
 	public void run() {
-	    if(!this.streamsAreFiles){
+	    if(this.printWelcomeMessagge){
 	        this.printWelcomeMessage();
 	        this.scanner.nextLine(); // verifica se utente ha premuto invio
 	    }
@@ -321,17 +334,19 @@ public class View extends BaseObservable implements Runnable {
     /**
      * Stampa il messaggio comunicando che il silenzio è stato dichiarato
      */
-	public void comunicaSilenzioDichiarato() {
+	public void comunicaSilenzioDichiarato(Event event) {
         print("Hai dichiarato silenzio.");
+        this.notify(event); //notify per ClientManager
     }
 
     /**
      * Comunica al giocatore che ha annunciato rumore nel settore indicato
-     * @param settore
+     * @param event
      */
-	public void comunicaSettoreAnnunciato(String settore) {
-        print(String.format("Hai annunciato rumore nel settore %s", settore));
-        //this.notify(new ); //TODO
+	public void comunicaSettoreAnnunciato(Event event) {
+		ModelAnnunciatoSettoreEvent annuncioEvent = (ModelAnnunciatoSettoreEvent) event;
+        print(String.format("Hai annunciato rumore nel settore %s", annuncioEvent.settore()));
+        this.notify(event); //notify per ClientManager
     }
 	
 	/**
@@ -370,8 +385,18 @@ public class View extends BaseObservable implements Runnable {
      * comunica l'attacco effettuato al giocatore
      * @param event
      */
-	public void comunicaAttaccoEffettuato(ModelAttaccoEvent event) {
+	public void comunicaAttaccoEffettuato(Event event) {
         this.print(event.getMsg());
         this.notify(event); //notify per ClientManager   
     }
+
+	/**
+	 * comunica che il gioco è finito
+	 * @param event
+	 */
+	public void comunicaGiocoFinito(Event event) {
+		this.print("Il gioco è finito");
+		this.print(event.getMsg());
+		this.notify(event); //notify per ClientManager
+	}
 }
