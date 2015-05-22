@@ -95,6 +95,7 @@ public class Client {
 	 * chiude la connessione di questo client
 	 */
     public void close() {
+        this.write("CHIUSURA");
 		this.in.close();
 		this.out.close();
 		try {

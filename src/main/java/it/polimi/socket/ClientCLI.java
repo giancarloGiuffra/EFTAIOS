@@ -17,8 +17,9 @@ public class ClientCLI implements Runnable{
 	private PrintWriter stdOut = new PrintWriter(System.out);
 	private static final Integer PORT = 1337;
     private static final Logger LOGGER = Logger.getLogger(ClientCLI.class.getName());
+    private static final String close = "CHIUSURA";
+    private Boolean closed = false;
 
-	
 	/**
 	 * Costruttore
 	 */
@@ -30,7 +31,7 @@ public class ClientCLI implements Runnable{
 	 * Tenta di connettersi al server
 	 */
 	public void connectToServer(){
-		stdOut.println("Inserisci l'Indirizzo IP del Server: ");
+		print("Inserisci l'Indirizzo IP del Server: ");
 		try {
 			this.socket = new Socket(stdIn.nextLine(), PORT);
 			this.in = new Scanner(socket.getInputStream());
@@ -42,10 +43,51 @@ public class ClientCLI implements Runnable{
 			stdOut.println("Errore nel cercare di connettersi");
 		}
 	}
+	
+	/**
+	 * controlla se il server ha chiuso la connessione
+	 * @return
+	 */
+	private Boolean isClosed(){
+	    return this.closed;
+	}
+	
+	/**
+	 * stampa in std Out
+	 * @param string
+	 */
+	private void print(String string){
+	    stdOut.println(string);
+	    stdOut.flush();
+	}
+	
+	/**
+	 * stampa nel server
+	 * @param string
+	 */
+	private void printToServer(String string){
+	    out.println(string);
+	    out.flush();
+	}
 
 	@Override
 	public void run() {
-		//TODO
+	    while(!isClosed()){
+    	    String fromServer = in.nextLine();
+    	    print(fromServer);
+    	    while(in.hasNextLine()){
+    	        fromServer = in.nextLine();
+    	        print(fromServer);
+    	        if(fromServer.equals(ClientCLI.close)){
+    	            this.closed = true;
+    	        }
+    	    }
+    	    printToServer(stdIn.nextLine());
+    	    //TODO trovare un modo di impedire aspettare input dall'utente 
+    	    //quando ad esempio il turno è finito oppure il server invia un messaggio
+    	    //senza aspettare input dal client
+	    }
+	    this.close();
 	}
 	
 	/**
@@ -71,5 +113,4 @@ public class ClientCLI implements Runnable{
 		client.run();
     }
 	
-
 }
