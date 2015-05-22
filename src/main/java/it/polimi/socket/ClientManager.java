@@ -45,7 +45,6 @@ public class ClientManager extends BaseObservable implements BaseObserver{
         this.fileIn = new File(this.toString().concat("IN"));
         this.fileOut = new File(this.toString().concat("OUT"));
         this.addClient(client);
-        this.welcome(client);
     }
     
     /**
@@ -70,6 +69,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
      */
     public void addClient(Client client){
         this.clients.add(client);
+        this.welcome(client);
     }
     
     /**
@@ -123,8 +123,8 @@ public class ClientManager extends BaseObservable implements BaseObserver{
             	this.gestisceModelGameOver(event);
             	break;
             default:
-                throw new IllegalEventForClientManager(String.format("%s non è un evento riconosciuto dalla classe ClientManager", event.name()));
-        }
+                break;
+            }
     }
     
     /**
