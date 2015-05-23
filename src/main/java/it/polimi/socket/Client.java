@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class Client {
     
     private Socket socket;
-    private BufferedReader in;
+    private Scanner in;
     private PrintWriter out;
     
     /**
@@ -23,7 +23,7 @@ public class Client {
      */
     public Client(Socket socket) throws IOException{
         this.socket = socket;
-        this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+        this.in = new Scanner(this.socket.getInputStream());
         this.out = new PrintWriter(this.socket.getOutputStream(), true);
     }
     
@@ -59,6 +59,22 @@ public class Client {
      * @throws IOException
      */
     public String read() throws IOException{
-        return this.in.readLine();
+        return this.in.nextLine();
+    }
+    
+    /**
+     * getter per lo scanner
+     * @return
+     */
+    public Scanner in(){
+        return this.in;
+    }
+    
+    /**
+     * getter per l'out
+     * @return
+     */
+    public PrintWriter out(){
+        return this.out;
     }
 }

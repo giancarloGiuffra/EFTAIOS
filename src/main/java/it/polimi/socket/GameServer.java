@@ -19,7 +19,11 @@ public class GameServer {
         //consigliato da sonar 
     }
     
-    /*public static void main(String[] args) {
+    /**
+     * MAIN
+     * @param args
+     */
+    public static void main(String[] args) {
         
         try{                
             ServerSocket serverSocket = new ServerSocket(PORTNUMBER);
@@ -33,6 +37,7 @@ public class GameServer {
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        } 
-    }*/
+        }
+        //serverSocket.close()
+    }
 }
