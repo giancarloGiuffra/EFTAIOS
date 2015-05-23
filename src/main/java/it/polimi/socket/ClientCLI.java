@@ -19,7 +19,6 @@ public class ClientCLI implements Runnable{
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 1337;
     private static final Logger LOGGER = Logger.getLogger(ClientCLI.class.getName());
-    private static final String close = "CHIUSURA";
     private Boolean closed = false;
 
 	/**
@@ -75,19 +74,13 @@ public class ClientCLI implements Runnable{
 
 	@Override
 	public void run() {
+	    String fromServer;
 	    while(!isClosed()){
-    	    String fromServer = readLineFromServer();
-    	    print(fromServer);
     	    while( mustPrint(fromServer = readLineFromServer()) ){
     	        print(fromServer);
-    	        if(fromServer.equals(ClientCLI.close)){
-    	            this.closed = true;
-    	        }
     	    }
-    	    if(fromServer.equals("RICHIEDE_INPUT")){
-    	        //stdIn.skip(".*");
-    	        printToServer(stdIn.nextLine());
-    	    }
+    	    if(fromServer.equals("RICHIEDE_INPUT")) printToServer(stdIn.nextLine());
+    	    if(fromServer.equals("CHIUSURA")) this.closed = true;
 	    }
 	    this.close();
 	}
@@ -98,7 +91,9 @@ public class ClientCLI implements Runnable{
 	 * @return
 	 */
 	private Boolean mustPrint(String string){
-	    return !string.equals("FINE_MESSAGGIO") && !string.equals("RICHIEDE_INPUT");
+	    return !string.equals("FINE_MESSAGGIO") && 
+	           !string.equals("RICHIEDE_INPUT") &&
+	           !string.equals("CHIUSURA");
 	}
 	
 	/**
