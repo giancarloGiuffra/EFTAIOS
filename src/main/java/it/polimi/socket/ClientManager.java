@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 public class ClientManager extends BaseObservable implements BaseObserver{
     
-    private static final Integer MAX_CLIENTS = 3;
+    private static final Integer MAX_CLIENTS = 2;
     private Queue<Client> clients;
     private Map<Player,Client> players;
     private List<Client> clientsMorti;
@@ -213,7 +213,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
      */
     private void gestisceUserTurnoFinitoEvent(BaseObservable source) {
         this.finishClientTurn();
-        ( (View) source).setScannerAndOutput(this.currentClient());
+        ( (View) source).setInputAndOutput(this.currentClient());
     }
 
     /**

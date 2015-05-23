@@ -167,6 +167,7 @@ public class Controller implements BaseObserver {
      */
 	private void comunicaMessaggio(String msg) {
         this.view.print(msg);
+        this.view.printFineMessaggio();
     }
 
     /**

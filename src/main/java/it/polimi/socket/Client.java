@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class Client {
     
     private Socket socket;
-    private Scanner in;
+    private BufferedReader in;
     private PrintWriter out;
     private static final Logger LOGGER = Logger.getLogger(ClientManager.class.getName().concat(Client.class.getSimpleName()));
     
@@ -26,7 +26,7 @@ public class Client {
     public Client(Socket socket) {
         this.socket = socket;
         try{
-        	this.in = new Scanner(this.socket.getInputStream());
+        	this.in = new BufferedReader( new InputStreamReader(this.socket.getInputStream()));
         	this.out = new PrintWriter(this.socket.getOutputStream(), true);
         } catch (IOException ex){
         	LOGGER.log(Level.SEVERE, String.format("Errore nell'ottenere stream dal socket %s", this.socket.toString()), ex);
@@ -68,18 +68,23 @@ public class Client {
     }
     
     /**
-     * legge dal inputstream del client
+     * legge dal inputstream del client, restituisce ERROR se 
      * @return
      */
     public String read(){
-        return this.in.nextLine();
+        try {
+            return this.in.readLine();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, String.format("Errore nel leggere da Client nel socket %s", this.socket.toString()), e);
+            return "ERROR";
+        }
     }
     
     /**
      * getter per lo scanner
      * @return
      */
-    public Scanner in(){
+    public BufferedReader in(){
         return this.in;
     }
     
@@ -96,9 +101,9 @@ public class Client {
 	 */
     public void close() {
         this.write("CHIUSURA");
-		this.in.close();
 		this.out.close();
 		try {
+		    this.in.close();
 			this.socket.close();
 		} catch (IOException e) {
 			LOGGER.log(Level.INFO, "Errore nel chiudere il scoket", e);

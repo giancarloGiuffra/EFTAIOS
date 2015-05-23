@@ -1,14 +1,16 @@
 package it.polimi.view;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -37,7 +39,7 @@ public class View extends BaseObservable implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(View.class.getName());    
 	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.{3})");
 	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
-	private Scanner scanner;
+	private BufferedReader input;
 	private PrintWriter output;
 	private Boolean printWelcomeMessagge = true;
 	
@@ -47,17 +49,17 @@ public class View extends BaseObservable implements Runnable {
 	 * @param output
 	 */
 	public View(InputStream inputStream, OutputStream output) {
-		this.scanner = new Scanner(inputStream);
+		this.input = new BufferedReader( new InputStreamReader(inputStream) );
 		this.output = new PrintWriter(output, true);
 	}
 	
 	/**
 	 * Costruttore
-	 * @param scanner
+	 * @param input
 	 * @param printwriter
 	 */
-	public View(Scanner scanner, PrintWriter printwriter){
-		this.scanner = scanner;
+	public View(BufferedReader input, PrintWriter printwriter){
+		this.input = input;
 		this.output = printwriter;
 		this.printWelcomeMessagge = false;
 	}
@@ -69,7 +71,7 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	public View(File in, File out) {
 		try{
-		    this.scanner = new Scanner(in);
+		    this.input = new BufferedReader( new FileReader(in));
 		    this.output = new PrintWriter(out);
 		    this.printWelcomeMessagge = false;
 		} catch(IOException ex){
@@ -84,8 +86,8 @@ public class View extends BaseObservable implements Runnable {
 	 * @param client
 	 * @throws IOException
 	 */
-	public void setScannerAndOutput(Client client) {
-	    this.setScanner(client.in());
+	public void setInputAndOutput(Client client) {
+	    this.setInput(client.in());
 	    this.setOutput(client.out());
     }
 
@@ -97,6 +99,26 @@ public class View extends BaseObservable implements Runnable {
 		output.println(message);		
 	}
 	
+	public void printFineMessaggio(){
+	    if(this.printWelcomeMessagge) return;
+	    print("FINE_MESSAGGIO");
+	}
+	
+	public void printRichiedeInput(){
+	    if(this.printWelcomeMessagge) return;
+	    print("RICHIEDE_INPUT");
+	}
+	
+	public void printFineMessaggio(String message){
+	    print(message);
+	    printFineMessaggio();
+	}
+	
+	public void printRichiedeInput(String message){
+        print(message);
+        printRichiedeInput();
+    }
+	
 	/**
 	 * Stampa nello stream di output un messaggio per chiedere all'utente di inserire
 	 * una mossa, ricordando il format usato finche l'utente non inserisce una mossa valida
@@ -106,10 +128,12 @@ public class View extends BaseObservable implements Runnable {
 		print("Indica la tua mossa:");
 		print("Ricorda che il formato da utlizzare è:");
 		print(PATTERN_MOSSA.pattern());
-		String mossa = this.scanner.nextLine();
+		printRichiedeInput();
+		String mossa = this.readLine();
 		while(!isValidMossa(mossa)){
 			print("La mossa inserita non è valida. Inserirne un'altra.");
-			mossa = this.scanner.nextLine();
+			printRichiedeInput();
+			mossa = this.readLine();
 		}
 		this.sendMossa(mossa);
 	}
@@ -154,6 +178,7 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	public void comunicaTurnoFinito() {
 		print("Il tuo turno è finito.\n\n");
+		printFineMessaggio();
 		this.notify(new UserTurnoFinitoEvent());
 	}
 
@@ -196,12 +221,14 @@ public class View extends BaseObservable implements Runnable {
 	private AzioneGiocatore restituisceScelta(
 			Map<Integer, AzioneGiocatore> mappa) {
 		Pattern indexPattern = Pattern.compile("\\d+");
-		String scelta = this.scanner.nextLine();
+		printRichiedeInput();
+		String scelta = this.readLine();
 		Matcher matcher = indexPattern.matcher(scelta);
 		while(!matcher.matches() ||
 		        !mappa.containsKey(Integer.parseInt(scelta)) ){
 		    print("Scelta non valida");
-			scelta = this.scanner.nextLine();
+		    printRichiedeInput();
+			scelta = this.readLine();
 			matcher.reset(scelta);
 		}
 		return mappa.get(Integer.parseInt(scelta));
@@ -233,7 +260,8 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	private void chiediDiPescareCarta() {
         print("Devi pescare una Carta Settore. Premi invio per procedere.");
-        this.scanner.nextLine(); //Verifica se utente ha premuto invio
+        printRichiedeInput();
+        this.readLine(); //Verifica se utente ha premuto invio
         Event event = new UserPicksCardEvent();
         this.notify(event);
     }
@@ -275,7 +303,7 @@ public class View extends BaseObservable implements Runnable {
 	public void run() {
 	    if(this.printWelcomeMessagge){
 	        this.printWelcomeMessage();
-	        this.scanner.nextLine(); // verifica se utente ha premuto invio
+	        this.readLine(); // verifica se utente ha premuto invio
 	    }
 		this.notify(new UserStartEvent());
 	}
@@ -287,10 +315,12 @@ public class View extends BaseObservable implements Runnable {
 		print("Devi annunciare un settore");
 		print("Ricorda che il formato da utlizzare è:");
 		print(PATTERN_ANNOUNCE.pattern());
-		String announce = this.scanner.nextLine();
+		printRichiedeInput();
+		String announce = this.readLine();
 		while(!isValidAnnouncement(announce)){
 			print("L'annuncio inserito non è valido. Inserirne un altro.");
-			announce = this.scanner.nextLine();
+			printRichiedeInput();
+			announce = this.readLine();
 		}
 		this.sendAnnouncement(announce);
 	}
@@ -322,6 +352,7 @@ public class View extends BaseObservable implements Runnable {
      */
 	public void comunicaSpostamento(String settore) {
 	    print(String.format("Ti sei spostato nel settore %s", settore));
+	    printFineMessaggio();
     }
 
     /**
@@ -330,6 +361,7 @@ public class View extends BaseObservable implements Runnable {
      */
 	public void comunicaCartaPescata(String nomeCarta) {
         print(String.format("Hai pescato una carta %s", nomeCarta));
+        printFineMessaggio();
     }
 
     /**
@@ -337,6 +369,7 @@ public class View extends BaseObservable implements Runnable {
      */
 	public void comunicaSilenzioDichiarato(Event event) {
         print("Hai dichiarato silenzio.");
+        printFineMessaggio();
         this.notify(event); //notify per ClientManager
     }
 
@@ -347,23 +380,24 @@ public class View extends BaseObservable implements Runnable {
 	public void comunicaSettoreAnnunciato(Event event) {
 		ModelAnnunciatoSettoreEvent annuncioEvent = (ModelAnnunciatoSettoreEvent) event;
         print(String.format("Hai annunciato rumore nel settore %s", annuncioEvent.settore()));
+        printFineMessaggio();
         this.notify(event); //notify per ClientManager
     }
 	
 	/**
-	 * setter per lo scanner
+	 * setter per lo input
 	 * @param inputstream
 	 */
-	public void setScanner(InputStream inputstream){
-	    this.scanner = new Scanner(inputstream);
+	public void setInput(InputStream inputstream){
+	    this.input = new BufferedReader(new InputStreamReader(inputstream));
 	}
 	
 	/**
-	 * setter per lo scanner
-	 * @param scanner
+	 * setter per lo input
+	 * @param input
 	 */
-	public void setScanner(Scanner scanner){
-	    this.scanner = scanner;
+	public void setInput(BufferedReader input){
+	    this.input = input;
 	}
 	
 	/**
@@ -388,6 +422,7 @@ public class View extends BaseObservable implements Runnable {
      */
 	public void comunicaAttaccoEffettuato(Event event) {
         this.print(event.getMsg());
+        printFineMessaggio();
         this.notify(event); //notify per ClientManager   
     }
 
@@ -398,6 +433,20 @@ public class View extends BaseObservable implements Runnable {
 	public void comunicaGiocoFinito(Event event) {
 		this.print("Il gioco è finito");
 		this.print(event.getMsg());
+		printFineMessaggio();
 		this.notify(event); //notify per ClientManager
+	}
+	
+	/**
+	 * legge l'input 
+	 * @return
+	 */
+	public String readLine(){
+	    try {
+            return this.input.readLine();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Errore di lettura da parte dalla View", e);
+            return "ERROR";
+        }
 	}
 }
