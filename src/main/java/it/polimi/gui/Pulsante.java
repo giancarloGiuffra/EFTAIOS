@@ -4,30 +4,52 @@ import javax.swing.*;
 
 public class Pulsante {
 	
-	private static String idPulsante;
-	private final String nomePulsante;
+	private static int idPulsante;
+	private String nomePulsante;
 	private final JButton button;
-	
-	public Pulsante(String nome, String id) {
+	private int ascissa;
+	private int ordinata;
+
+	public Pulsante(String nome, int indicePulsante) {
 		nomePulsante = nome;
 		button = new JButton(nome);
-		setIdPulsante(id);
+		setIdPulsante(indicePulsante);
 	}
 
-	public static String getIdPulsante() {
+	public static int getIdPulsante() {
 		return idPulsante;
 	}
 
-	public static void setIdPulsante(String id) {
-		Pulsante.idPulsante = id;
+	public void setIdPulsante(int indicePulsante) {
+		Pulsante.idPulsante = indicePulsante;
 	}
 
 	public String getNomePulsante() {
 		return nomePulsante;
 	}
 
+	public void setNomePulsante(String nomePulsante) {
+		this.nomePulsante = nomePulsante;
+	}
+
 	public JButton getButton() {
 		return button;
+	}
+
+	public int getAscissa() {
+		return ascissa;
+	}
+
+	public void setAscissa(int ascissa) {
+		this.ascissa = ascissa;
+	}
+	
+	public int getOrdinata() {
+		return ordinata;
+	}
+
+	public void setOrdinata(int ordinata) {
+		this.ordinata = ordinata;
 	}
 	
 }

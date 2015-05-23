@@ -25,9 +25,9 @@ public class Principale {
 		
 		/*Principale main = new Principale();
 		main.run();	*/
-		
-		GUI.ricavaSettori();
-		GUI.setNumeroGiocatori();
+		GUI nuovaGUI = new GUI();
+		//nuovaGUI.ricavaSettori();
+		nuovaGUI.setNumeroGiocatori();
 		Partita nuovaPartita = new Partita(7); //modificare 
 		//Partita nuovaPartita = GUI.creaNuovaPartita();
 		Turno nuovoTurno = new Turno(nuovaPartita.getNumeroGiocatori(), nuovaPartita.getListaGiocatori());
