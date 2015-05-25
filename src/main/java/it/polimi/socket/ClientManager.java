@@ -132,6 +132,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
      * @param event
      */
     private void gestisceModelGameOver(Event event) {
+    	this.broadcastAllButCurrentClient("Il gioco è finito");
 		this.broadcastAllButCurrentClient(event.getMsg());
 		this.broadcast("La connessione si chiuderà tra breve");
 		this.close();

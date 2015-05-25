@@ -1,6 +1,8 @@
 package it.polimi.common.observer;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -9,13 +11,13 @@ import java.util.Set;
  */
 public abstract class BaseObservable {
 	
-	private final Set<BaseObserver> observers;
+	private final List<BaseObserver> observers;
 	
 	/**
 	 * Costruttore
 	 */
 	public BaseObservable(){
-		this.observers = new HashSet<BaseObserver>();
+		this.observers = new ArrayList<BaseObserver>();
 	}
 	
 	public void addObserver(BaseObserver obs){

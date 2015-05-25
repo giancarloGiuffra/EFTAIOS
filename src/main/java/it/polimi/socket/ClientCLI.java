@@ -6,9 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.google.common.collect.Iterables;
 
 public class ClientCLI implements Runnable{
 	
@@ -79,7 +82,10 @@ public class ClientCLI implements Runnable{
     	    while( mustPrint(fromServer = readLineFromServer()) ){
     	        print(fromServer);
     	    }
-    	    if(fromServer.equals("RICHIEDE_INPUT")) printToServer(stdIn.nextLine());
+    	    if(fromServer.equals("RICHIEDE_INPUT")){
+    	    	//String toServer = Iterables.getLast(Arrays.asList(stdIn.useDelimiter("\\A").next().split("\n")));
+    	    	printToServer(stdIn.nextLine());
+    	    }
     	    if(fromServer.equals("CHIUSURA")) this.closed = true;
 	    }
 	    this.close();
