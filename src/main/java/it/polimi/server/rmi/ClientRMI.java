@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 
 import it.polimi.server.Client;
+import it.polimi.view.BufferedReaderPlus;
+import it.polimi.view.PrintWriterPlus;
 
 public class ClientRMI implements Client {
 
@@ -14,13 +16,13 @@ public class ClientRMI implements Client {
 	}
 
 	@Override
-	public BufferedReader in() {
+	public BufferedReaderPlus in() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public PrintWriter out() {
+	public PrintWriterPlus out() {
 		// TODO Auto-generated method stub
 		return null;
 	}

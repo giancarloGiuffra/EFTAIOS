@@ -3,12 +3,10 @@ package it.polimi.server.socket;
 import it.polimi.server.Client;
 import it.polimi.server.ClientManager;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,8 +14,8 @@ import java.util.logging.Logger;
 public class ClientSocket implements Client{
     
     private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    private BufferedReaderSocket in;
+    private PrintWriterSocket out;
     private static final Logger LOGGER = Logger.getLogger(ClientManager.class.getName().concat(ClientSocket.class.getSimpleName()));
     
     /**
@@ -28,8 +26,8 @@ public class ClientSocket implements Client{
     public ClientSocket(Socket socket) {
         this.socket = socket;
         try{
-        	this.in = new BufferedReader( new InputStreamReader(this.socket.getInputStream()));
-        	this.out = new PrintWriter(this.socket.getOutputStream(), true);
+        	this.in = new BufferedReaderSocket( new InputStreamReader(this.socket.getInputStream()));
+        	this.out = new PrintWriterSocket(this.socket.getOutputStream(), true);
         } catch (IOException ex){
         	LOGGER.log(Level.SEVERE, String.format("Errore nell'ottenere stream dal socket %s", this.socket.toString()), ex);
         }
@@ -88,7 +86,7 @@ public class ClientSocket implements Client{
      * @return
      */
     @Override
-    public BufferedReader in(){
+    public BufferedReaderSocket in(){
         return this.in;
     }
     
@@ -97,7 +95,7 @@ public class ClientSocket implements Client{
      * @return
      */
     @Override
-    public PrintWriter out(){
+    public PrintWriterSocket out(){
         return this.out;
     }
 
