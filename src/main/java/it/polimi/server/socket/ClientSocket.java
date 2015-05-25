@@ -1,4 +1,7 @@
-package it.polimi.socket;
+package it.polimi.server.socket;
+
+import it.polimi.server.Client;
+import it.polimi.server.ClientManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,23 +10,22 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Client {
+public class ClientSocket implements Client{
     
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private static final Logger LOGGER = Logger.getLogger(ClientManager.class.getName().concat(Client.class.getSimpleName()));
+    private static final Logger LOGGER = Logger.getLogger(ClientManager.class.getName().concat(ClientSocket.class.getSimpleName()));
     
     /**
      * Costruttore
      * @param inputstream
      * @param outputstream
      */
-    public Client(Socket socket) {
+    public ClientSocket(Socket socket) {
         this.socket = socket;
         try{
         	this.in = new BufferedReader( new InputStreamReader(this.socket.getInputStream()));
@@ -63,6 +65,7 @@ public class Client {
      * scrive messaggio nel outputstream del client
      * @param message
      */
+    @Override
     public void write(String message){
         this.out.println(message);
     }
@@ -84,6 +87,7 @@ public class Client {
      * getter per lo scanner
      * @return
      */
+    @Override
     public BufferedReader in(){
         return this.in;
     }
@@ -92,6 +96,7 @@ public class Client {
      * getter per l'out
      * @return
      */
+    @Override
     public PrintWriter out(){
         return this.out;
     }

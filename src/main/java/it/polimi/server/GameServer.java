@@ -1,4 +1,6 @@
-package it.polimi.socket;
+package it.polimi.server;
+
+import it.polimi.server.socket.ClientSocket;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -47,9 +49,9 @@ public class GameServer {
     					LOGGER.log(Level.WARNING, "Exception in blocco wait che aspetta finche si liberi una GAMEROOM");;
     				}
             	}
-                GameRoom gameRoom = new GameRoom(new ClientManager(new Client(serverSocket.accept())));
+                GameRoom gameRoom = new GameRoom(new ClientManager(new ClientSocket(serverSocket.accept())));
                 while(!gameRoom.isFull()){
-                    gameRoom.addClient(new Client(serverSocket.accept()));
+                    gameRoom.addClient(new ClientSocket(serverSocket.accept()));
                 }
                 gameRoom.start();
         	}

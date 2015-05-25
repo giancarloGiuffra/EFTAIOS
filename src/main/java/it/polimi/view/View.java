@@ -30,9 +30,9 @@ import it.polimi.common.observer.UserTurnoFinitoEvent;
 import it.polimi.model.exceptions.AzioneSceltaInaspettataException;
 import it.polimi.model.exceptions.IterazioneNonPrevistaException;
 import it.polimi.model.player.AzioneGiocatore;
-import it.polimi.socket.Client;
-import it.polimi.socket.ClientManager;
-import it.polimi.socket.GameServer;
+import it.polimi.server.Client;
+import it.polimi.server.ClientManager;
+import it.polimi.server.GameServer;
 
 public class View extends BaseObservable implements Runnable {
 
