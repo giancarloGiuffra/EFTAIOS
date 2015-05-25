@@ -30,16 +30,16 @@ import it.polimi.common.observer.UserTurnoFinitoEvent;
 import it.polimi.model.exceptions.AzioneSceltaInaspettataException;
 import it.polimi.model.exceptions.IterazioneNonPrevistaException;
 import it.polimi.model.player.AzioneGiocatore;
-import it.polimi.socket.Client;
-import it.polimi.socket.ClientManager;
-import it.polimi.socket.GameServer;
+import it.polimi.server.Client;
+import it.polimi.server.ClientManager;
+import it.polimi.server.GameServer;
 
 public class View extends BaseObservable implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(View.class.getName());    
 	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.{3})");
 	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
-	private BufferedReader input;
+	private BufferedReaderPlus input;
 	private PrintWriter output;
 	private Boolean printWelcomeMessagge = true;
 	
@@ -49,7 +49,7 @@ public class View extends BaseObservable implements Runnable {
 	 * @param output
 	 */
 	public View(InputStream inputStream, OutputStream output) {
-		this.input = new BufferedReader( new InputStreamReader(inputStream) );
+		this.input = (BufferedReaderPlus) new BufferedReader( new InputStreamReader(inputStream) );
 		this.output = new PrintWriter(output, true);
 	}
 	
@@ -58,27 +58,10 @@ public class View extends BaseObservable implements Runnable {
 	 * @param input
 	 * @param printwriter
 	 */
-	public View(BufferedReader input, PrintWriter printwriter){
+	public View(BufferedReaderPlus input, PrintWriter printwriter){
 		this.input = input;
 		this.output = printwriter;
 		this.printWelcomeMessagge = false;
-	}
-	
-	/**
-	 * Costruttore per File
-	 * @param in
-	 * param out
-	 */
-	public View(File in, File out) {
-		try{
-		    this.input = new BufferedReader( new FileReader(in));
-		    this.output = new PrintWriter(out);
-		    this.printWelcomeMessagge = false;
-		} catch(IOException ex){
-		    LOGGER.log(Level.SEVERE, String.format("Errore nel aprire file %s o file %s", in.toString(), out.toString()), ex);
-		    System.exit(0); //NOSONAR
-		    //TODO forse c'è un miglior metodo
-		}
 	}
 	
 	/**
@@ -389,14 +372,14 @@ public class View extends BaseObservable implements Runnable {
 	 * @param inputstream
 	 */
 	public void setInput(InputStream inputstream){
-	    this.input = new BufferedReader(new InputStreamReader(inputstream));
+	    this.input = (BufferedReaderPlus) new BufferedReader(new InputStreamReader(inputstream));
 	}
 	
 	/**
 	 * setter per lo input
 	 * @param input
 	 */
-	public void setInput(BufferedReader input){
+	public void setInput(BufferedReaderPlus input){
 	    this.input = input;
 	}
 	

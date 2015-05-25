@@ -1,4 +1,4 @@
-package it.polimi.socket;
+package it.polimi.server;
 
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
@@ -7,25 +7,17 @@ import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.ModelDichiaratoSilenzioEvent;
-import it.polimi.controller.Controller;
-import it.polimi.model.exceptions.IllegalEventForClientManager;
 import it.polimi.model.exceptions.IllegalObservableForClientManager;
 import it.polimi.model.player.Player;
 import it.polimi.view.View;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ClientManager extends BaseObservable implements BaseObserver{
     
@@ -132,6 +124,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
      * @param event
      */
     private void gestisceModelGameOver(Event event) {
+    	this.broadcastAllButCurrentClient("Il gioco è finito");
 		this.broadcastAllButCurrentClient(event.getMsg());
 		this.broadcast("La connessione si chiuderà tra breve");
 		this.close();

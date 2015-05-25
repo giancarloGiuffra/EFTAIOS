@@ -1,4 +1,4 @@
-package it.polimi.socket;
+package it.polimi.server;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;

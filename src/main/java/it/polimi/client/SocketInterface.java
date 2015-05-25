@@ -1,4 +1,4 @@
-package it.polimi.socket;
+package it.polimi.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,46 +6,44 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.common.collect.Iterables;
+public class SocketInterface implements NetworkInterface {
 
-public class ClientCLI implements Runnable{
-	
 	private Socket socket;
 	private BufferedReader in;
 	private PrintWriter out;
 	private Scanner stdIn = new Scanner(System.in);
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
-	private static final Integer PORT = 1337;
+	private static final Integer PORT = 1337; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(ClientCLI.class.getName());
     private Boolean closed = false;
-
+	
 	/**
 	 * Costruttore
 	 */
-	public ClientCLI(){
-		//TODO per adesso non fa niente
+	public SocketInterface(){
+		
 	}
 	
-	/**
-	 * Tenta di connettersi al server
-	 */
-	public void connectToServer(){
+	@Override
+	public Boolean connectToServer() {
 		print("Inserisci l'Indirizzo IP del Server: ");
 		try {
 			//this.socket = new Socket(stdIn.readLine(), PORT);
 			this.socket = new Socket("127.0.0.1", PORT);
 			this.in = new BufferedReader( new InputStreamReader(socket.getInputStream()));
 			this.out = new PrintWriter(socket.getOutputStream());
+			return true;
 		} catch (UnknownHostException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			return false;
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			print("Errore nel cercare di connettersi");
+			return false;
 		}
 	}
 	
@@ -76,15 +74,28 @@ public class ClientCLI implements Runnable{
 	}
 
 	@Override
+	public Boolean close() {
+		this.out.close();
+		try {
+		    this.in.close();
+			this.socket.close();
+			return true;
+		} catch (IOException e) {
+			LOGGER.log(Level.INFO, "Errore nel chiudere il socket", e);
+			return false;
+		}
+	}
+
+	@Override
 	public void run() {
-	    String fromServer;
+		String fromServer;
 	    while(!isClosed()){
     	    while( mustPrint(fromServer = readLineFromServer()) ){
     	        print(fromServer);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
-    	        String toServer = Iterables.getLast(Arrays.asList(stdIn.useDelimiter("\\A").next().split("\n")));
-    	        printToServer(toServer);
+    	    	//String toServer = Iterables.getLast(Arrays.asList(stdIn.useDelimiter("\\A").next().split("\n")));
+    	    	printToServer(stdIn.nextLine());
     	    }
     	    if(fromServer.equals("CHIUSURA")) this.closed = true;
 	    }
@@ -114,28 +125,5 @@ public class ClientCLI implements Runnable{
             return "ERROR FROM SERVER";
         }
 	}
-	
-	/**
-	 * chiude la connessione
-	 */
-	private void close(){
-		this.out.close();
-		try {
-		    this.in.close();
-			this.socket.close();
-		} catch (IOException e) {
-			LOGGER.log(Level.INFO, "Errore nel chiudere il socket", e);;
-		}
-	}
-	
-	/**
-     * MAIN
-     * @param args
-     */
-    public static void main(String[] args) {
-    	ClientCLI client = new ClientCLI();
-    	client.connectToServer();
-		(new Thread(client)).start();;
-    }
-	
+
 }
