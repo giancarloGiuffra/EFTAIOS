@@ -18,6 +18,7 @@ public class GameRoom implements BaseObserver{
     private Controller controller;
     private View view;
     private ClientManager manager;
+    private Boolean hasStarted = false;
     
     private static AtomicInteger NUMBER_OF_GAMEROOMS = new AtomicInteger(0);
     
@@ -43,6 +44,7 @@ public class GameRoom implements BaseObserver{
         this.view.addObserver(this.manager); //importante che manager sia il primo observer
         this.view.addObserver(controller);
         NUMBER_OF_GAMEROOMS.incrementAndGet();
+        this.hasStarted = true;
         this.run();
     }
     
@@ -75,6 +77,14 @@ public class GameRoom implements BaseObserver{
      */
     public static Integer numberOfRooms(){
         return GameRoom.NUMBER_OF_GAMEROOMS.get();
+    }
+    
+    /**
+     * 
+     * @return true se la sala ha già iniziato
+     */
+    public Boolean hasStarted(){
+        return this.hasStarted;
     }
 
 	@Override

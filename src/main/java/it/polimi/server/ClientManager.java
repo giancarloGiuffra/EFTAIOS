@@ -31,11 +31,18 @@ public class ClientManager extends BaseObservable implements BaseObserver{
     /**
      * Costruttore
      */
-    public ClientManager(Client client){
+    public ClientManager(){
         this.clients = new LinkedList<Client>();
         this.clientsMorti = new ArrayList<Client>();
         this.fileIn = new File(this.toString().concat("IN"));
         this.fileOut = new File(this.toString().concat("OUT"));
+    }
+    
+    /**
+     * Costruttore
+     */
+    public ClientManager(Client client){
+        this();
         this.addClient(client);
     }
     

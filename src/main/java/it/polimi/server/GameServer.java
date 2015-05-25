@@ -5,6 +5,7 @@ import it.polimi.server.socket.ClientSocket;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,12 +15,22 @@ public class GameServer {
     private static final Integer MAX_GAMEROOMS = 2;
     private final Integer port;
     private ServerSocket serverSocket;
+    private GameRoom currentGameRoom; 
     
     /**
      * Costruttore
      */
     public GameServer(int port){
         this.port = port; 
+    }
+    
+    /**
+     * retituisce la GameRoom attiva attualmente , cioè quella che sta ricevendo
+     * giocatori
+     * @return
+     */
+    public GameRoom currentGameRoom(){
+        return this.currentGameRoom;
     }
     
     /**
@@ -49,11 +60,19 @@ public class GameServer {
     					LOGGER.log(Level.WARNING, "Exception in blocco wait che aspetta finche si liberi una GAMEROOM");;
     				}
             	}
-                GameRoom gameRoom = new GameRoom(new ClientManager(new ClientSocket(serverSocket.accept())));
+                GameRoom gameRoom = new GameRoom(new ClientManager());
+                this.currentGameRoom = gameRoom;
                 while(!gameRoom.isFull()){
-                    gameRoom.addClient(new ClientSocket(serverSocket.accept()));
+                    ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
+                    if(!gameRoom.isFull()){
+                        gameRoom.addClient(clientSocket);
+                    }else {
+                        clientSocket.write("Ci dispiace la sala si è riempita. Prova per favore a connetterti di nuovo. Questa connessione verrà chiusa");
+                        clientSocket.close();
+                        break;
+                    }
                 }
-                gameRoom.start();
+                if(!gameRoom.hasStarted()) gameRoom.start();
         	}
         }
     }
