@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class ClientCLI{
 	
-	private NetworkInterface networkInterface;
+	private NetworkInterfaceForClient networkInterface;
 	private Scanner stdIn = new Scanner(System.in);
 	
 	/**

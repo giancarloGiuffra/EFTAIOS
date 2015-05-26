@@ -1,6 +1,6 @@
 package it.polimi.client;
 
-public interface NetworkInterface extends Runnable{
+public interface NetworkInterfaceForClient extends Runnable{
 	
 	/**
 	 * Gestisce l'apertura della connessione

@@ -120,7 +120,7 @@ public class GameServer implements BaseObserver{
 				this.currentGameRoom.addClient(((ServerNewClientRMIEvent)event).clientRMI());
 				if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()) this.currentGameRoom.start();
 			} else {
-				//TODO comunica al client che la sala è piena e chiude connessione
+				((ServerNewClientRMIEvent)event).clientRMI().write("Ci dispiace la sala è piena. Per favore prova a connetterti di nuovo. Questa connessione sarà chiusa");
 			}
 			
 		}

@@ -10,7 +10,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SocketInterface implements NetworkInterface {
+public class SocketInterface implements NetworkInterfaceForClient {
 
 	private Socket socket;
 	private BufferedReader in;
@@ -18,7 +18,7 @@ public class SocketInterface implements NetworkInterface {
 	private Scanner stdIn = new Scanner(System.in);
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 1337; //porta di ascolto del server
-    private static final Logger LOGGER = Logger.getLogger(ClientCLI.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
     private Boolean closed = false;
 	
 	/**
