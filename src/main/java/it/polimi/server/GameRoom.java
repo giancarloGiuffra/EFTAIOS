@@ -8,8 +8,8 @@ import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
 import it.polimi.controller.Controller;
 import it.polimi.model.Model;
-import it.polimi.model.exceptions.IllegalObservableForClientManager;
-import it.polimi.model.exceptions.IllegalObservableForGameRoom;
+import it.polimi.server.exceptions.IllegalObservableForClientManager;
+import it.polimi.server.exceptions.IllegalObservableForGameRoom;
 import it.polimi.view.View;
 
 public class GameRoom implements BaseObserver{
@@ -90,7 +90,7 @@ public class GameRoom implements BaseObserver{
 	@Override
 	public void notifyRicevuto(BaseObservable source, Event event) {
 		if(!(source instanceof ClientManager)) throw new IllegalObservableForGameRoom(String.format("%s non è un observable ammissibile per questa classe %s", source.toString(), this.toString()));
-		if("CloseGameRoom".equals(event.name())){
+		if("ServerCloseGameRoom".equals(event.name())){
 			GameRoom.NUMBER_OF_GAMEROOMS.decrementAndGet();
 		}
 	}

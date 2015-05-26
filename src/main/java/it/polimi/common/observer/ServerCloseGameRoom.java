@@ -1,11 +1,11 @@
 package it.polimi.common.observer;
 
-public class CloseGameRoom extends Event {
+public class ServerCloseGameRoom extends Event {
 	
 	/**
 	 * Costruttore
 	 */
-	public CloseGameRoom(){
+	public ServerCloseGameRoom(){
 		super("Si chiude la Game Room");
 	}
 

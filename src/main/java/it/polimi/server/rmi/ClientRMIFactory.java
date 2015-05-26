@@ -1,20 +1,10 @@
 package it.polimi.server.rmi;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public class ClientRMIFactory implements RemoteClientRMIFactory{
+public interface ClientRMIFactory extends Remote {
     
-    /**
-     * Costruttore
-     */
-    private ClientRMIFactory(){
-        
-    }
+    void createNewClientRMI(String RMIInterfaceName) throws RemoteException;
 
-    @Override
-    public void createNewClientRMI(String RMIInterfaceName) throws RemoteException {
-        // TODO Auto-generated method stub
-        
-    }
-    
 }

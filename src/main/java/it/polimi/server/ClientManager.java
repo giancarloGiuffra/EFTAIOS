@@ -2,13 +2,13 @@ package it.polimi.server;
 
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
-import it.polimi.common.observer.CloseGameRoom;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.ModelDichiaratoSilenzioEvent;
-import it.polimi.model.exceptions.IllegalObservableForClientManager;
+import it.polimi.common.observer.ServerCloseGameRoom;
 import it.polimi.model.player.Player;
+import it.polimi.server.exceptions.IllegalObservableForClientManager;
 import it.polimi.view.View;
 
 import java.io.File;
@@ -135,7 +135,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
 		this.broadcastAllButCurrentClient(event.getMsg());
 		this.broadcast("La connessione si chiuderà tra breve");
 		this.close();
-		this.notify(new CloseGameRoom());
+		this.notify(new ServerCloseGameRoom());
 	}
 
 	/**
