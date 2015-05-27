@@ -2,32 +2,44 @@ package it.polimi.view;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
-public abstract class BufferedReaderPlus extends BufferedReader {
+public class BufferedReaderPlus {
 
 	protected BufferedReader bufferedReader;
 	
 	/**
-	 * Costruttore
-	 * @param in
+	 * Costruttore vuoto
 	 */
-	public BufferedReaderPlus(Reader in) {
-		super(in);
-		this.bufferedReader = new BufferedReader(in);
-	}
-
-	/**
-	 * Costruttore
-	 * @param in
-	 * @param sz
-	 */
-	public BufferedReaderPlus(Reader in, int sz) {
-		super(in, sz);
-		this.bufferedReader = new BufferedReader(in);
+	public BufferedReaderPlus(){
+		
 	}
 	
-	@Override
-	public abstract String readLine() throws IOException;
+	/**
+	 * Costruttore
+	 * @param inputStream
+	 */
+	public BufferedReaderPlus(InputStream inputStream){
+		this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+	}
+	
+	/**
+	 * chiama readLine
+	 * @return
+	 * @throws IOException
+	 */
+	public String readLine() throws IOException{
+		return this.bufferedReader.readLine();
+	};
+	
+	/**
+	 * chiude lo stream
+	 * @throws IOException
+	 */
+	public void close() throws IOException{
+		this.bufferedReader.close();
+	}
 
 }

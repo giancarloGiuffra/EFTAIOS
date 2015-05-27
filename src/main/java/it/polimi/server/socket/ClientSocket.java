@@ -26,7 +26,7 @@ public class ClientSocket implements Client{
     public ClientSocket(Socket socket) {
         this.socket = socket;
         try{
-        	this.in = new BufferedReaderSocket( new InputStreamReader(this.socket.getInputStream()));
+        	this.in = new BufferedReaderSocket(this.socket.getInputStream());
         	this.out = new PrintWriterSocket(this.socket.getOutputStream(), true);
         } catch (IOException ex){
         	LOGGER.log(Level.SEVERE, String.format("Errore nell'ottenere stream dal socket %s", this.socket.toString()), ex);

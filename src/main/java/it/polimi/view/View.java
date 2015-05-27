@@ -40,7 +40,7 @@ public class View extends BaseObservable implements Runnable {
 	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.{3})");
 	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
 	private BufferedReaderPlus input;
-	private PrintWriter output;
+	private PrintWriterPlus output;
 	private Boolean printWelcomeMessagge = true;
 	
 	/**
@@ -49,8 +49,8 @@ public class View extends BaseObservable implements Runnable {
 	 * @param output
 	 */
 	public View(InputStream inputStream, OutputStream output) {
-		this.input = (BufferedReaderPlus) new BufferedReader( new InputStreamReader(inputStream) );
-		this.output = new PrintWriter(output, true);
+		this.input = new BufferedReaderPlus(inputStream);
+		this.output = new PrintWriterPlus(output, true);
 	}
 	
 	/**
@@ -58,7 +58,7 @@ public class View extends BaseObservable implements Runnable {
 	 * @param input
 	 * @param printwriter
 	 */
-	public View(BufferedReaderPlus input, PrintWriter printwriter){
+	public View(BufferedReaderPlus input, PrintWriterPlus printwriter){
 		this.input = input;
 		this.output = printwriter;
 		this.printWelcomeMessagge = false;
@@ -369,14 +369,6 @@ public class View extends BaseObservable implements Runnable {
 	
 	/**
 	 * setter per lo input
-	 * @param inputstream
-	 */
-	public void setInput(InputStream inputstream){
-	    this.input = (BufferedReaderPlus) new BufferedReader(new InputStreamReader(inputstream));
-	}
-	
-	/**
-	 * setter per lo input
 	 * @param input
 	 */
 	public void setInput(BufferedReaderPlus input){
@@ -385,17 +377,9 @@ public class View extends BaseObservable implements Runnable {
 	
 	/**
 	 * setter per l'output
-	 * @param outputstream
-	 */
-	public void setOutput(OutputStream outputstream){
-	    this.output = new PrintWriter(outputstream, true);
-	}
-	
-	/**
-	 * setter per l'output
 	 * @param printwriter
 	 */
-	public void setOutput(PrintWriter printwriter){
+	public void setOutput(PrintWriterPlus printwriter){
 	    this.output = printwriter;
 	}
 

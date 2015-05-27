@@ -8,10 +8,12 @@ public class PrintWriterRMI extends PrintWriterPlus {
 
 	private ClientRMI clientRMI;
 	
-	public PrintWriterRMI(ClientRMI clientRMI) throws FileNotFoundException{
-		super(new File(PrintWriterRMI.class.getName()));
+	/**
+	 * Costruttore
+	 * @param clientRMI
+	 */
+	public PrintWriterRMI(ClientRMI clientRMI){
 		this.clientRMI = clientRMI;
-		//TODO eliminare in altro modo exception
 	}
 
 	@Override

@@ -20,12 +20,8 @@ public class ClientRMI implements Client {
 	
 	public ClientRMI(RemoteNotifier notifierToClient){
 		this.notifierToClient = notifierToClient;
-		try {
-			this.in = new BufferedReaderRMI(this);
-			this.out = new PrintWriterRMI(this);
-		} catch (FileNotFoundException e) {
-			LOGGER.log(Level.SEVERE, "Impossibile creare BufferedReaderRMI oppure PrintWriterRMI", e);
-		}
+		this.in = new BufferedReaderRMI(this);
+		this.out = new PrintWriterRMI(this);
 	}
 	
 	@Override
