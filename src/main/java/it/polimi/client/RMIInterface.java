@@ -61,7 +61,9 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	public void run() {
 	    while(!isClosed()){
 	    	try {
-				wait();
+				synchronized(this){
+					this.wait();
+				}
 			} catch (InterruptedException e) {
 				LOGGER.log(Level.WARNING, "Exception in blocco wait di RMIInterface");
 			}

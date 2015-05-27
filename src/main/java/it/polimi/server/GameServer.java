@@ -82,12 +82,12 @@ public class GameServer implements BaseObserver{
         this.serverSocket = new ServerSocket(this.portSocket);
     	LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
         while(true){
-        	//synchronized consigliato da sonar 
-        	synchronized(Thread.currentThread()){
         		//while+wait per far dormire il thread se non ci sono gameroom disponibili
                 while(!(GameRoom.numberOfRooms() < MAX_GAMEROOMS)){
             		try {
-    					wait();
+            			synchronized(this){
+            				this.wait();
+            			}
     				} catch (InterruptedException e) {
     					LOGGER.log(Level.WARNING, "Exception in blocco wait che aspetta finche si liberi una GAMEROOM");
     				}
@@ -106,7 +106,6 @@ public class GameServer implements BaseObserver{
                     break;
                 }
                 
-        	} //synchronized
         } //while(true)
     }
 
