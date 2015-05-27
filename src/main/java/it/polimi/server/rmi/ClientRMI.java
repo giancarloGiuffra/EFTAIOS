@@ -34,19 +34,18 @@ public class ClientRMI implements Client {
 	}
 
 	@Override
-	public BufferedReaderPlus in() {
+	public BufferedReaderRMI in() {
 		return this.in;
 	}
 
 	@Override
-	public PrintWriterPlus out() {
+	public PrintWriterRMI out() {
 		return this.out;
 	}
 
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
-
+		this.write("CHIUSURA");
 	}
 
 	public String read() {

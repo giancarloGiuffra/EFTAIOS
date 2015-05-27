@@ -15,7 +15,7 @@ import java.util.Queue;
  */
 public class Turno {
 
-	private static final int MAX_TURNI = 2;
+	private static final int MAX_TURNI = 1;
 	private int turn_counter = 1;
 	private Player firstPlayer;
 	private Queue<Player> players;

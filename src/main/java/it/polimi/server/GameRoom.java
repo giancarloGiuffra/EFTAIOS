@@ -92,7 +92,9 @@ public class GameRoom extends BaseObservable implements BaseObserver{
 		if(!(source instanceof ClientManager)) throw new IllegalObservableForGameRoom(String.format("%s non è un observable ammissibile per questa classe %s", source.toString(), this.toString()));
 		if("ServerCloseGameRoom".equals(event.name())){
 			GameRoom.NUMBER_OF_GAMEROOMS.decrementAndGet();
-			this.notifyAll();
+			synchronized(this){
+			    this.notifyAll();
+			}
 		}
 	}
 }

@@ -126,8 +126,12 @@ public class RMIInterface implements NetworkInterfaceForClient {
 			stdOut.println(string);
 		    stdOut.flush();
 	    }
-	    if("CHIUSURA".equals(string)) this.closed = true;
-	    this.notifyAll();
+	    if("CHIUSURA".equals(string)){
+	        this.closed = true;
+	        synchronized(this){
+	            this.notifyAll();
+	        }
+	    }
 	}
 	
 	private boolean mustPrint(String string) {
