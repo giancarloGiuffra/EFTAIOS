@@ -28,6 +28,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	private static final Integer PORT = 4040; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
     private ClientRMIFactory clientRMIFactory;
+    private Boolean closed = false;
 	
 	/**
 	 * Costruttore
@@ -38,27 +39,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	
 	@Override
 	public Boolean connectToServer() {
-		print("Inserisci l'Indirizzo IP del Server: ");
-		String server = stdIn.nextLine();
-		String clientRMIFactoryName = "ClientRMIFactory";
-		Registry registry;
-		try {
-			registry = LocateRegistry.getRegistry(server, PORT);
-		} catch (RemoteException e){
-			LOGGER.log(Level.SEVERE, "Non è stato possibile connettersi al server", e);
-			return false;
-		}
-		
-		try {
-			this.clientRMIFactory = (ClientRMIFactory) registry.lookup(clientRMIFactoryName);
-		} catch(RemoteException e){
-			LOGGER.log(Level.SEVERE, "Remote Exception", e);
-			return false;
-		} catch (NotBoundException e){
-			LOGGER.log(Level.SEVERE, "Oggetto non bound", e);
-			return false;
-		}
-		return true;
+		return registerServerInClient() && registerClientInServer();
 	}
 
 	/**
@@ -78,35 +59,20 @@ public class RMIInterface implements NetworkInterfaceForClient {
 
 	@Override
 	public void run() {
-		print("Inserisci la porta locale da utilizzare per la comunicazione: ");
-		Pattern portPattern = Pattern.compile("\\d+");
-		String portName = stdIn.nextLine();
-		Matcher matcher = portPattern.matcher(portName);
-		while(!matcher.matches() || !notValidPort(portName)){
-			print("Porta non valida. Deve essere un numero nel range [49152,65535]. Inserisce ancora: ");
-			portName = stdIn.nextLine();
-			matcher.reset(portName);
-		}
-		Integer port = Integer.parseInt(portName);
-		//String ipAddress = getMyIPAddress();
-		String ipAddress = "127.0.0.1";
-		if(!"ERROR".equals(ipAddress)){
-			try {
-				RemoteNotifier notifier = new NotifierClient(this);
-				RemoteNotifier notifierStub = (RemoteNotifier) UnicastRemoteObject.exportObject(notifier, port);
-				Registry registry = LocateRegistry.createRegistry(port);
-				String notifierName = "Notifier".concat(port.toString());
-				registry.bind(notifierName, notifierStub);
-				this.clientRMIFactory.createNewClientRMI(notifierName, ipAddress, port);
-				print(String.format("Si è messa a disposizione la porta %s per comunicare con il server",port));
-			} catch (RemoteException | AlreadyBoundException e) {
-				LOGGER.log(Level.SEVERE, "RMI Exception", e);
+	    while(!isClosed()){
+	    	try {
+				wait();
+			} catch (InterruptedException e) {
+				LOGGER.log(Level.WARNING, "Exception in blocco wait di RMIInterface");
 			}
-		}else{
-			print("Errore nell'ottenere un indirizzo IP valido da inviare al server");
-		}
+	    }
+	    this.close();
 	}
 	
+	private boolean isClosed() {
+		return this.closed;
+	}
+
 	/**
 	 * metodo per ottenere un indirizzo IP da inviare al server
 	 * @return
@@ -154,16 +120,89 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * @param string
 	 */
 	public void print(String string){
-	    stdOut.println(string);
-	    stdOut.flush();
+	    if(mustPrint(string)){
+			stdOut.println(string);
+		    stdOut.flush();
+	    }
+	    if("CHIUSURA".equals(string)) this.closed = true;
+	    this.notifyAll();
 	}
 	
+	private boolean mustPrint(String string) {
+		return !string.equals("FINE_MESSAGGIO") && 
+	           !string.equals("RICHIEDE_INPUT") &&
+	           !string.equals("CHIUSURA");
+	}
+
 	/**
 	 * legge da stdIn
 	 * @return
 	 */
 	public String read(){
 		return stdIn.nextLine();
+	}
+	
+	/**
+	 * inizializza oggetto remoto per interagire con il server
+	 */
+	private Boolean registerServerInClient(){
+		print("Inserisci l'Indirizzo IP del Server: ");
+		String server = stdIn.nextLine();
+		String clientRMIFactoryName = "ClientRMIFactory";
+		Registry registry;
+		try {
+			registry = LocateRegistry.getRegistry(server, PORT);
+		} catch (RemoteException e){
+			LOGGER.log(Level.SEVERE, "Non è stato possibile connettersi al server", e);
+			return false;
+		}
+		
+		try {
+			this.clientRMIFactory = (ClientRMIFactory) registry.lookup(clientRMIFactoryName);
+		} catch(RemoteException e){
+			LOGGER.log(Level.SEVERE, "Remote Exception", e);
+			return false;
+		} catch (NotBoundException e){
+			LOGGER.log(Level.SEVERE, "Oggetto non bound", e);
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * crea notifier per poter ricevere richiesta dal server
+	 * @return
+	 */
+	private Boolean registerClientInServer(){
+		print("Inserisci la porta locale da utilizzare per la comunicazione: ");
+		Pattern portPattern = Pattern.compile("\\d+");
+		String portName = stdIn.nextLine();
+		Matcher matcher = portPattern.matcher(portName);
+		while(!matcher.matches() || !notValidPort(portName)){
+			print("Porta non valida. Deve essere un numero nel range [49152,65535]. Inserisce ancora: ");
+			portName = stdIn.nextLine();
+			matcher.reset(portName);
+		}
+		Integer port = Integer.parseInt(portName);
+		//String ipAddress = getMyIPAddress();
+		String ipAddress = "127.0.0.1";
+		if(!"ERROR".equals(ipAddress)){
+			try {
+				RemoteNotifier notifier = new NotifierClient(this);
+				RemoteNotifier notifierStub = (RemoteNotifier) UnicastRemoteObject.exportObject(notifier, port);
+				Registry registry = LocateRegistry.createRegistry(port);
+				String notifierName = "Notifier".concat(port.toString());
+				registry.bind(notifierName, notifierStub);
+				this.clientRMIFactory.createNewClientRMI(notifierName, ipAddress, port);
+				return true;
+			} catch (RemoteException | AlreadyBoundException e) {
+				LOGGER.log(Level.SEVERE, "RMI Exception", e);
+				return false;
+			}
+		}else{
+			print("Errore nell'ottenere un indirizzo IP valido da inviare al server");
+			return false;
+		}
 	}
 
 }

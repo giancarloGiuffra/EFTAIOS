@@ -12,7 +12,7 @@ import it.polimi.server.exceptions.IllegalObservableForClientManager;
 import it.polimi.server.exceptions.IllegalObservableForGameRoom;
 import it.polimi.view.View;
 
-public class GameRoom implements BaseObserver{
+public class GameRoom extends BaseObservable implements BaseObserver{
     
     private Model model;
     private Controller controller;
@@ -29,6 +29,7 @@ public class GameRoom implements BaseObserver{
     public GameRoom(ClientManager manager){
         this.manager = manager;
         this.manager.addObserver(this);
+        NUMBER_OF_GAMEROOMS.incrementAndGet();
     }
     
     /**
@@ -43,7 +44,6 @@ public class GameRoom implements BaseObserver{
         this.model.addObserver(controller);
         this.view.addObserver(this.manager); //importante che manager sia il primo observer
         this.view.addObserver(controller);
-        NUMBER_OF_GAMEROOMS.incrementAndGet();
         this.hasStarted = true;
         this.run();
     }
@@ -92,6 +92,7 @@ public class GameRoom implements BaseObserver{
 		if(!(source instanceof ClientManager)) throw new IllegalObservableForGameRoom(String.format("%s non è un observable ammissibile per questa classe %s", source.toString(), this.toString()));
 		if("ServerCloseGameRoom".equals(event.name())){
 			GameRoom.NUMBER_OF_GAMEROOMS.decrementAndGet();
+			this.notifyAll();
 		}
 	}
 }

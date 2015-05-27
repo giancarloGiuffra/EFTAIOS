@@ -61,7 +61,26 @@ public class GameServer implements BaseObserver{
      */
     public void startServer() throws IOException {
     	
-    	//ciclo infinito
+    	//creazione gameroom
+    	this.currentGameRoom = new GameRoom(new ClientManager());
+    	
+    	//server rmi
+        String clientRMIFactoryName = "ClientRMIFactory";
+        try{
+        	ClientRMIFactory clientRMIFactory = new RemoteClientRMIFactory();
+        	( (RemoteClientRMIFactory) clientRMIFactory).addObserver(this); //aggiunge il server come observer
+        	ClientRMIFactory clientRMIFactoryStub = (ClientRMIFactory) UnicastRemoteObject.exportObject(clientRMIFactory,this.portRMI);
+        	LocateRegistry.createRegistry(this.portRMI);
+        	Registry registry = LocateRegistry.getRegistry(this.portRMI);
+        	registry.rebind(clientRMIFactoryName, clientRMIFactoryStub);
+        	LOGGER.log(Level.INFO, String.format("GameServer RMI pronto in porta: %d", this.portRMI));
+        } catch (Exception e) {
+        	LOGGER.log(Level.SEVERE, "RMI Exception: ".concat(e.getMessage()),e);
+        }
+    	
+        //server socket
+        this.serverSocket = new ServerSocket(this.portSocket);
+    	LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
         while(true){
         	//synchronized consigliato da sonar 
         	synchronized(Thread.currentThread()){
@@ -70,42 +89,38 @@ public class GameServer implements BaseObserver{
             		try {
     					wait();
     				} catch (InterruptedException e) {
-    					LOGGER.log(Level.WARNING, "Exception in blocco wait che aspetta finche si liberi una GAMEROOM");;
+    					LOGGER.log(Level.WARNING, "Exception in blocco wait che aspetta finche si liberi una GAMEROOM");
     				}
             	}
-                //creazione gameroom
-                GameRoom gameRoom = new GameRoom(new ClientManager());
-                this.currentGameRoom = gameRoom;
-                //server rmi
-                String clientRMIFactoryName = "ClientRMIFactory";
-                try{
-                	ClientRMIFactory clientRMIFactory = new RemoteClientRMIFactory();
-                	( (RemoteClientRMIFactory) clientRMIFactory).addObserver(this); //aggiunge il server come observer
-                	ClientRMIFactory clientRMIFactoryStub = (ClientRMIFactory) UnicastRemoteObject.exportObject(clientRMIFactory,this.portRMI);
-                	LocateRegistry.createRegistry(this.portRMI);
-                	Registry registry = LocateRegistry.getRegistry(this.portRMI);
-                	registry.rebind(clientRMIFactoryName, clientRMIFactoryStub);
-                	LOGGER.log(Level.INFO, String.format("GameServer RMI pronto in porta: %d", this.portRMI));
-                } catch (Exception e) {
-                	LOGGER.log(Level.SEVERE, "RMI Exception: ".concat(e.getMessage()),e);
-                }
-                //server socket
-            	this.serverSocket = new ServerSocket(this.portSocket);
-            	LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
-                while(!gameRoom.isFull()){
-                    ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
-                    if(!gameRoom.isFull()){
-                        gameRoom.addClient(clientSocket);
-                    }else {
-                        clientSocket.write("Ci dispiace la sala si è riempita. Prova per favore a connetterti di nuovo. Questa connessione verrà chiusa");
-                        clientSocket.close();
-                        break;
+                
+                ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
+                if(!this.currentGameRoom.isFull()){
+                	this.currentGameRoom.addClient(clientSocket);
+                    if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()){
+                    	GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
+                    	gameRoomToLaunch.start();
                     }
+                }else {
+                    clientSocket.write("Ci dispiace la sala si è riempita. Prova per favore a connetterti di nuovo. Questa connessione verrà chiusa");
+                    clientSocket.close();
+                    break;
                 }
-                if(!gameRoom.hasStarted()) gameRoom.start();
-        	}
-        }
+                
+        	} //synchronized
+        } //while(true)
     }
+
+	/**
+	 * Crea una nuova gameroom e la rende disponibile nel field currentGameRoom
+	 * se non ci sono più gameroom disponibili lascia il field nel suo stato attuale
+	 * @return gameroom precedente 
+	 */
+    private GameRoom makeNewGameRoomAvailable() {
+		if(!(GameRoom.numberOfRooms() < MAX_GAMEROOMS)) return this.currentGameRoom;
+		GameRoom previousGameRoom = this.currentGameRoom;
+		this.currentGameRoom = new GameRoom(new ClientManager());
+		return previousGameRoom;
+	}
 
 	@Override
 	public void notifyRicevuto(BaseObservable source, Event event) {
@@ -113,7 +128,10 @@ public class GameServer implements BaseObserver{
 		if("ServerNewClientRMIEvent".equals(event.name())){
 			if(!this.currentGameRoom.isFull()){
 				this.currentGameRoom.addClient(((ServerNewClientRMIEvent)event).clientRMI());
-				if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()) this.currentGameRoom.start();
+				if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()){
+					GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
+					gameRoomToLaunch.start();
+				}
 			} else {
 				((ServerNewClientRMIEvent)event).clientRMI().write("Ci dispiace la sala è piena. Per favore prova a connetterti di nuovo. Questa connessione sarà chiusa");
 			}
