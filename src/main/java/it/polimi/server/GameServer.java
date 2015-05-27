@@ -4,20 +4,15 @@ import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ServerNewClientRMIEvent;
-import it.polimi.server.exceptions.IllegalObservableForClientManager;
 import it.polimi.server.exceptions.IllegalObservableForGameServer;
 import it.polimi.server.rmi.ClientRMIFactory;
 import it.polimi.server.rmi.RemoteClientRMIFactory;
 import it.polimi.server.socket.ClientSocket;
-import it.polimi.view.View;
-
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

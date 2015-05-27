@@ -88,7 +88,8 @@ public class RMIInterface implements NetworkInterfaceForClient {
 			matcher.reset(portName);
 		}
 		Integer port = Integer.parseInt(portName);
-		String ipAddress = getMyIPAddress();
+		//String ipAddress = getMyIPAddress();
+		String ipAddress = "127.0.0.1";
 		if(!"ERROR".equals(ipAddress)){
 			try {
 				RemoteNotifier notifier = new NotifierClient(this);

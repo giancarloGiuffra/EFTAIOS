@@ -1,12 +1,10 @@
 package it.polimi.server.rmi;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
+import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import it.polimi.client.RMIInterface;
 import it.polimi.common.observer.PrintEvent;
 import it.polimi.common.observer.ReadEvent;
 import it.polimi.server.Client;
@@ -22,6 +20,12 @@ public class ClientRMI implements Client {
 	
 	public ClientRMI(RemoteNotifier notifierToClient){
 		this.notifierToClient = notifierToClient;
+		try {
+			this.in = new BufferedReaderRMI(this);
+			this.out = new PrintWriterRMI(this);
+		} catch (FileNotFoundException e) {
+			LOGGER.log(Level.SEVERE, "Impossibile creare BufferedReaderRMI oppure PrintWriterRMI", e);
+		}
 	}
 	
 	@Override

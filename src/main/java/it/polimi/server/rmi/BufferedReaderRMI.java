@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-
 import it.polimi.view.BufferedReaderPlus;
 
 public class BufferedReaderRMI extends BufferedReaderPlus {
