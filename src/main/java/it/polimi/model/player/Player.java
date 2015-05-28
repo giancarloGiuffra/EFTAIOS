@@ -17,7 +17,7 @@ import it.polimi.model.sector.Settore;
  * Classe Astratta da cui derivare i giocatori.
  *
  */
-abstract public class Player {
+public abstract class Player {
     
     private final Personaggio personaggio;
     private Mazzo mazzo;
@@ -26,6 +26,15 @@ abstract public class Player {
     //static block
     static{
         LOGGER.setFilter(new FilterAllLogs());
+    }
+    
+    /**
+     * Copy Constructor
+     * @param source
+     */
+    public Player(Player source){
+    	this.personaggio = source.personaggio;
+    	this.mazzo = new Mazzo(source.mazzo);
     }
     
     /**
@@ -43,7 +52,7 @@ abstract public class Player {
      * @param to    settore di arrivo
      * @return true se la mossa è valida, false altrimenti
      */
-    abstract public boolean isMoveValid(Settore from, Settore to);
+     public abstract boolean isMoveValid(Settore from, Settore to);
 
 	/**
 	 * Restituisce il personaggio del giocatore

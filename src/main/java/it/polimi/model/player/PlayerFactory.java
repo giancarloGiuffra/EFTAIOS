@@ -34,6 +34,23 @@ public class PlayerFactory {
         }
     }
     
+    public static Player copyPlayer(Player player){
+    	switch(player.razza()){
+    	case HUMAN: 
+            return new HumanPlayer(player);
+        case ALIEN: 
+            return new AlienPlayer(player);
+        default: 
+            throw new IllegalRaceException("Razza deve essere HUMAN o ALIEN");
+    	}
+    }
+    
+    public static List<Player> copyListOfPlayers(List<Player> players){
+    	List<Player> lista = new ArrayList<Player>();
+    	for(Player player : players) lista.add(copyPlayer(player));
+    	return lista;
+    }
+    
     /**
      * 
      * @return il giocatore capitano

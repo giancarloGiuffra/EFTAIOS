@@ -1,6 +1,7 @@
 package it.polimi.model.player;
 
 import it.polimi.model.exceptions.BadSectorException;
+import it.polimi.model.exceptions.NotValidAlienPlayer;
 import it.polimi.model.sector.Settore;
 
 /**
@@ -19,6 +20,19 @@ public class AlienPlayer extends Player {
     }
     
     /**
+     * Copy Constructor
+     * @param player
+     */
+    public AlienPlayer( Player player){
+    	super(checkIfValidAlienPlayer(player));
+    }
+    
+    private static Player checkIfValidAlienPlayer(Player player) {
+		if(!player.razza().equals(Razza.ALIEN)) throw new NotValidAlienPlayer();
+		return player;
+	}
+
+	/**
      * Metodo per controllare se la mossa è valida
      * @param from  settore di partenza
      * @param to    settore di arrivo

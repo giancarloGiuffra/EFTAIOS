@@ -1,6 +1,7 @@
 package it.polimi.model.gioco;
 
 import it.polimi.model.player.Player;
+import it.polimi.model.player.PlayerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +29,16 @@ public class Turno {
 		Collections.shuffle(listOfPlayers); //primo giocatore random
 		this.players = new LinkedList<Player>(listOfPlayers);
 		this.firstPlayer = this.players.peek();
+	}
+	
+	/**
+	 * Copy Constructor
+	 * @param turno
+	 */
+	public Turno(Turno source){
+		this.turn_counter = source.turn_counter;
+		this.firstPlayer = PlayerFactory.copyPlayer(source.firstPlayer);
+		this.players = new LinkedList<Player>(PlayerFactory.copyListOfPlayers(this.players()));
 	}
 	
 	/**
