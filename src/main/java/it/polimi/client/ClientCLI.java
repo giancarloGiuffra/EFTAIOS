@@ -9,6 +9,7 @@ public class ClientCLI{
 	
 	/**
 	 * Costruttore
+	 * @return 
 	 */
 	private ClientCLI(){
 		String scelta = "";
@@ -32,12 +33,8 @@ public class ClientCLI{
      */
     public static void main(String[] args) {
     	ClientCLI client = new ClientCLI();
-    	if(client.connectToServer()) (new Thread(client.networkInterface)).start();
+    	if(client.networkInterface.connectToServer()) (new Thread(client.networkInterface)).start();
     	else System.out.println("Non è stato possibile connettersi al server");
     }
 
-	private Boolean connectToServer() {
-		return this.networkInterface.connectToServer();
-	}
-	
 }

@@ -10,8 +10,18 @@ public class NetworkInterfaceFactory {
 	}
 	
 	public static NetworkInterfaceForClient getInterface(TipoInterface tipo){
-		if(TipoInterface.SOCKET.equals(tipo)) return new SocketInterface();
-		else return new RMIInterface();
+		switch(tipo){
+    		case SOCKET:
+    		    return new SocketInterface();
+    		case RMI:
+    		    return new RMIInterface();
+    		case SOCKET_GUI:
+    		    return new SOCKETGUIInterface();
+    		case RMI_GUI:
+    		    return new RMIGUIInterface();
+		    default:
+		        throw new IllegalInterfaceException();
+		}
 	}
 
 }
