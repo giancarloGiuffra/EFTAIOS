@@ -417,5 +417,5 @@ public class Settore {
                 append(this.col,other.col).
                 append(this.riga,other.riga).
                 isEquals();
-    }
+    } 
 }
