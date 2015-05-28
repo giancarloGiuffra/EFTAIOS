@@ -52,6 +52,19 @@ public class Gioco extends BaseObservable {
     }
     
     /**
+     * Copy Constructor
+     * @param source
+     */
+    public Gioco(Gioco source){
+    	this.tabellone = new Tabellone(source.tabellone);
+    	this.mazzoDiCarteSettore = new Mazzo(source.mazzoDiCarteSettore);
+    	this.turni = new Turno(source.turni);
+    	this.positions = new HashMap<Player,Settore>();
+    	for(int i = 0; i < this.turni.players().size(); i++)
+    		positions.put(this.turni.players().get(i), this.tabellone.getSettore(source.positions.get(source.turni.players().get(i)).getNome()));
+    }
+    
+    /**
      * @return il giocatore corrente
      */
     private Player currentPlayer(){

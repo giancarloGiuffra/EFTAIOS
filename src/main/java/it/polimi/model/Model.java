@@ -11,6 +11,13 @@ public class Model extends Gioco {
     public Model(int numGiocatori) {
 		super(numGiocatori);
 	}
-
+    
+    /**
+     * Copy Constructor
+     * @param source
+     */
+    public Model(Model source){
+    	super(source);
+    }
 
 }

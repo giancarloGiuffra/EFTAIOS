@@ -9,6 +9,7 @@ import it.polimi.common.logger.FilterAllLogs;
 import it.polimi.common.logger.FilterHigherThanInfoLevelLogs;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
+import it.polimi.common.observer.ControllerUpdateModel;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
@@ -18,6 +19,7 @@ import it.polimi.common.observer.ModelMoveDoneEvent;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserMoveEvent;
 import it.polimi.model.Model;
+import it.polimi.model.ModelView;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.exceptions.BadSectorException;
 import it.polimi.model.exceptions.BadSectorPositionNameException;
@@ -29,10 +31,10 @@ import it.polimi.model.exceptions.UnknownEventForController;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.view.View;
 
-public class Controller implements BaseObserver { 
+public class Controller extends BaseObservable implements BaseObserver { 
 	
 	private static final Logger LOGGER = Logger.getLogger(Controller.class.getName());
-	private Model model;
+	private ModelView model;
 	private View view;
 	
 	//static block
@@ -45,7 +47,7 @@ public class Controller implements BaseObserver {
 	 * @param model
 	 * @param view
 	 */
-	public Controller(Model model, View view){
+	public Controller(ModelView model, View view){
 		this.model = model;
 		this.view = view;
 	}
@@ -182,7 +184,8 @@ public class Controller implements BaseObserver {
 	 * Comunica al giocatore che il suo turno è finito
 	 */
 	private void comunicaTurnoFinito() {
-        this.view.comunicaTurnoFinito();
+        this.notify(new ControllerUpdateModel(this.model.model()));
+		this.view.comunicaTurnoFinito();
     }
 
     /**
