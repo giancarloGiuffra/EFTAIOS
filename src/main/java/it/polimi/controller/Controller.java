@@ -9,6 +9,7 @@ import it.polimi.common.logger.FilterAllLogs;
 import it.polimi.common.logger.FilterHigherThanInfoLevelLogs; 
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
+import it.polimi.common.observer.ControllerUpdateModel;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent; 
@@ -18,6 +19,7 @@ import it.polimi.common.observer.ModelMoveDoneEvent;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserMoveEvent;
 import it.polimi.model.Model;
+import it.polimi.model.ModelView;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.exceptions.BadSectorException; 
 import it.polimi.model.exceptions.BadSectorPositionNameException;
@@ -29,10 +31,10 @@ import it.polimi.model.exceptions.UnknownEventForController;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.view.View;
 
-public class Controller implements BaseObserver { 
+public class Controller extends BaseObservable implements BaseObserver { 
 	
 	private static final Logger LOGGER = Logger.getLogger(Controller.class.getName());
-	private Model model;
+	private ModelView model;
 	private View view;
 	
 	//static block
@@ -45,7 +47,7 @@ public class Controller implements BaseObserver {
 	 * @param model
 	 * @param view
 	 */
-	public Controller(Model model, View view){
+	public Controller(ModelView model, View view){
 		this.model = model;
 		this.view = view;
 	}
@@ -75,22 +77,22 @@ public class Controller implements BaseObserver {
             this.currentPlayerUsaCarta( ( (ModelCartaPescataEvent) event).carta() );
             break;
         case "ModelDichiaratoSilenzioEvent":
-            this.comunicaSilenzioDichiarato();
+            this.comunicaSilenzioDichiarato(event);
             this.comunicaTurnoFinito();
             break;
         case "ModelAnnunciatoSettoreEvent":
-            this.comunicaSettoreAnnunciato( ( (ModelAnnunciatoSettoreEvent) event).settore() );
+            this.comunicaSettoreAnnunciato(event);
             this.comunicaTurnoFinito();
             break;
         case "ModelCartaAnnunciaSettoreQualunqueEvent":
             this.chiediSettoreDaAnnunciare();
             break;
         case "ModelAttaccoEvent":
-            this.comunicaAttaccoEffettuato( (ModelAttaccoEvent) event );
+            this.comunicaAttaccoEffettuato(event);
             this.comunicaTurnoFinito();
             break;
         case "ModelGameOver":
-            this.comunicaGiocoFinito( (ModelGameOver) event );
+            this.comunicaGiocoFinito(event );
             break;
         case "ModelGameContinues":
             this.startTurn();
@@ -125,7 +127,7 @@ public class Controller implements BaseObserver {
             this.finishTurn();
             break;
         default:
-            throw new UnknownEventForController(String.format("Evento %s non riconosciuto da Controller",event.name()));
+            break;
 	    }
         
     }
@@ -134,14 +136,14 @@ public class Controller implements BaseObserver {
 	 * Comunica che il gioco è finito
 	 * @param event
 	 */
-	private void comunicaGiocoFinito(ModelGameOver event) {
-        this.view.print(event.getMsg());
+	private void comunicaGiocoFinito(Event event) {
+        this.view.comunicaGiocoFinito(event);
     }
 
     /**
 	 * Comunica al giocatore l'attacco effettuato e la lista di morti
 	 */
-	private void comunicaAttaccoEffettuato(ModelAttaccoEvent event) {
+	private void comunicaAttaccoEffettuato(Event event) {
         this.view.comunicaAttaccoEffettuato(event);
     }
 
@@ -167,28 +169,30 @@ public class Controller implements BaseObserver {
      */
 	private void comunicaMessaggio(String msg) {
         this.view.print(msg);
+        this.view.printFineMessaggio();
     }
 
     /**
 	 * Comunica al giocatore che il settore è stato annunciato
-	 * @param settore
+	 * @param event
 	 */
-	private void comunicaSettoreAnnunciato(String settore) {
-        this.view.comunicaSettoreAnnunciato(settore);
+	private void comunicaSettoreAnnunciato(Event event) {
+        this.view.comunicaSettoreAnnunciato(event);
     }
 
     /**
 	 * Comunica al giocatore che il suo turno è finito
 	 */
 	private void comunicaTurnoFinito() {
-        this.view.comunicaTurnoFinito();
+        this.notify(new ControllerUpdateModel(this.model.model()));
+		this.view.comunicaTurnoFinito();
     }
 
     /**
 	 * Comunica al giocatore che ha dichiarato silenzio
 	 */
-	private void comunicaSilenzioDichiarato() {
-        this.view.comunicaSilenzioDichiarato();
+	private void comunicaSilenzioDichiarato(Event event) {
+        this.view.comunicaSilenzioDichiarato(event);
     }
 
     /**
@@ -234,7 +238,7 @@ public class Controller implements BaseObserver {
      * Inizia un turno
      */
     private void startTurn(){
-    	this.view.print(String.format("Tocca a te %s - Turno numero %d", this.currentPlayerName(), this.currentTurnNumber()));
+    	this.view.print(String.format("Tocca a te %s - Turno numero %d - Posizione %s", this.currentPlayerName(), this.currentTurnNumber(), this.model.currentPlayerPosition()));
         this.view.chiediMossa(); //bisogna capire poi come viene girata alla view corrispondente al giocatore currentPlayer
     }
 

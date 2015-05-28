@@ -6,6 +6,7 @@ import it.polimi.model.sector.TipoSettore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,10 +16,36 @@ import java.util.Map;
  * vengono salvati tutti gli altri e per default il resto sono i settori pericolosi.
  *
  */
-public abstract class Tabellone {
+public class Tabellone {
+	
     protected Map<String, Settore> sectors;
     protected Settore baseUmana;
     protected Settore baseAliena;
+    protected final List<Character> listalistaColonne = Arrays.asList('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W');
+    protected final List<Integer> listaRighe = Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+    
+    /**
+     * Constructor
+     */
+    Tabellone(){
+    	
+    }
+    
+    /**
+     * Copy Constructor
+     * @param source
+     */
+    public Tabellone(Tabellone source){
+    	this.baseUmana = new Settore(source.baseUmana);
+    	this.baseAliena = new Settore(source.baseAliena);
+    	this.sectors = new HashMap<String,Settore>();
+    	for(Character colonna : this.listalistaColonne){
+            for(Integer riga : this.listaRighe){
+            	Settore settore = new Settore(source.getSettore(Settore.buildNomeSettore(colonna, riga)));
+            	sectors.put(settore.getNome(),settore);
+            }
+        }
+    }
     
     /**
      * @param nome del settore
@@ -73,8 +100,6 @@ public abstract class Tabellone {
      * @return
      */
     public List<Settore> getSettoriDiTipo(TipoSettore tipo){
-        List<Character> colonne = Arrays.asList('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W');
-        List<Integer> righe = Arrays.asList(1,2,3,4,5,6,7,8,9,10,11,12,13,14);
         List<Settore> lista = new ArrayList<Settore>();
         switch(tipo){
             case BASE_HUMAN: 
@@ -84,8 +109,8 @@ public abstract class Tabellone {
                 lista.add(this.baseAliena);
                 break;
             case INACCESSIBILE: case SICURO: case PERICOLOSO: case SCIALUPPA:
-                for(Character colonna : colonne){
-                    for(Integer riga : righe){
+                for(Character colonna : this.listalistaColonne){
+                    for(Integer riga : this.listaRighe){
                         if(tipo == this.getSettore(Settore.buildNomeSettore( colonna, riga)).getTipo())
                             lista.add(this.getSettore(Settore.buildNomeSettore( colonna, riga)));
                     }
@@ -95,5 +120,5 @@ public abstract class Tabellone {
                 break;
         }
         return lista;
-    } 
+    }
 }

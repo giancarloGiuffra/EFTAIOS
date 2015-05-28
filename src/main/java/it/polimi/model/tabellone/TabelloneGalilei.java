@@ -18,6 +18,8 @@ public class TabelloneGalilei extends Tabellone {
      * Costruttore
      */
     TabelloneGalilei(){
+    	
+    	super();
         
         //hard-coded nomi dei settori a seconda del tipo indicato
         final String scialuppeNomi = "B02,V02,B13,V13";

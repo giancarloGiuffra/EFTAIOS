@@ -52,6 +52,19 @@ public class Gioco extends BaseObservable {
     }
     
     /**
+     * Copy Constructor
+     * @param source
+     */
+    public Gioco(Gioco source){
+    	this.tabellone = new Tabellone(source.tabellone);
+    	this.mazzoDiCarteSettore = new Mazzo(source.mazzoDiCarteSettore);
+    	this.turni = new Turno(source.turni);
+    	this.positions = new HashMap<Player,Settore>();
+    	for(int i = 0; i < this.turni.players().size(); i++)
+    		positions.put(this.turni.players().get(i), this.tabellone.getSettore(source.positions.get(source.turni.players().get(i)).getNome()));
+    }
+    
+    /**
      * @return il giocatore corrente
      */
     private Player currentPlayer(){
@@ -64,6 +77,14 @@ public class Gioco extends BaseObservable {
      */
     public String currentPlayerName(){
         return this.currentPlayer().nome();
+    }
+    
+    /**
+     * nome del settore dove si trova il giocatore corrente
+     * @return
+     */
+    public String currentPlayerPosition(){
+    	return this.positions.get(this.currentPlayer()).getNome();
     }
     
     /**
@@ -256,7 +277,7 @@ public class Gioco extends BaseObservable {
 	 */
     private void dichiaraSilenzio(Player player) {
 		player.dichiaraSilenzio();
-		this.notify(new ModelDichiaratoSilenzioEvent());
+		this.notify(new ModelDichiaratoSilenzioEvent(player.nome()));
 	}
 
 	/**
@@ -277,7 +298,7 @@ public class Gioco extends BaseObservable {
      */
     private void annunciaSettore(Player player, Settore settore){
     	player.annunciaSettore(settore);
-    	this.notify(new ModelAnnunciatoSettoreEvent(settore.getNome()));
+    	this.notify(new ModelAnnunciatoSettoreEvent(settore.getNome(), player.nome()));
     }
     
     /**

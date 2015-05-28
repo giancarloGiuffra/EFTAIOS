@@ -1,6 +1,7 @@
 package it.polimi.model.gioco;
 
 import it.polimi.model.player.Player;
+import it.polimi.model.player.PlayerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +16,7 @@ import java.util.Queue;
  */
 public class Turno {
 
-	private static final int MAX_TURNI = 39;
+	private static final int MAX_TURNI = 1;
 	private int turn_counter = 1;
 	private Player firstPlayer;
 	private Queue<Player> players;
@@ -28,6 +29,16 @@ public class Turno {
 		Collections.shuffle(listOfPlayers); //primo giocatore random
 		this.players = new LinkedList<Player>(listOfPlayers);
 		this.firstPlayer = this.players.peek();
+	}
+	
+	/**
+	 * Copy Constructor
+	 * @param turno
+	 */
+	public Turno(Turno source){
+		this.turn_counter = source.turn_counter;
+		this.firstPlayer = PlayerFactory.copyPlayer(source.firstPlayer);
+		this.players = new LinkedList<Player>(PlayerFactory.copyListOfPlayers(source.players()));
 	}
 	
 	/**
@@ -74,7 +85,7 @@ public class Turno {
 	 * @param player
 	 */
 	public void remove(Player player){
-		if(player.equals(firstPlayer)) firstPlayer = this.getNextFirstPlayer();
+		if(player.equals(firstPlayer)) this.firstPlayer = this.getNextFirstPlayer();
 		this.players.remove(player);
 	}
 
