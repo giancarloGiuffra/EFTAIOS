@@ -24,6 +24,16 @@ public class CartaSettore extends Carta {
 	}
 	
 	/**
+	 * Copy COnstructor
+	 * @param source
+	 */
+	public CartaSettore(CartaSettore source){
+		super((Carta)source); //non da errore se non si fa il cast, ma meglio essere espliciti
+		this.tipo = source.tipo;
+		this.iconaOgetto = new Boolean(source.iconaOgetto.booleanValue());
+	}
+	
+	/**
 	 * @return tipo di carta settore
 	 */
 	public TipoCartaSettore tipo() {

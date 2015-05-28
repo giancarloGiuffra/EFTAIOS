@@ -17,6 +17,14 @@ public abstract class Carta {
     Carta(AzioneGiocatore azione){
         this.azione=azione;
     }
+    
+    /**
+     * Copy Constructor
+     * @param source
+     */
+    public Carta(Carta source){
+    	this.azione = source.azione;
+    }
 
     /**
      * @return azione associata alla carta

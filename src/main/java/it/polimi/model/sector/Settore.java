@@ -37,6 +37,16 @@ public class Settore {
     }
     
     /**
+     * Copy Constructor
+     * @param source
+     */
+    public Settore(Settore source){
+    	this.col = new Character(source.col.charValue());
+    	this.riga = new Integer(source.riga.intValue());
+    	this.tipo = source.tipo; //for enums it is fine like this
+    }
+    
+    /**
      * Costruttore
      * @param nome nome del settore, formato a 3 caratteri, eg: A01, W14
      * @param tipo tipo del settore

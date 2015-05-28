@@ -26,6 +26,27 @@ public class Mazzo {
         this.carte.addAll(lista);
     }
     
+    /**
+     * Copy Constructor
+     * @param source
+     */
+    public Mazzo(Mazzo source){
+    	this(buildCopyOfCarte(source));
+    }
+    
+    /**
+     * di supporto per Copy Constructor
+     * @param source
+     * @return
+     */
+    private static List<Carta> buildCopyOfCarte(Mazzo source){
+    	List<Carta> lista = new ArrayList<Carta>();
+    	for(Carta carta : source.carte){
+    		lista.add(new CartaSettore((CartaSettore) carta)); //ipotesi implicita: tutte le carte sono carte settore
+    	}
+    	return lista;
+    }
+    
     public Mazzo(){
     	this.carte = new ArrayDeque<Carta>();
     }
