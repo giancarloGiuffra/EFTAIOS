@@ -5,9 +5,11 @@ import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ServerNewClientRMIEvent;
 import it.polimi.server.exceptions.IllegalObservableForGameServer;
+import it.polimi.server.rmi.ClientRMI;
 import it.polimi.server.rmi.ClientRMIFactory;
 import it.polimi.server.rmi.RemoteClientRMIFactory;
 import it.polimi.server.socket.ClientSocket;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.rmi.registry.LocateRegistry;
@@ -62,7 +64,8 @@ public class GameServer implements BaseObserver{
     public void startServer() throws IOException {
     	
     	//creazione gameroom
-    	this.currentGameRoom = new GameRoom(new ClientManager());
+    	this.setCurrentGameRoom(new GameRoom(new ClientManager()));
+    	
     	
     	//server rmi
         String clientRMIFactoryName = "ClientRMIFactory";
@@ -82,32 +85,30 @@ public class GameServer implements BaseObserver{
         this.serverSocket = new ServerSocket(this.portSocket);
     	LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
         while(true){
-        		//while+wait per far dormire il thread se non ci sono gameroom disponibili
-                while(!(GameRoom.numberOfRooms() < MAX_GAMEROOMS)){
-            		try {
-            			synchronized(this){
-            				this.wait();
-            			}
-    				} catch (InterruptedException e) {
-    					LOGGER.log(Level.WARNING, "Exception in blocco wait che aspetta finche si liberi una GAMEROOM");
-    				}
-            	}
-                
                 ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
-                if(!this.currentGameRoom.isFull()){
-                	this.currentGameRoom.addClient(clientSocket);
-                    if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()){
-                    	GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
-                    	gameRoomToLaunch.start();
-                    }
-                }else {
-                    clientSocket.write("Ci dispiace la sala si è riempita. Prova per favore a connetterti di nuovo. Questa connessione verrà chiusa");
-                    clientSocket.close();
-                    break;
-                }
-                
+                synchronized(this){
+	                if(!this.currentGameRoom.isFull()){
+	                	this.currentGameRoom.addClient(clientSocket);
+	                    if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()){
+	                    	GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
+	                    	gameRoomToLaunch.start();
+	                    }
+	                }else {
+	                    clientSocket.write("Ci dispiace l'ultima sala si è riempita. Prova per favore a connetterti più tardi. Questa connessione verrà chiusa");
+	                    clientSocket.close();
+	                }
+                } //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
         } //while(true)
     }
+
+	/**
+	 * set del field currentGameRoom
+	 * @param gameRoom
+	 */
+    private void setCurrentGameRoom(GameRoom gameRoom) {
+		this.currentGameRoom = gameRoom;
+		this.currentGameRoom.addObserver(this);
+	}
 
 	/**
 	 * Crea una nuova gameroom e la rende disponibile nel field currentGameRoom
@@ -117,14 +118,38 @@ public class GameServer implements BaseObserver{
     private GameRoom makeNewGameRoomAvailable() {
 		if(!(GameRoom.numberOfRooms() < MAX_GAMEROOMS)) return this.currentGameRoom;
 		GameRoom previousGameRoom = this.currentGameRoom;
-		this.currentGameRoom = new GameRoom(new ClientManager());
+		this.setCurrentGameRoom( new GameRoom(new ClientManager()) );
 		return previousGameRoom;
 	}
 
 	@Override
 	public void notifyRicevuto(BaseObservable source, Event event) {
-		if(!(source instanceof RemoteClientRMIFactory)) throw new IllegalObservableForGameServer(String.format("%s non è un observable ammissibile per questa classe %s", source.toString(), this.toString()));
-		if("ServerNewClientRMIEvent".equals(event.name())){
+		if(!(source instanceof RemoteClientRMIFactory) && !(source instanceof GameRoom)) throw new IllegalObservableForGameServer(String.format("%s non è un observable ammissibile per questa classe %s", source.toString(), this.toString()));
+		switch(event.name()){
+			case "ServerNewClientRMIEvent":
+				this.gesticeServerNewClientRMIEvent(event);
+				break;
+			case "ServerGameRoomTurnedAvailable":
+				this.gesticeServerGameRoomTurnedAvailable();
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * gestisce il fatto che si sta rendendo disponibile una gameroom
+	 */
+	private void gesticeServerGameRoomTurnedAvailable() {
+		makeNewGameRoomAvailable();
+	}
+
+	/**
+	 * gestisce l'arrivo di un nuovo client RMI
+	 * @param event
+	 */
+	private void gesticeServerNewClientRMIEvent(Event event) {
+		synchronized(this){
 			if(!this.currentGameRoom.isFull()){
 				this.currentGameRoom.addClient(((ServerNewClientRMIEvent)event).clientRMI());
 				if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()){
@@ -132,9 +157,11 @@ public class GameServer implements BaseObserver{
 					gameRoomToLaunch.start();
 				}
 			} else {
-				((ServerNewClientRMIEvent)event).clientRMI().write("Ci dispiace la sala è piena. Per favore prova a connetterti di nuovo. Questa connessione sarà chiusa");
+				ClientRMI clientRMI = ((ServerNewClientRMIEvent)event).clientRMI();
+				clientRMI.write("Ci dispiace l'ultima sala si è riempita. Prova per favore a connetterti più tardi. Questa connessione verrà chiusa");
+				clientRMI.close();
 			}
-			
-		}
+		} //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
 	}
+	
 }

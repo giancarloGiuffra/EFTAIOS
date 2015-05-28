@@ -34,4 +34,9 @@ public class RemoteClientRMIFactory extends BaseObservable implements ClientRMIF
 		}
     }
     
+    @Override
+    public void checkConnection(){
+    	//serve solo per verificare da client se il server è ancora attivo
+    }
+    
 }

@@ -32,12 +32,12 @@ public class ClientCLI{
      */
     public static void main(String[] args) {
     	ClientCLI client = new ClientCLI();
-    	client.connectToServer();
-		(new Thread(client.networkInterface)).start();;
+    	if(client.connectToServer()) (new Thread(client.networkInterface)).start();
+    	else System.out.println("Non è stato possibile connettersi al server");
     }
 
-	private void connectToServer() {
-		this.networkInterface.connectToServer();
+	private Boolean connectToServer() {
+		return this.networkInterface.connectToServer();
 	}
 	
 }

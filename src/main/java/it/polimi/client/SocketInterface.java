@@ -98,6 +98,10 @@ public class SocketInterface implements NetworkInterfaceForClient {
     	    	printToServer(stdIn.nextLine());
     	    }
     	    if(fromServer.equals("CHIUSURA")) this.closed = true;
+    	    if(fromServer.equals("ERROR FROM SERVER")){
+    	    	print("Il server non risponde. Si chiuderà il programma");
+    	    	this.closed = true;
+    	    }
 	    }
 	    this.close();
 	}
@@ -110,7 +114,8 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	private Boolean mustPrint(String string){
 	    return !string.equals("FINE_MESSAGGIO") && 
 	           !string.equals("RICHIEDE_INPUT") &&
-	           !string.equals("CHIUSURA");
+	           !string.equals("CHIUSURA") &&
+	           !string.equals("ERROR FROM SERVER");
 	}
 	
 	/**

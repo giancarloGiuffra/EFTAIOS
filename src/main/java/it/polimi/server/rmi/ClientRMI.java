@@ -24,6 +24,15 @@ public class ClientRMI implements Client {
 		this.out = new PrintWriterRMI(this);
 	}
 	
+	public String read() {
+		try {
+			return this.notifierToClient.notifyRMIEvent(new ReadEvent(), "server");
+		} catch (RemoteException e) {
+			LOGGER.log(Level.SEVERE, "Errore remoto nel reader", e);
+			return "ERROR";
+		}
+	}
+	
 	@Override
 	public void write(String message) {
 		try {
@@ -46,15 +55,6 @@ public class ClientRMI implements Client {
 	@Override
 	public void close() {
 		this.write("CHIUSURA");
-	}
-
-	public String read() {
-		try {
-			return this.notifierToClient.notifyRMIEvent(new ReadEvent(), "server");
-		} catch (RemoteException e) {
-			LOGGER.log(Level.SEVERE, "Errore remoto nel reader", e);
-			return "ERROR";
-		}
 	}
 
 }

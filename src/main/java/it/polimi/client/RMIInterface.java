@@ -29,6 +29,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
     private static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
     private ClientRMIFactory clientRMIFactory;
     private Boolean closed = false;
+    private static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
 	
 	/**
 	 * Costruttore
@@ -62,7 +63,8 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	    while(!isClosed()){
 	    	try {
 				synchronized(this){
-					this.wait();
+					this.wait(TIME_BETWEEN_CONNECTION_CHECKS);
+					this.checkConnectionToServer();
 				}
 			} catch (InterruptedException e) {
 				LOGGER.log(Level.WARNING, "Exception in blocco wait di RMIInterface");
@@ -71,6 +73,19 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	    this.close();
 	}
 	
+	/**
+	 * Controlla se il serve è ancora attivo, in caso negativo comunica all'utente
+	 * di tale condizione e chiude il programma
+	 */
+	private void checkConnectionToServer() {
+		try {
+			this.clientRMIFactory.checkConnection();
+		} catch (RemoteException e) {
+			print("Il server non risponde. Si chiuderà il programma.");
+			this.closed = true;
+		}
+	}
+
 	private boolean isClosed() {
 		return this.closed;
 	}
