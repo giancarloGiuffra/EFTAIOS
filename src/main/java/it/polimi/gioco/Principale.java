@@ -25,11 +25,9 @@ public class Principale {
 		
 		/*Principale main = new Principale();
 		main.run();	*/
-		
-		GUI.ricavaSettori();
-		GUI.setNumeroGiocatori();
+		GUI nuovaGUI = new GUI();
+		nuovaGUI.partecipazionePartita();
 		Partita nuovaPartita = new Partita(7); //modificare 
-		//Partita nuovaPartita = GUI.creaNuovaPartita();
 		Turno nuovoTurno = new Turno(nuovaPartita.getNumeroGiocatori(), nuovaPartita.getListaGiocatori());
 		while (nuovaPartita.endGame(nuovoTurno.getTurniGiocati(), nuovaPartita.contaUmaniInGioco(), nuovoTurno.umanoSuScialuppa) == false) {
 			nuovoTurno.svolgimentoTurno();
