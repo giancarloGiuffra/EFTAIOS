@@ -22,5 +22,12 @@ public class SettoreTest extends TestCase{
 	public void testGetSettoriAdiacenti() {
 		assertThat(this.tabellone.getSettore("A01").getSettoriAdiacenti(), is(this.A01));
 	}
+	
+	@Test
+	public void testCopyConstructor(){
+		Settore L09 = this.tabellone.getSettore("L09");
+		Settore L09Copy = new Settore(L09);
+		assertThat(L09,not(is(L09Copy)));
+	}
 
 }

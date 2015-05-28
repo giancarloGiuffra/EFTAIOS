@@ -38,7 +38,7 @@ public class Turno {
 	public Turno(Turno source){
 		this.turn_counter = source.turn_counter;
 		this.firstPlayer = PlayerFactory.copyPlayer(source.firstPlayer);
-		this.players = new LinkedList<Player>(PlayerFactory.copyListOfPlayers(this.players()));
+		this.players = new LinkedList<Player>(PlayerFactory.copyListOfPlayers(source.players()));
 	}
 	
 	/**

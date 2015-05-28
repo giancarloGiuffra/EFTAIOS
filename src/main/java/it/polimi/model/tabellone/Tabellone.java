@@ -41,7 +41,7 @@ public class Tabellone {
     	this.sectors = new HashMap<String,Settore>();
     	for(Character colonna : this.listalistaColonne){
             for(Integer riga : this.listaRighe){
-            	Settore settore = new Settore(this.getSettore(Settore.buildNomeSettore(colonna, riga)));
+            	Settore settore = new Settore(source.getSettore(Settore.buildNomeSettore(colonna, riga)));
             	sectors.put(settore.getNome(),settore);
             }
         }
