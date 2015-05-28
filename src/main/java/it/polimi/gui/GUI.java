@@ -4,6 +4,7 @@ import it.polimi.gioco.Partita;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
 import it.polimi.model.tabellone.*;
+import it.polimi.model.gioco.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,6 +16,10 @@ import javax.swing.border.EmptyBorder;
 
 // per il posizionamento pulsanti: https://docs.oracle.com/javase/tutorial/uiswing/layout/none.html
 
+/** 
+ *  Classe adibita alla generazione dell'interfaccia grafica che l'utente utilizzerà
+ *  per interagire con il gioco.
+ */
 public class GUI {
 	
 	private final static String lettere[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W"};
@@ -40,6 +45,7 @@ public class GUI {
 	private static ListaSettore scialuppe;
 	private boolean isSettorePericoloso = false;
 	private boolean giocaAlieno = false;
+	private Gioco gioco;
 	
 	private void creaListaPulsanti() {
 		listaPulsanti = new ArrayList<Pulsante>();
@@ -48,6 +54,7 @@ public class GUI {
 				listaPulsanti.add(new Pulsante(lettere[j] + numeri[i], indicePulsante));
 				listaPulsanti.get(indicePulsante).setOrdinata(yCorrente);
 				listaPulsanti.get(indicePulsante).setAscissa(xCorrente); 
+				listaPulsanti.get(indicePulsante).evidenziaPosizione(); // eliminare
 				yCorrente += altezzaPulsante;
 				indicePulsante++;
 			}
@@ -63,8 +70,9 @@ public class GUI {
 		
 	}
 
-	
-	// il metodo deve essere invocato successivamente all'inserimento del numero di giocatori
+	/**
+	 * Metodo utilizzato per la definizione della GUI vera e propria.
+	 */
 	public void creaGUI() {
 		JFrame frame = new JFrame("Escape from the aliens");
 		JLabel topLabel = new JLabel("Giocatore corrente: ", SwingConstants.CENTER);
@@ -100,6 +108,9 @@ public class GUI {
 		
 	}
 	
+	/**
+	 * Metodo che raccoglie i settori in appositi ArrayList, in base alla loro tipologia.
+	 */
 	public static void ricavaSettori() {
 		settoriInaccessibili = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.INACCESSIBILE), "Inaccessibili");
 		settoriSicuri = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.SICURO), "Sicuri");
@@ -141,6 +152,9 @@ public class GUI {
 		}
 	}
 	
+	/**
+	 * Metodo che colora i pulsanti corrispondenti ai settori, in base alla loro tipologia.
+	 */
 	public void coloraGUI() {
 		ricavaSettori();
 		coloraSettoriPerTipo(settoriInaccessibili);
@@ -167,6 +181,28 @@ public class GUI {
 		finestra.add(inserimentoNumero);
 		finestra.setSize(300, 80);
 		finestra.getContentPane();
+		finestra.setVisible(true);
+		finestra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+	/**
+	 * Metodo che genera una finestra dotata di pulsante. Cliccando sul pulsante, 
+	 * l'utente si 'registra' come partecipante alla partita.
+	 */
+	public void partecipazionePartita() {
+		final JFrame finestra = new JFrame();
+		JButton inizioPartita = new JButton("Start");
+		inizioPartita.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				creaGUI();
+				coloraGUI();
+				finestra.setVisible(false);
+			}
+		});
+		finestra.setLayout(new FlowLayout());
+		finestra.add(inizioPartita);
+		finestra.getContentPane();
+		finestra.pack();
 		finestra.setVisible(true);
 		finestra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
