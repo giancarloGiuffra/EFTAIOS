@@ -9,6 +9,7 @@ import it.polimi.common.logger.FilterAllLogs;
 import it.polimi.common.logger.FilterHigherThanInfoLevelLogs;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
+import it.polimi.common.observer.ControllerRispristinaModelView;
 import it.polimi.common.observer.ControllerUpdateModel;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
@@ -126,6 +127,9 @@ public class Controller extends BaseObservable implements BaseObserver {
         case "UserTurnoFinitoEvent":
             this.finishTurn();
             break;
+        case "ServerConnessionePersaConClient":
+        	this.ripristinaModelViewEPassaTurno();
+        	break;
         default:
             break;
 	    }
@@ -133,6 +137,26 @@ public class Controller extends BaseObservable implements BaseObserver {
     }
 
     /**
+     * ripristina il model e passa il turno al giocatore successivo
+     */
+	private void ripristinaModelViewEPassaTurno() {
+		this.notify(new ControllerRispristinaModelView());
+		this.model.putCurrentPlayerToSleep();
+		this.notify(new ControllerUpdateModel(this.model.model())); //importante aggiornare il model
+		if(!model.isThisLastPlayerDisconnecting()) this.startTurn();
+		else return;		
+	}
+	
+	/**
+	 * aggiorna la modelView con una copia di model
+	 * @param model
+	 */
+	public void setModelView(Model model){
+		this.model = new ModelView(model);
+		this.model.addObserver(this);
+	}
+
+	/**
 	 * Comunica che il gioco è finito
 	 * @param event
 	 */

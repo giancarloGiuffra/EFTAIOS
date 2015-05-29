@@ -20,6 +20,7 @@ public class Turno {
 	private int turn_counter = 1;
 	private Player firstPlayer;
 	private Queue<Player> players;
+	private List<Player> playersInStandBy;
 	
 	/**
 	 * Costruttore
@@ -29,6 +30,7 @@ public class Turno {
 		Collections.shuffle(listOfPlayers); //primo giocatore random
 		this.players = new LinkedList<Player>(listOfPlayers);
 		this.firstPlayer = this.players.peek();
+		this.playersInStandBy = new ArrayList<Player>();
 	}
 	
 	/**
@@ -39,6 +41,7 @@ public class Turno {
 		this.turn_counter = source.turn_counter;
 		this.firstPlayer = PlayerFactory.copyPlayer(source.firstPlayer);
 		this.players = new LinkedList<Player>(PlayerFactory.copyListOfPlayers(source.players()));
+		this.playersInStandBy = new ArrayList<Player>(PlayerFactory.copyListOfPlayers(source.playersInStandBy()));
 	}
 	
 	/**
@@ -46,6 +49,10 @@ public class Turno {
 	 */
 	public List<Player> players(){
 		return new ArrayList<Player>(this.players);
+	}
+	
+	public List<Player> playersInStandBy(){
+		return new ArrayList<Player>(this.playersInStandBy);
 	}
 	
 	/**
@@ -93,13 +100,14 @@ public class Turno {
 	 * restituisce il giocatore successivo al giocatore che inizia i turni (i.e. firstPlayer)
 	 * @return
 	 */
-	private Player getNextFirstPlayer() {
+	protected Player getNextFirstPlayer() {
 		Iterator<Player> iterator = this.players.iterator();
 		while(iterator.hasNext()){
-			if(iterator.equals(firstPlayer)) return iterator.next();
-			iterator.next();
+			Player player = iterator.next();
+			if(player.equals(firstPlayer) && iterator.hasNext()) return iterator.next();
+			else return this.players.peek();
 		}
-		return this.players.peek(); //se ha percorso tutta la queue vuol dire che il next è in testa
+		return this.players.peek(); //viene richiesto se no non compila
 	}
 	
 	/**
@@ -108,6 +116,18 @@ public class Turno {
 	 */
 	public Integer numeroMassimoDiTurni(){
 		return MAX_TURNI;
+	}
+
+	/**
+	 * mette al giocatore corrent in standby
+	 */
+	public void putCurrentPlayerToSleep() {
+		if(this.currentPlayer().equals(firstPlayer)) this.firstPlayer = this.getNextFirstPlayer();
+		this.playersInStandBy.add(this.players.remove());
+	}
+
+	public Boolean isThisLastPlayerDisconnecting() {
+		return this.players.isEmpty();
 	}
 
 }

@@ -42,7 +42,7 @@ public class Settore {
      */
     public Settore(Settore source){
     	this.col = new Character(source.col.charValue());
-    	this.riga = new Integer(source.riga.intValue());
+    	this.riga = new Integer(source.riga);
     	this.tipo = source.tipo; //for enums it is fine like this
     }
     

@@ -31,6 +31,7 @@ public class Gioco extends BaseObservable {
     private final Tabellone tabellone;
     private Mazzo mazzoDiCarteSettore;
     private Map<Player,Settore> positions;
+    private Map<Player,Settore> positionsOfPlayersInStandBy;
     private Turno turni; //Per gestire i turni
     
     /**
@@ -42,6 +43,7 @@ public class Gioco extends BaseObservable {
         this.mazzoDiCarteSettore = Mazzo.creaNuovoMazzoCarteSettore();
         this.turni = new Turno(PlayerFactory.createPlayers(numGiocatori));
         this.positions = new HashMap<Player,Settore>();
+        this.positionsOfPlayersInStandBy = new HashMap<Player,Settore>();
         for(Player player:turni.players()){
             if(player.razza()==Razza.HUMAN){
                 positions.put(player, tabellone.baseUmana());
@@ -60,8 +62,11 @@ public class Gioco extends BaseObservable {
     	this.mazzoDiCarteSettore = new Mazzo(source.mazzoDiCarteSettore);
     	this.turni = new Turno(source.turni);
     	this.positions = new HashMap<Player,Settore>();
+    	this.positionsOfPlayersInStandBy = new HashMap<Player,Settore>();
     	for(int i = 0; i < this.turni.players().size(); i++)
     		positions.put(this.turni.players().get(i), this.tabellone.getSettore(source.positions.get(source.turni.players().get(i)).getNome()));
+    	for(int i = 0; i < this.turni.playersInStandBy().size(); i++)
+    		positionsOfPlayersInStandBy.put(this.turni.playersInStandBy().get(i), this.tabellone.getSettore(source.positionsOfPlayersInStandBy.get(source.turni.playersInStandBy().get(i)).getNome()));
     }
     
     /**
@@ -344,6 +349,20 @@ public class Gioco extends BaseObservable {
     		}
     	}
     	this.notify(new ModelAttaccoEvent(player, this.positions.get(player), playersMorti));
+    }
+    
+    /**
+     * passa il turno del giocatore corrente mettendolo in standby
+     * e controllando se il gioco è finito 
+     */
+    public void putCurrentPlayerToSleep(){
+    	if(turni.players().isEmpty()) return;
+    	this.positionsOfPlayersInStandBy.put(this.currentPlayer(), this.positions.get(this.currentPlayer()));
+    	this.turni.putCurrentPlayerToSleep(); //il giocatore fa comunque parte del gioco
+    }
+    
+    public Boolean isThisLastPlayerDisconnecting(){
+    	return this.turni.isThisLastPlayerDisconnecting();
     }
     
 }

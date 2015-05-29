@@ -94,7 +94,6 @@ public class SocketInterface implements NetworkInterfaceForClient {
     	        print(fromServer);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
-    	    	//String toServer = Iterables.getLast(Arrays.asList(stdIn.useDelimiter("\\A").next().split("\n")));
     	    	printToServer(stdIn.nextLine());
     	    }
     	    if(fromServer.equals("CHIUSURA")) this.closed = true;

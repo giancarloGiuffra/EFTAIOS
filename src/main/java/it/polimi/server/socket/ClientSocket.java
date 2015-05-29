@@ -102,6 +102,7 @@ public class ClientSocket implements Client{
 	/**
 	 * chiude la connessione di questo client
 	 */
+    @Override
     public void close() {
         this.write("CHIUSURA");
 		this.out.close();

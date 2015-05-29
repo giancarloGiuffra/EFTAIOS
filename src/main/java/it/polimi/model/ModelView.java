@@ -20,10 +20,12 @@ public class ModelView extends BaseObservable {
 		this.model = new Model(model);
 	}
 	
+	@Override
 	public void addObserver(BaseObserver obs) {
 		model.addObserver(obs);
 	}
 
+	@Override
 	public void deleteObserver(BaseObserver obs) {
 		model.deleteObserver(obs);
 	}
@@ -68,6 +70,7 @@ public class ModelView extends BaseObservable {
 		model.currentPlayerUsaCarta(carta);
 	}
 
+	@Override
 	public String toString() {
 		return model.toString();
 	}
@@ -79,6 +82,14 @@ public class ModelView extends BaseObservable {
 	public void currentPlayerAttacca() {
 		model.currentPlayerAttacca();
 	}
+	
+	public void putCurrentPlayerToSleep(){
+		model.putCurrentPlayerToSleep();
+	}
+	
+	 public Boolean isThisLastPlayerDisconnecting(){
+	    return model.isThisLastPlayerDisconnecting();
+	 }
 
 	/**
 	 * getter per model

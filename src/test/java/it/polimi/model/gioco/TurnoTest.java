@@ -28,8 +28,10 @@ public class TurnoTest{
 
 	@Test
 	public void testFinishTurn() {
+		for(Player player : lista){
+		assertThat(turno.currentPlayer(),is(player));
 		turno.finishTurn();
-		assertTrue(turno.currentPlayer().equals(lista.get(1)));
+		}
 	}
 
 	@Test
@@ -51,6 +53,13 @@ public class TurnoTest{
 	public void testRemove() {
 		turno.remove(lista.get(0));
 		assertTrue(turno.currentPlayer().equals(lista.get(1)));	
+	}
+	
+	@Test
+	public void testGetNextFirstPlayer(){
+		for(Player player : lista){
+			assertThat(turno.getNextFirstPlayer(), is(lista.get(1)));
+		}
 	}
 
 }

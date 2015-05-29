@@ -81,6 +81,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 		try {
 			this.clientRMIFactory.checkConnection();
 		} catch (RemoteException e) {
+			LOGGER.log(Level.SEVERE, "Connessione con il server persa", e);
 			print("Il server non risponde. Si chiuderà il programma.");
 			this.closed = true;
 		}
