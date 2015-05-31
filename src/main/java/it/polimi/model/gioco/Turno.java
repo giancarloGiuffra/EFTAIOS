@@ -20,6 +20,7 @@ public class Turno {
 	private int turn_counter = 1;
 	private Player firstPlayer;
 	private Queue<Player> players;
+    private List<Player> playersInStandBy;
 	
 	/**
 	 * Costruttore
@@ -29,6 +30,7 @@ public class Turno {
 		Collections.shuffle(listOfPlayers); //primo giocatore random
 		this.players = new LinkedList<Player>(listOfPlayers);
 		this.firstPlayer = this.players.peek();
+		this.playersInStandBy = new ArrayList<Player>();
 	}
 	
 	/**
@@ -41,13 +43,17 @@ public class Turno {
 		this.players = new LinkedList<Player>(PlayerFactory.copyListOfPlayers(source.players()));
 		this.playersInStandBy = new ArrayList<Player>(PlayerFactory.copyListOfPlayers(source.playersInStandBy()));
 	}
-	
-	/**
+
+    /**
 	 * @return lista di giocatori
 	 */
 	public List<Player> players(){
 		return new ArrayList<Player>(this.players);
 	}
+	
+	public List<Player> playersInStandBy(){
+        return new ArrayList<Player>(this.playersInStandBy);
+    }
 	
 	/**
 	 * Registra che il turno del giocatore player è finito
@@ -110,5 +116,18 @@ public class Turno {
 	public Integer numeroMassimoDiTurni(){
 		return MAX_TURNI;
 	}
+	
+	/**
+     * mette al giocatore corrent in standby
+     */
+    public void putCurrentPlayerToSleep() {
+        if(this.currentPlayer().equals(firstPlayer)) this.firstPlayer = this.getNextFirstPlayer();
+        this.playersInStandBy.add(this.players.remove());
+    }
+
+    public Boolean isThisLastPlayerDisconnecting() {
+        return this.players.isEmpty();
+    }
+
 
 }

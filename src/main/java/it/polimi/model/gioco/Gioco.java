@@ -351,13 +351,6 @@ public class Gioco extends BaseObservable {
     	this.notify(new ModelAttaccoEvent(player, this.positions.get(player), playersMorti));
     }
     
-    /**
-     * restituisce lista con i giocatori morti
-     * @return
-     */
-    public List<Player> getListaGiocatoriMorti() {
-    	return this.playersMorti;
-    }
     
     /**
      * restituisce il tabellone
