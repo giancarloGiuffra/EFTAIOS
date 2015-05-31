@@ -90,6 +90,10 @@ public class ModelView extends BaseObservable {
 	 public Boolean isThisLastPlayerDisconnecting(){
 	    return model.isThisLastPlayerDisconnecting();
 	 }
+	 
+	 public List<String> calcolaSettoriValidiForCurrentPlayer(){
+	     return model.calcolaSettoriValidiForCurrentPlayer();
+	 }
 
 	/**
 	 * getter per model

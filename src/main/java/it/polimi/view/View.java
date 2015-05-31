@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import it.polimi.client.Comando;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
@@ -108,7 +109,7 @@ public class View extends BaseObservable implements Runnable {
 	 * una mossa, ricordando il format usato finche l'utente non inserisce una mossa valida
 	 * dopodicchè comunica la mossa agli observers
 	 */
-	public void chiediMossa(){
+	public void chiediMossa(Event event){
 		print("Indica la tua mossa:");
 		print("Ricorda che il formato da utlizzare è:");
 		print(PATTERN_MOSSA.pattern());
@@ -423,11 +424,30 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	public String readLine(){
 	    try {
-            return this.input.readLine();
+            String read = this.input.readLine();
+	        if(read != null) return read;
+	        else{
+	            this.notify(new ServerConnessionePersaConClient());
+	            return "ABORT"; //in OS X non lancia l'exception invece restituisce null quando cade la connessione
+	        }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Errore di lettura da parte dalla View", e);
             this.notify(new ServerConnessionePersaConClient());
             return "ABORT";
         }
+	}
+	
+	/**
+	 * metodo di supporto per creare la string che identifica il comando da usare nella GUI
+	 * @param comando
+	 * @param args
+	 * @return
+	 */
+	private String buildCommand(Comando comando, List<String> args){
+	    StringBuilder string = new StringBuilder().append("COMANDO%");
+	    string.append(comando.toString()).append("%");
+	    for(String arg : args) string.append(arg).append("%");
+	    string.append("COMANDO");
+	    return string.toString();
 	}
 }

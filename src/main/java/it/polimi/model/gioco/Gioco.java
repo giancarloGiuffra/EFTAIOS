@@ -365,4 +365,22 @@ public class Gioco extends BaseObservable {
     	return this.turni.isThisLastPlayerDisconnecting();
     }
     
+    /**
+     * calcola i settori validi per la mossa del giocatore corrente
+     * @return
+     */
+    public List<String> calcolaSettoriValidiForCurrentPlayer(){
+        return this.calcolaSettoriValidi(this.currentPlayer());
+    }
+    
+    /**
+     * calcola i settori validi per la mossa del player indicato
+     * @param player
+     * @return
+     */
+    private List<String> calcolaSettoriValidi(Player player){
+        //TODO bisogna eliminare i settori che non sono accessibili eper i quali non c'è un camino valido
+        if(player.isHuman()) return this.positions.get(player).getSettoriAdiacenti();
+        else return this.positions.get(player).getSettoriAdiacentiADistanzaDue();
+    }
 }

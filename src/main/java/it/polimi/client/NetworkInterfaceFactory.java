@@ -16,7 +16,7 @@ public class NetworkInterfaceFactory {
     		case RMI:
     		    return new RMIInterface();
     		case SOCKET_GUI:
-    		    return new SOCKETGUIInterface();
+    		    return new SocketGUIInterface();
     		case RMI_GUI:
     		    return new RMIGUIInterface();
 		    default:

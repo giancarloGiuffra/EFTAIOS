@@ -17,7 +17,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	private PrintWriter out;
 	private Scanner stdIn = new Scanner(System.in);
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
-	private static final Integer PORT = 1337; //porta di ascolto del server
+	private static final Integer PORT = 65535; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
     private Boolean closed = false;
 	

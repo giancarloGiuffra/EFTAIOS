@@ -17,6 +17,7 @@ import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.ModelCartaPescataEvent;
 import it.polimi.common.observer.ModelGameOver;
 import it.polimi.common.observer.ModelMoveDoneEvent;
+import it.polimi.common.observer.RichiediMossaEvent;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserMoveEvent;
 import it.polimi.model.Model;
@@ -263,7 +264,7 @@ public class Controller extends BaseObservable implements BaseObserver {
      */
     private void startTurn(){
     	this.view.print(String.format("Tocca a te %s - Turno numero %d - Posizione %s", this.currentPlayerName(), this.currentTurnNumber(), this.model.currentPlayerPosition()));
-        this.view.chiediMossa(); //bisogna capire poi come viene girata alla view corrispondente al giocatore currentPlayer
+        this.view.chiediMossa(new RichiediMossaEvent(this.model.calcolaSettoriValidiForCurrentPlayer()));
     }
 
 	/**
@@ -309,7 +310,7 @@ public class Controller extends BaseObservable implements BaseObserver {
 	 * Chiedi mossa al giocatore
 	 */
 	private void chiediMossa() {
-        this.view.chiediMossa();
+        this.view.chiediMossa(new RichiediMossaEvent(this.model.calcolaSettoriValidiForCurrentPlayer()));
     }
 
     /**

@@ -25,7 +25,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 
 	private Scanner stdIn = new Scanner(System.in);
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
-	private static final Integer PORT = 4040; //porta di ascolto del server
+	private static final Integer PORT = 65534; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
     private ClientRMIFactory clientRMIFactory;
     private Boolean closed = false;

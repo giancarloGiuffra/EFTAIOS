@@ -5,7 +5,9 @@ import it.polimi.model.exceptions.BadSectorPositionNameException;
 import it.polimi.model.player.Player;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -427,5 +429,19 @@ public class Settore {
                 append(this.col,other.col).
                 append(this.riga,other.riga).
                 isEquals();
+    }
+
+    /**
+     * restituisci i settori adiacenti fino a due settori di distanza
+     * @return
+     */
+    public List<String> getSettoriAdiacentiADistanzaDue() {
+        List<String> settori = this.getSettoriAdiacenti();
+        for(String nome : this.getSettoriAdiacenti()){
+            Settore settore = new Settore(nome,TipoSettore.INACCESSIBILE); //solo per poter chiamare il metodo
+            settori.addAll(settore.getSettoriAdiacenti());
+        }
+        Set<String> set = new HashSet<String>(settori);
+        return new ArrayList<String>(set);
     }
 }
