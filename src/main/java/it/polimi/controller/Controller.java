@@ -264,7 +264,7 @@ public class Controller extends BaseObservable implements BaseObserver {
      */
     private void startTurn(){
     	this.view.print(String.format("Tocca a te %s - Turno numero %d - Posizione %s", this.currentPlayerName(), this.currentTurnNumber(), this.model.currentPlayerPosition()));
-        this.view.chiediMossa(new RichiediMossaEvent(this.model.calcolaSettoriValidiForCurrentPlayer()));
+    	this.chiediMossa();
     }
 
 	/**

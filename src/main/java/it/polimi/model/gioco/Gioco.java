@@ -379,8 +379,26 @@ public class Gioco extends BaseObservable {
      * @return
      */
     private List<String> calcolaSettoriValidi(Player player){
-        //TODO bisogna eliminare i settori che non sono accessibili eper i quali non c'è un camino valido
-        if(player.isHuman()) return this.positions.get(player).getSettoriAdiacenti();
-        else return this.positions.get(player).getSettoriAdiacentiADistanzaDue();
+        if(player.isHuman()) return this.calcolaSettoriValidiForHuman(player);
+        else return this.calcolaSettoriValidiForAlien(player);
+    }
+
+    private List<String> calcolaSettoriValidiForAlien(Player player) {
+        List<String> settori = new ArrayList<String>();
+        for(String settore : this.positions.get(player).getSettoriAdiacentiADistanzaDue()){
+            if(this.tabellone.getSettore(settore).isValidDestinationForAlien() &&
+               this.tabellone.esisteSentieroValido(this.positions.get(player), this.tabellone.getSettore(settore)))
+               settori.add(settore);
+            }
+            return settori;
+    }
+
+    private List<String> calcolaSettoriValidiForHuman(Player player) {
+        List<String> settori = new ArrayList<String>();
+        for(String settore : this.positions.get(player).getSettoriAdiacenti()){
+            if(this.tabellone.getSettore(settore).isValidDestinationForHuman())
+                settori.add(settore);
+        }
+        return settori;
     }
 }

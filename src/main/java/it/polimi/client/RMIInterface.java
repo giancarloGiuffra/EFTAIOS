@@ -30,6 +30,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
     private ClientRMIFactory clientRMIFactory;
     private Boolean closed = false;
     private static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
+    private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO(.+%){1,}COMANDO");
 	
 	/**
 	 * Costruttore
@@ -153,7 +154,13 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	private boolean mustPrint(String string) {
 		return !string.equals("FINE_MESSAGGIO") && 
 	           !string.equals("RICHIEDE_INPUT") &&
-	           !string.equals("CHIUSURA");
+	           !string.equals("CHIUSURA") &&
+	           !isCommand(string);
+	}
+	
+	private boolean isCommand(String string){
+	    Matcher matcher = PATTERN_COMANDO.matcher(string);
+	    return matcher.matches();
 	}
 
 	/**

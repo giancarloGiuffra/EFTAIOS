@@ -22,6 +22,7 @@ import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.ModelGameOver;
+import it.polimi.common.observer.RichiediMossaEvent;
 import it.polimi.common.observer.ServerConnessionePersaConClient;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserAttackEvent;
@@ -113,6 +114,7 @@ public class View extends BaseObservable implements Runnable {
 		print("Indica la tua mossa:");
 		print("Ricorda che il formato da utlizzare è:");
 		print(PATTERN_MOSSA.pattern());
+		this.sendCommandChiediMossa(event);
 		printRichiedeInput();
 		String mossa = this.readLine();
 		while(!isValidMossa(mossa)){
@@ -124,7 +126,12 @@ public class View extends BaseObservable implements Runnable {
 		this.sendMossa(mossa);
 	}
 	
-	/**
+	private void sendCommandChiediMossa(Event event) {
+        RichiediMossaEvent richiediMossaEvent = (RichiediMossaEvent) event;
+        print(this.buildCommand(Comando.ABILITA_SETTORI, richiediMossaEvent.settori()));
+    }
+
+    /**
 	 * controlla se c'è stato un errore di connessione
 	 * @param string
 	 * @return
