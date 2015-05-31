@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
+import it.polimi.common.observer.ControllerRispristinaModelView;
 import it.polimi.common.observer.ControllerUpdateModel;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ServerGameRoomTurnedAvailable;
@@ -23,6 +24,7 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     private View view;
     private ClientManager manager;
     private Boolean hasStarted = false;
+    private Boolean hasFinished = false;
     
     private static AtomicInteger NUMBER_OF_GAMEROOMS = new AtomicInteger(0);
     
@@ -47,7 +49,7 @@ public class GameRoom extends BaseObservable implements BaseObserver{
         this.view = new View(this.manager.currentClient().in(), this.manager.currentClient().out());
         this.controller = new Controller(modelView,view);
         this.controller.addObserver(this);
-        this.model.addObserver(controller);
+        this.modelView.addObserver(controller);
         this.view.addObserver(this.manager); //importante che manager sia il primo observer
         this.view.addObserver(controller);
         this.hasStarted = true;
@@ -78,6 +80,22 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     }
     
     /**
+     * stop consigliato in
+     * http://docs.oracle.com/javase/1.5.0/docs/guide/misc/threadPrimitiveDeprecation.html
+     */
+    private void stop(){
+    	this.hasFinished = true;
+    }
+    
+    /**
+     * indica se la sala è chiusa
+     * @return
+     */
+    public Boolean hasFinished(){
+    	return this.hasFinished;
+    }
+    
+    /**
      * retituisce il numero di sale create
      * @return
      */
@@ -100,9 +118,13 @@ public class GameRoom extends BaseObservable implements BaseObserver{
 			case "ServerCloseGameRoom":
 				GameRoom.NUMBER_OF_GAMEROOMS.decrementAndGet();
 				this.notify(new ServerGameRoomTurnedAvailable());
+				this.stop();
 				break;
 			case "ControllerUpdateModel":
 				this.model = new Model(((ControllerUpdateModel)event).model());
+				break;
+			case "ControllerRispristinaModelView":
+				this.controller.setModelView(this.model);
 				break;
 			default:
 				break;

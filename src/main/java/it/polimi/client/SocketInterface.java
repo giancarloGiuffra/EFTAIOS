@@ -9,6 +9,8 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SocketInterface implements NetworkInterfaceForClient {
 
@@ -17,9 +19,10 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	private PrintWriter out;
 	private Scanner stdIn = new Scanner(System.in);
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
-	private static final Integer PORT = 1337; //porta di ascolto del server
+	private static final Integer PORT = 65535; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
     private Boolean closed = false;
+    private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO(.+%){1,}COMANDO");
 	
 	/**
 	 * Costruttore
@@ -94,7 +97,6 @@ public class SocketInterface implements NetworkInterfaceForClient {
     	        print(fromServer);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
-    	    	//String toServer = Iterables.getLast(Arrays.asList(stdIn.useDelimiter("\\A").next().split("\n")));
     	    	printToServer(stdIn.nextLine());
     	    }
     	    if(fromServer.equals("CHIUSURA")) this.closed = true;
@@ -115,8 +117,14 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	    return !string.equals("FINE_MESSAGGIO") && 
 	           !string.equals("RICHIEDE_INPUT") &&
 	           !string.equals("CHIUSURA") &&
-	           !string.equals("ERROR FROM SERVER");
+	           !string.equals("ERROR FROM SERVER") &&
+	           !isCommand(string);
 	}
+	
+	private boolean isCommand(String string){
+        Matcher matcher = PATTERN_COMANDO.matcher(string);
+        return matcher.matches();
+    }
 	
 	/**
 	 * legge dal server

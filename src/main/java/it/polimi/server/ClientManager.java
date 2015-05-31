@@ -7,6 +7,7 @@ import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.ModelDichiaratoSilenzioEvent;
 import it.polimi.common.observer.ServerCloseGameRoom;
+import it.polimi.common.observer.ServerConnessionePersaConClient;
 import it.polimi.model.player.Player;
 import it.polimi.server.exceptions.IllegalObservableForClientManager;
 import it.polimi.view.View;
@@ -19,14 +20,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 public class ClientManager extends BaseObservable implements BaseObserver{
     
     private static final Integer MAX_CLIENTS = 2;
     private Queue<Client> clients;
-    private Map<Player,Client> players;
+    private BiMap<Player,Client> players;
     private List<Client> clientsMorti;
     private File fileIn;
     private File fileOut;
+	private List<Client> clientsDisconnected;
     
     /**
      * Costruttore
@@ -34,6 +39,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
     public ClientManager(){
         this.clients = new LinkedList<Client>();
         this.clientsMorti = new ArrayList<Client>();
+        this.clientsDisconnected = new ArrayList<Client>();
         this.fileIn = new File(this.toString().concat("IN"));
         this.fileOut = new File(this.toString().concat("OUT"));
     }
@@ -121,12 +127,26 @@ public class ClientManager extends BaseObservable implements BaseObserver{
             case "ModelGameOver":
             	this.gestisceModelGameOver(event);
             	break;
+            case "ServerConnessionePersaConClient":
+            	this.gestisceServerConnessionePersaConClient(source);
+            	break;
             default:
                 break;
             }
     }
     
-    /**
+    private void gestisceServerConnessionePersaConClient( BaseObservable source) {
+		if(this.clients.isEmpty()) return;
+    	BiMap<Client, Player> clientsToPlayers = this.players.inverse();
+		this.broadcastAllButCurrentClient(String.format("Abbiamo perso la connessione con %s", clientsToPlayers.get(this.clients.peek()).nome()));
+		this.clientsDisconnected.add(this.clients.remove());
+		if(!this.clients.isEmpty())
+			( (View) source).setInputAndOutput(this.currentClient());
+		else
+			this.notify(new ServerCloseGameRoom());
+	}
+
+	/**
      * comunica ai giocatori che il gioco è finito
      * @param event
      */
@@ -229,7 +249,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
      * @param playersList
      */
     public void createMap(List<Player> playersList) {
-        this.players = new HashMap<Player,Client>();
+        this.players = HashBiMap.create();
         List<Client> clientsList = new ArrayList<Client>(this.clients);
         for(int i=0; i<playersList.size(); i++){
             players.put(playersList.get(i), clientsList.get(i));

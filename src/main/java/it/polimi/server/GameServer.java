@@ -49,7 +49,7 @@ public class GameServer implements BaseObserver{
      * @param args
      */
     public static void main(String[] args) {
-    	GameServer server = new GameServer(1337, 4040);
+    	GameServer server = new GameServer(65535, 65534);
     	try{                
             server.startServer();
         } catch (IOException e) {
@@ -98,7 +98,7 @@ public class GameServer implements BaseObserver{
 	                    clientSocket.close();
 	                }
                 } //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
-        } //while(true)
+        } //while
     }
 
 	/**

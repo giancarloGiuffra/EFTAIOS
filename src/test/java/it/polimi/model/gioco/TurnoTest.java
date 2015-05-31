@@ -29,7 +29,7 @@ public class TurnoTest{
 	@Test
 	public void testFinishTurn() {
 		turno.finishTurn();
-		assertTrue(turno.currentPlayer().equals(lista.get(1)));
+		assertThat(turno.currentPlayer().equals(lista.get(1)));
 	}
 
 	@Test

@@ -16,11 +16,14 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import it.polimi.client.Comando;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.ModelGameOver;
+import it.polimi.common.observer.RichiediMossaEvent;
+import it.polimi.common.observer.ServerConnessionePersaConClient;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserAttackEvent;
 import it.polimi.common.observer.UserMoveEvent;
@@ -107,20 +110,36 @@ public class View extends BaseObservable implements Runnable {
 	 * una mossa, ricordando il format usato finche l'utente non inserisce una mossa valida
 	 * dopodicchè comunica la mossa agli observers
 	 */
-	public void chiediMossa(){
+	public void chiediMossa(Event event){
 		print("Indica la tua mossa:");
 		print("Ricorda che il formato da utlizzare è:");
 		print(PATTERN_MOSSA.pattern());
+		this.sendCommandChiediMossa(event);
 		printRichiedeInput();
 		String mossa = this.readLine();
 		while(!isValidMossa(mossa)){
 			print("La mossa inserita non è valida. Inserirne un'altra.");
 			printRichiedeInput();
 			mossa = this.readLine();
+			if(connectionError(mossa)) return; //esce
 		}
 		this.sendMossa(mossa);
 	}
 	
+	private void sendCommandChiediMossa(Event event) {
+        RichiediMossaEvent richiediMossaEvent = (RichiediMossaEvent) event;
+        print(this.buildCommand(Comando.ABILITA_SETTORI, richiediMossaEvent.settori()));
+    }
+
+    /**
+	 * controlla se c'è stato un errore di connessione
+	 * @param string
+	 * @return
+	 */
+	private boolean connectionError(String string) {
+		return "ABORT".equals(string);
+	}
+
 	/**
 	 * Chiede azione da eseguire a seconda di quelle elencate nella lista
 	 * @param azioni ista di azioni
@@ -212,6 +231,7 @@ public class View extends BaseObservable implements Runnable {
 		    print("Scelta non valida");
 		    printRichiedeInput();
 			scelta = this.readLine();
+			if(connectionError(scelta)) return mappa.get(1); //esce con un valore valido
 			matcher.reset(scelta);
 		}
 		return mappa.get(Integer.parseInt(scelta));
@@ -244,9 +264,9 @@ public class View extends BaseObservable implements Runnable {
 	private void chiediDiPescareCarta() {
         print("Devi pescare una Carta Settore. Premi invio per procedere.");
         printRichiedeInput();
-        this.readLine(); //Verifica se utente ha premuto invio
+        String invio = this.readLine(); //Verifica se utente ha premuto invio
         Event event = new UserPicksCardEvent();
-        this.notify(event);
+        if(!connectionError(invio)) this.notify(event);
     }
 
     /**
@@ -304,6 +324,7 @@ public class View extends BaseObservable implements Runnable {
 			print("L'annuncio inserito non è valido. Inserirne un altro.");
 			printRichiedeInput();
 			announce = this.readLine();
+			if(connectionError(announce)) return; //esce
 		}
 		this.sendAnnouncement(announce);
 	}
@@ -410,10 +431,30 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	public String readLine(){
 	    try {
-            return this.input.readLine();
+            String read = this.input.readLine();
+	        if(read != null) return read;
+	        else{
+	            this.notify(new ServerConnessionePersaConClient());
+	            return "ABORT"; //in OS X non lancia l'exception invece restituisce null quando cade la connessione
+	        }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Errore di lettura da parte dalla View", e);
-            return "ERROR";
+            this.notify(new ServerConnessionePersaConClient());
+            return "ABORT";
         }
+	}
+	
+	/**
+	 * metodo di supporto per creare la string che identifica il comando da usare nella GUI
+	 * @param comando
+	 * @param args
+	 * @return
+	 */
+	private String buildCommand(Comando comando, List<String> args){
+	    StringBuilder string = new StringBuilder().append("COMANDO%");
+	    string.append(comando.toString()).append("%");
+	    for(String arg : args) string.append(arg).append("%");
+	    string.append("COMANDO");
+	    return string.toString();
 	}
 }

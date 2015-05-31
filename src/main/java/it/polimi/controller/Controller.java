@@ -9,6 +9,7 @@ import it.polimi.common.logger.FilterAllLogs;
 import it.polimi.common.logger.FilterHigherThanInfoLevelLogs; 
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
+import it.polimi.common.observer.ControllerRispristinaModelView;
 import it.polimi.common.observer.ControllerUpdateModel;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
@@ -16,6 +17,7 @@ import it.polimi.common.observer.ModelAttaccoEvent;
 import it.polimi.common.observer.ModelCartaPescataEvent;
 import it.polimi.common.observer.ModelGameOver;
 import it.polimi.common.observer.ModelMoveDoneEvent;
+import it.polimi.common.observer.RichiediMossaEvent;
 import it.polimi.common.observer.UserAnnounceSectorEvent;
 import it.polimi.common.observer.UserMoveEvent;
 import it.polimi.model.Model;
@@ -126,6 +128,9 @@ public class Controller extends BaseObservable implements BaseObserver {
         case "UserTurnoFinitoEvent":
             this.finishTurn();
             break;
+        case "ServerConnessionePersaConClient":
+        	this.ripristinaModelViewEPassaTurno();
+        	break;
         default:
             break;
 	    }
@@ -133,6 +138,26 @@ public class Controller extends BaseObservable implements BaseObserver {
     }
 
     /**
+     * ripristina il model e passa il turno al giocatore successivo
+     */
+	private void ripristinaModelViewEPassaTurno() {
+		this.notify(new ControllerRispristinaModelView());
+		this.model.putCurrentPlayerToSleep();
+		this.notify(new ControllerUpdateModel(this.model.model())); //importante aggiornare il model
+		if(!model.isThisLastPlayerDisconnecting()) this.startTurn();
+		else return;		
+	}
+	
+	/**
+	 * aggiorna la modelView con una copia di model
+	 * @param model
+	 */
+	public void setModelView(Model model){
+		this.model = new ModelView(model);
+		this.model.addObserver(this);
+	}
+
+	/**
 	 * Comunica che il gioco è finito
 	 * @param event
 	 */
@@ -239,7 +264,7 @@ public class Controller extends BaseObservable implements BaseObserver {
      */
     private void startTurn(){
     	this.view.print(String.format("Tocca a te %s - Turno numero %d - Posizione %s", this.currentPlayerName(), this.currentTurnNumber(), this.model.currentPlayerPosition()));
-        this.view.chiediMossa(); //bisogna capire poi come viene girata alla view corrispondente al giocatore currentPlayer
+    	this.chiediMossa();
     }
 
 	/**
@@ -285,7 +310,7 @@ public class Controller extends BaseObservable implements BaseObserver {
 	 * Chiedi mossa al giocatore
 	 */
 	private void chiediMossa() {
-        this.view.chiediMossa();
+        this.view.chiediMossa(new RichiediMossaEvent(this.model.calcolaSettoriValidiForCurrentPlayer()));
     }
 
     /**

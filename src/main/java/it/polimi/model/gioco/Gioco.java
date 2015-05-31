@@ -13,6 +13,7 @@ import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
 import it.polimi.model.exceptions.FalsoGameOver;
 import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
+import it.polimi.model.exceptions.IllegalMoveException;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 import it.polimi.model.player.PlayerFactory;
@@ -30,8 +31,8 @@ public class Gioco extends BaseObservable {
     private final Tabellone tabellone;
     private Mazzo mazzoDiCarteSettore;
     private Map<Player,Settore> positions;
+    private Map<Player,Settore> positionsOfPlayersInStandBy;
     private Turno turni; //Per gestire i turni
-    private List<Player> playersMorti = new ArrayList<Player>();
     
     /**
      * Costruttore
@@ -42,6 +43,7 @@ public class Gioco extends BaseObservable {
         this.mazzoDiCarteSettore = Mazzo.creaNuovoMazzoCarteSettore();
         this.turni = new Turno(PlayerFactory.createPlayers(numGiocatori));
         this.positions = new HashMap<Player,Settore>();
+        this.positionsOfPlayersInStandBy = new HashMap<Player,Settore>();
         for(Player player:turni.players()){
             if(player.razza()==Razza.HUMAN){
                 positions.put(player, tabellone.baseUmana());
@@ -60,8 +62,11 @@ public class Gioco extends BaseObservable {
     	this.mazzoDiCarteSettore = new Mazzo(source.mazzoDiCarteSettore);
     	this.turni = new Turno(source.turni);
     	this.positions = new HashMap<Player,Settore>();
+    	this.positionsOfPlayersInStandBy = new HashMap<Player,Settore>();
     	for(int i = 0; i < this.turni.players().size(); i++)
     		positions.put(this.turni.players().get(i), this.tabellone.getSettore(source.positions.get(source.turni.players().get(i)).getNome()));
+    	for(int i = 0; i < this.turni.playersInStandBy().size(); i++)
+    		positionsOfPlayersInStandBy.put(this.turni.playersInStandBy().get(i), this.tabellone.getSettore(source.positionsOfPlayersInStandBy.get(source.turni.playersInStandBy().get(i)).getNome()));
     }
     
     /**
@@ -343,7 +348,6 @@ public class Gioco extends BaseObservable {
     			playersMorti.add(possibileVittima);
     		}
     	}
-    	this.playersMorti.addAll(playersMorti);
     	this.notify(new ModelAttaccoEvent(player, this.positions.get(player), playersMorti));
     }
     
@@ -363,5 +367,55 @@ public class Gioco extends BaseObservable {
         return this.tabellone;
     }
     
+    /**
+     * passa il turno del giocatore corrente mettendolo in standby
+     * e controllando se il gioco è finito 
+     */
+    public void putCurrentPlayerToSleep(){
+    	if(turni.players().isEmpty()) return;
+    	this.positionsOfPlayersInStandBy.put(this.currentPlayer(), this.positions.get(this.currentPlayer()));
+    	this.turni.putCurrentPlayerToSleep(); //il giocatore fa comunque parte del gioco
+    }
+    
+    public Boolean isThisLastPlayerDisconnecting(){
+    	return this.turni.isThisLastPlayerDisconnecting();
+    }
+    
+    /**
+     * calcola i settori validi per la mossa del giocatore corrente
+     * @return
+     */
+    public List<String> calcolaSettoriValidiForCurrentPlayer(){
+        return this.calcolaSettoriValidi(this.currentPlayer());
+    }
+    
+    /**
+     * calcola i settori validi per la mossa del player indicato
+     * @param player
+     * @return
+     */
+    private List<String> calcolaSettoriValidi(Player player){
+        if(player.isHuman()) return this.calcolaSettoriValidiForHuman(player);
+        else return this.calcolaSettoriValidiForAlien(player);
+    }
+
+    private List<String> calcolaSettoriValidiForAlien(Player player) {
+        List<String> settori = new ArrayList<String>();
+        for(String settore : this.positions.get(player).getSettoriAdiacentiADistanzaDue()){
+            if(this.tabellone.getSettore(settore).isValidDestinationForAlien() &&
+               this.tabellone.esisteSentieroValido(this.positions.get(player), this.tabellone.getSettore(settore)))
+               settori.add(settore);
+            }
+            return settori;
+    }
+
+    private List<String> calcolaSettoriValidiForHuman(Player player) {
+        List<String> settori = new ArrayList<String>();
+        for(String settore : this.positions.get(player).getSettoriAdiacenti()){
+            if(this.tabellone.getSettore(settore).isValidDestinationForHuman())
+                settori.add(settore);
+        }
+        return settori;
+    }
 }
 

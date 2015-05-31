@@ -30,7 +30,7 @@ public class CartaSettore extends Carta {
 	public CartaSettore(CartaSettore source){
 		super((Carta)source); //non da errore se non si fa il cast, ma meglio essere espliciti
 		this.tipo = source.tipo;
-		this.iconaOgetto = new Boolean(source.iconaOgetto.booleanValue());
+		this.iconaOgetto = new Boolean(source.iconaOgetto);
 	}
 	
 	/**

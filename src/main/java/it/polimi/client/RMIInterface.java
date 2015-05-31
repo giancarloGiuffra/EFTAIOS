@@ -25,11 +25,12 @@ public class RMIInterface implements NetworkInterfaceForClient {
 
 	private Scanner stdIn = new Scanner(System.in);
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
-	private static final Integer PORT = 4040; //porta di ascolto del server
+	private static final Integer PORT = 65534; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
     private ClientRMIFactory clientRMIFactory;
     private Boolean closed = false;
     private static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
+    private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO(.+%){1,}COMANDO");
 	
 	/**
 	 * Costruttore
@@ -81,6 +82,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 		try {
 			this.clientRMIFactory.checkConnection();
 		} catch (RemoteException e) {
+			LOGGER.log(Level.SEVERE, "Connessione con il server persa", e);
 			print("Il server non risponde. Si chiuderà il programma.");
 			this.closed = true;
 		}
@@ -152,7 +154,13 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	private boolean mustPrint(String string) {
 		return !string.equals("FINE_MESSAGGIO") && 
 	           !string.equals("RICHIEDE_INPUT") &&
-	           !string.equals("CHIUSURA");
+	           !string.equals("CHIUSURA") &&
+	           !isCommand(string);
+	}
+	
+	private boolean isCommand(String string){
+	    Matcher matcher = PATTERN_COMANDO.matcher(string);
+	    return matcher.matches();
 	}
 
 	/**
