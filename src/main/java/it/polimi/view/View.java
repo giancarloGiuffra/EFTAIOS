@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,9 @@ import it.polimi.common.observer.UserStartEvent;
 import it.polimi.common.observer.UserTurnoFinitoEvent;
 import it.polimi.model.exceptions.AzioneSceltaInaspettataException;
 import it.polimi.model.exceptions.IterazioneNonPrevistaException;
+import it.polimi.model.gioco.TipoGameOver;
 import it.polimi.model.player.AzioneGiocatore;
+import it.polimi.model.player.Player;
 import it.polimi.server.Client;
 import it.polimi.server.ClientManager;
 import it.polimi.server.GameServer;
@@ -181,7 +185,12 @@ public class View extends BaseObservable implements Runnable {
 	public void comunicaTurnoFinito() {
 		print("Il tuo turno è finito.\n\n");
 		printFineMessaggio();
+		this.sendCommandTurnoFinito();
 		this.notify(new UserTurnoFinitoEvent());
+	}
+
+	private void sendCommandTurnoFinito() {
+		print(this.buildCommand(Comando.TURNO_FINITO));
 	}
 
 	/**
@@ -255,7 +264,14 @@ public class View extends BaseObservable implements Runnable {
 			index++;
 		}
 		print(opzioniBuilder.toString());
+		this.sendCommandSceglieAzione(azioni);
 		return mappaAzioni;
+	}
+
+	private void sendCommandSceglieAzione(List<AzioneGiocatore> azioniGiocatore) {
+		List<String> azioni = new ArrayList<String>();
+		for(AzioneGiocatore azione : azioniGiocatore) azioni.add(azione.toString());
+		print(this.buildCommand(Comando.SCEGLIE_AZIONE, azioni));
 	}
 
 	/**
@@ -264,12 +280,17 @@ public class View extends BaseObservable implements Runnable {
 	private void chiediDiPescareCarta() {
         print("Devi pescare una Carta Settore. Premi invio per procedere.");
         printRichiedeInput();
+        this.sendCommandPescaCarta();
         String invio = this.readLine(); //Verifica se utente ha premuto invio
         Event event = new UserPicksCardEvent();
         if(!connectionError(invio)) this.notify(event);
     }
 
-    /**
+    private void sendCommandPescaCarta() {
+		print(this.buildCommand(Comando.PESCA_CARTA));
+	}
+
+	/**
 	 * Verifica che la mossa sia nel formato valido
 	 * @param mossa
 	 * @return true se la mossa è nel formato valido
@@ -318,6 +339,7 @@ public class View extends BaseObservable implements Runnable {
 		print("Devi annunciare un settore");
 		print("Ricorda che il formato da utlizzare è:");
 		print(PATTERN_ANNOUNCE.pattern());
+		this.sendCommandChiediSettoreDaAnnunciare();
 		printRichiedeInput();
 		String announce = this.readLine();
 		while(!isValidAnnouncement(announce)){
@@ -327,6 +349,10 @@ public class View extends BaseObservable implements Runnable {
 			if(connectionError(announce)) return; //esce
 		}
 		this.sendAnnouncement(announce);
+	}
+
+	private void sendCommandChiediSettoreDaAnnunciare() {
+		print(this.buildCommand(Comando.SETTORE_DA_ANNUNCIARE));
 	}
 
 	/**
@@ -357,27 +383,42 @@ public class View extends BaseObservable implements Runnable {
 	public void comunicaSpostamento(String settore) {
 	    print(String.format("Ti sei spostato nel settore %s", settore));
 	    printFineMessaggio();
+	    this.sendCommandMuove(settore);
     }
 
-    /**
+    private void sendCommandMuove(String settore) {
+		print(this.buildCommand(Comando.MUOVE, settore));
+	}
+
+	/**
      * Stampa il nome della carta pescata
      * @param nomeCarta
      */
 	public void comunicaCartaPescata(String nomeCarta) {
         print(String.format("Hai pescato una carta %s", nomeCarta));
         printFineMessaggio();
+        this.sendCommandCartaPescata(nomeCarta);
     }
 
-    /**
+    private void sendCommandCartaPescata(String nomeCarta) {
+		print(this.buildCommand(Comando.CARTA_PESCATA, nomeCarta));
+	}
+
+	/**
      * Stampa il messaggio comunicando che il silenzio è stato dichiarato
      */
 	public void comunicaSilenzioDichiarato(Event event) {
         print("Hai dichiarato silenzio.");
         printFineMessaggio();
         this.notify(event); //notify per ClientManager
+        this.sendCommandSilenzioDichiarato();
     }
 
-    /**
+    private void sendCommandSilenzioDichiarato() {
+		print(this.buildCommand(Comando.SILENZIO_DICHIARATO));
+	}
+
+	/**
      * Comunica al giocatore che ha annunciato rumore nel settore indicato
      * @param event
      */
@@ -386,8 +427,13 @@ public class View extends BaseObservable implements Runnable {
         print(String.format("Hai annunciato rumore nel settore %s", annuncioEvent.settore()));
         printFineMessaggio();
         this.notify(event); //notify per ClientManager
+        this.sendCommandSettoreAnnunciato(annuncioEvent.settore());
     }
 	
+	private void sendCommandSettoreAnnunciato(String settore) {
+		print(this.buildCommand(Comando.SETTORE_ANNUNCIATO, settore));
+	}
+
 	/**
 	 * setter per lo input
 	 * @param input
@@ -411,8 +457,23 @@ public class View extends BaseObservable implements Runnable {
 	public void comunicaAttaccoEffettuato(Event event) {
         this.print(event.getMsg());
         printFineMessaggio();
-        this.notify(event); //notify per ClientManager   
+        this.sendCommandRisultatoAttacco(event);
+        this.notify(event); //notify per ClientManager
     }
+
+	private void sendCommandRisultatoAttacco(Event event) {
+		print(this.buildCommand(Comando.RISULTATO_ATTACCO, this.buildListaArgsAttacco(event)));
+	}
+	
+	public List<String> buildListaArgsAttacco(Event event){
+		ModelAttaccoEvent attacco = (ModelAttaccoEvent) event;
+		List<String> args = new ArrayList<String>();
+		args.add(attacco.player().nome());
+		args.add(attacco.settore().getNome());
+		for(Player player : attacco.morti())
+			args.add(player.nome());
+		return args;
+	}
 
 	/**
 	 * comunica che il gioco è finito
@@ -422,9 +483,22 @@ public class View extends BaseObservable implements Runnable {
 		this.print("Il gioco è finito");
 		this.print(event.getMsg());
 		printFineMessaggio();
+		this.sendCommandGiocoFinito(event);
 		this.notify(event); //notify per ClientManager
 	}
 	
+	private void sendCommandGiocoFinito(Event event) {
+		print(this.buildCommand(Comando.GIOCO_FINITO, this.buildListaArgsGiocoFinito(event)));
+	}
+	
+	public List<String> buildListaArgsGiocoFinito(Event event){
+		ModelGameOver gameOver = (ModelGameOver) event;
+		List<String> args = new ArrayList<String>();
+		args.add(gameOver.tipo().toString());
+		if(gameOver.tipo()==TipoGameOver.UMANO_IN_SCIALUPPA) args.add(gameOver.player().nome());
+		return args;
+	}
+
 	/**
 	 * legge l'input 
 	 * @return
@@ -450,11 +524,30 @@ public class View extends BaseObservable implements Runnable {
 	 * @param args
 	 * @return
 	 */
-	private String buildCommand(Comando comando, List<String> args){
+	public String buildCommand(Comando comando, List<String> args){
 	    StringBuilder string = new StringBuilder().append("COMANDO%");
 	    string.append(comando.toString()).append("%");
 	    for(String arg : args) string.append(arg).append("%");
 	    string.append("COMANDO");
 	    return string.toString();
+	}
+	
+	/**
+	 * crea string che identifica il comando quando questo non ha argomenti
+	 * @param comando
+	 * @return
+	 */
+	public String buildCommand(Comando comando) {
+		return this.buildCommand(comando, new ArrayList<String>());
+	}
+	
+	/**
+	 * comando con un solo argomento
+	 * @param comando
+	 * @param arg
+	 * @return
+	 */
+	public String buildCommand(Comando comando, String arg) {
+		return this.buildCommand(comando, new ArrayList<String>(Arrays.asList(arg)));
 	}
 }

@@ -1,5 +1,6 @@
 package it.polimi.server;
 
+import it.polimi.client.Comando;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
@@ -116,16 +117,16 @@ public class ClientManager extends BaseObservable implements BaseObserver{
                 this.gestisceUserTurnoFinitoEvent(source);
                 break;
             case "ModelAttaccoEvent":
-                this.gestisceModelAttaccoEvent(event);
+                this.gestisceModelAttaccoEvent(source, event);
                 break;
             case "ModelDichiaratoSilenzioEvent":
-            	this.gestisceModelDichiaratoSilenzioEvent(event);
+            	this.gestisceModelDichiaratoSilenzioEvent(source, event);
             	break;
             case "ModelAnnunciatoSettoreEvent":
-            	this.gestisceModelAnnunciatoSettoreEvent(event);
+            	this.gestisceModelAnnunciatoSettoreEvent(source, event);
             	break;
             case "ModelGameOver":
-            	this.gestisceModelGameOver(event);
+            	this.gestisceModelGameOver(source, event);
             	break;
             case "ServerConnessionePersaConClient":
             	this.gestisceServerConnessionePersaConClient(source);
@@ -139,6 +140,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
 		if(this.clients.isEmpty()) return;
     	BiMap<Client, Player> clientsToPlayers = this.players.inverse();
 		this.broadcastAllButCurrentClient(String.format("Abbiamo perso la connessione con %s", clientsToPlayers.get(this.clients.peek()).nome()));
+		this.broadcastCommandConnessionePersa(source);
 		this.clientsDisconnected.add(this.clients.remove());
 		if(!this.clients.isEmpty())
 			( (View) source).setInputAndOutput(this.currentClient());
@@ -146,16 +148,28 @@ public class ClientManager extends BaseObservable implements BaseObserver{
 			this.notify(new ServerCloseGameRoom());
 	}
 
+	private void broadcastCommandConnessionePersa(BaseObservable source) {
+		View view = (View) source;
+		BiMap<Client, Player> clientsToPlayers = this.players.inverse();
+		this.broadcastAllButCurrentClient(view.buildCommand(Comando.CONNESSIONE_PERSA, clientsToPlayers.get(this.clients.peek()).nome()));
+	}
+
 	/**
      * comunica ai giocatori che il gioco è finito
      * @param event
      */
-    private void gestisceModelGameOver(Event event) {
+    private void gestisceModelGameOver(BaseObservable source, Event event) {
     	this.broadcastAllButCurrentClient("Il gioco è finito");
 		this.broadcastAllButCurrentClient(event.getMsg());
+		this.broadcastCommandGiocoFinito(source, event);
 		this.broadcast("La connessione si chiuderà tra breve");
 		this.close();
 		this.notify(new ServerCloseGameRoom());
+	}
+
+	private void broadcastCommandGiocoFinito(BaseObservable source, Event event) {
+		View view = (View) source;
+		this.broadcastAllButCurrentClient(view.buildCommand(Comando.GIOCO_FINITO, view.buildListaArgsGiocoFinito(event)));
 	}
 
 	/**
@@ -188,25 +202,44 @@ public class ClientManager extends BaseObservable implements BaseObserver{
      * comunica ai giocatori chi ha annunciato rumore in quale settore
      * @param event
      */
-    private void gestisceModelAnnunciatoSettoreEvent(Event event) {
+    private void gestisceModelAnnunciatoSettoreEvent(BaseObservable source, Event event) {
     	ModelAnnunciatoSettoreEvent annuncioEvent = (ModelAnnunciatoSettoreEvent) event;
     	this.broadcastAllButCurrentClient(String.format("%s dichiara RUMORE IN SETTORE %s", annuncioEvent.player(), annuncioEvent.settore()));
+    	this.broadcastCommandSettoreAnnunciato(source,event);
+	}
+
+	private void broadcastCommandSettoreAnnunciato(BaseObservable source,
+			Event event) {
+    	View view = (View) source;
+    	ModelAnnunciatoSettoreEvent annuncioEvent = (ModelAnnunciatoSettoreEvent) event;
+    	List<String> args = new ArrayList<String>();
+    	args.add(annuncioEvent.player());
+    	args.add(annuncioEvent.settore());
+    	this.broadcastAllButCurrentClient(view.buildCommand(Comando.SETTORE_ANNUNCIATO, args));
 	}
 
 	/**
      * comunica ai giocatori chi ha dichiarato silenzio
      * @param event
      */
-    private void gestisceModelDichiaratoSilenzioEvent(Event event) {
+    private void gestisceModelDichiaratoSilenzioEvent(BaseObservable source, Event event) {
     	ModelDichiaratoSilenzioEvent silenzioEvent = (ModelDichiaratoSilenzioEvent) event;
     	this.broadcastAllButCurrentClient(String.format("%s dichiara SILENZIO", silenzioEvent.player()));
+    	this.broadcastCommandSilenzioDichiarato(source, event);
+	}
+
+	private void broadcastCommandSilenzioDichiarato(BaseObservable source,
+			Event event) {
+		View view = (View) source;
+		ModelDichiaratoSilenzioEvent silenzioEvent = (ModelDichiaratoSilenzioEvent) event;
+		this.broadcastAllButCurrentClient(view.buildCommand(Comando.SILENZIO_DICHIARATO, silenzioEvent.player()));
 	}
 
 	/**
      * Gestisce il risultato di un attacco
      * @param event
      */
-    private void gestisceModelAttaccoEvent(Event event) {
+    private void gestisceModelAttaccoEvent(BaseObservable source, Event event) {
         if( !((ModelAttaccoEvent) event).morti().isEmpty() ){
             for(Player player : ((ModelAttaccoEvent) event).morti()){
                 this.removePlayer(player);
@@ -214,10 +247,23 @@ public class ClientManager extends BaseObservable implements BaseObserver{
             }
         }
         this.broadcastAllButCurrentClient(event.getMsg());
+        this.broadcastCommandRisultatoAttacco(source, event);
         this.broadcastMorti("Sei Morto :( la connessione rimarrà comunque aperta finchè il gioco non finisce");
+        this.broadcastCommandMorto(source);
     }
 
-    /**
+    private void broadcastCommandMorto(BaseObservable source) {
+    	View view = (View) source;
+		this.broadcastMorti(view.buildCommand(Comando.MORTO));
+	}
+
+	private void broadcastCommandRisultatoAttacco(BaseObservable source,
+			Event event) {
+    	View view = (View) source;
+    	this.broadcastAllButCurrentClient(view.buildCommand(Comando.RISULTATO_ATTACCO, view.buildListaArgsAttacco(event)));
+	}
+
+	/**
      * elimina giocatore e il corrispondente client
      * @param player
      */
