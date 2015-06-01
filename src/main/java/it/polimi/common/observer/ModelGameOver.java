@@ -44,7 +44,7 @@ public final class ModelGameOver extends Event {
                 msg.append("I turni sono finiti");
                 break;
             default:
-                msg.append("Un umano è arrivato in scualuppa");
+                msg.append("Un umano è arrivato in scialuppa");
         }
         return msg.toString();
     }
