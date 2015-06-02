@@ -16,6 +16,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Enumeration;
 import java.util.Scanner;
+import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -31,6 +32,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
     private Boolean closed = false;
     private static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
     private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO(.+%){1,}COMANDO");
+    private static final Integer TIME_LIMIT = 60; //in secondi
 	
 	/**
 	 * Costruttore
@@ -56,7 +58,8 @@ public class RMIInterface implements NetworkInterfaceForClient {
 
 	@Override
 	public Boolean close() {
-		return true;
+		this.closed = true;
+	    return true;
 	}
 
 	@Override
@@ -71,7 +74,6 @@ public class RMIInterface implements NetworkInterfaceForClient {
 				LOGGER.log(Level.WARNING, "Exception in blocco wait di RMIInterface");
 			}
 	    }
-	    this.close();
 	}
 	
 	/**
@@ -84,7 +86,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 		} catch (RemoteException e) {
 			LOGGER.log(Level.SEVERE, "Connessione con il server persa", e);
 			print("Il server non risponde. Si chiuderà il programma.");
-			this.closed = true;
+			this.close();
 		}
 	}
 
@@ -138,13 +140,14 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * stampa in std Out
 	 * @param string
 	 */
+	@Override
 	public void print(String string){
 	    if(mustPrint(string)){
 			stdOut.println(string);
 		    stdOut.flush();
 	    }
 	    if("CHIUSURA".equals(string)){
-	        this.closed = true;
+	        this.close();
 	        synchronized(this){
 	            this.notifyAll();
 	        }
@@ -168,7 +171,12 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * @return
 	 */
 	public String read(){
-		return stdIn.nextLine();
+	    Timer timer = new Timer();
+	    timer.schedule( new TimeLimitInput(this), TIME_LIMIT*1000 );
+	    print("(ricorda che hai 60 secondi)");
+		String input = stdIn.nextLine();
+		timer.cancel();
+		return input;
 	}
 	
 	/**

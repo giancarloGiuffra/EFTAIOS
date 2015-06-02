@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -23,6 +24,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
     private static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
     private Boolean closed = false;
     private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO(.+%){1,}COMANDO");
+    private static final Integer TIME_LIMIT = 60; //in secondi
 	
 	/**
 	 * Costruttore
@@ -62,7 +64,8 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	 * stampa in std Out
 	 * @param string
 	 */
-	private void print(String string){
+	@Override
+	public void print(String string){
 	    stdOut.println(string);
 	    stdOut.flush();
 	}
@@ -79,6 +82,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	@Override
 	public Boolean close() {
 		this.out.close();
+		this.closed = true;
 		try {
 		    this.in.close();
 			this.socket.close();
@@ -97,15 +101,14 @@ public class SocketInterface implements NetworkInterfaceForClient {
     	        print(fromServer);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
-    	    	printToServer(stdIn.nextLine());
+    	    	printToServer(this.read());
     	    }
-    	    if(fromServer.equals("CHIUSURA")) this.closed = true;
+    	    if(fromServer.equals("CHIUSURA")) this.close();
     	    if(fromServer.equals("ERROR FROM SERVER")){
     	    	print("Il server non risponde. Si chiuderà il programma");
-    	    	this.closed = true;
+    	    	this.close();
     	    }
 	    }
-	    this.close();
 	}
 	
 	/**
@@ -124,6 +127,19 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	private boolean isCommand(String string){
         Matcher matcher = PATTERN_COMANDO.matcher(string);
         return matcher.matches();
+    }
+	
+	/**
+     * legge da stdIn
+     * @return
+     */
+    public String read(){
+        Timer timer = new Timer();
+        timer.schedule( new TimeLimitInput(this), TIME_LIMIT*1000 );
+        print("(ricorda che hai 60 secondi)");
+        String input = stdIn.nextLine();
+        timer.cancel();
+        return input;
     }
 	
 	/**

@@ -13,5 +13,10 @@ public interface NetworkInterfaceForClient extends Runnable{
 	 * @return
 	 */
 	Boolean close();
+	
+	/**
+	 * stampa all'utente
+	 */
+	void print(String string);
 
 }
