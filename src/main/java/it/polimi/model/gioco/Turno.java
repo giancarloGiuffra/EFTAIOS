@@ -103,10 +103,11 @@ public class Turno {
 	private Player getNextFirstPlayer() {
 		Iterator<Player> iterator = this.players.iterator();
 		while(iterator.hasNext()){
-			if(iterator.equals(firstPlayer)) return iterator.next();
-			iterator.next();
+			Player player = iterator.next();
+			if(player.equals(firstPlayer) && iterator.hasNext()) return iterator.next();
+			else return this.players.peek();
 		}
-		return this.players.peek(); //se ha percorso tutta la queue vuol dire che il next è in testa
+		return this.players.peek(); //viene richiesto se no non compila
 	}
 	
 	/**
