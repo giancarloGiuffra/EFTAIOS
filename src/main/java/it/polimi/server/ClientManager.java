@@ -27,6 +27,7 @@ import com.google.common.collect.HashBiMap;
 public class ClientManager extends BaseObservable implements BaseObserver{
     
     private static final Integer MAX_CLIENTS = 2;
+	private static final Integer MIN_NUMBER_CLIENTS = 2;
     private Queue<Client> clients;
     private BiMap<Player,Client> players;
     private List<Client> clientsMorti;
@@ -369,4 +370,28 @@ public class ClientManager extends BaseObservable implements BaseObserver{
         client.write("Benvenuto nel gioco Fuga dagli Alieni nello Spazio Profondo.");
         client.write(String.format("(Al momento ci sono %d giocatori incluso te)", this.numeroGiocatori()));
     }
+
+	/**
+	 * true se ci sono almeno due client
+	 * @return
+	 */
+    public Boolean hasAtLeastMinimumNumberOfClients() {
+		return this.clients.size() >= MIN_NUMBER_CLIENTS;
+	}
+
+	/**
+	 * getter per il minimo numero di clients (per far iniziare il gioco)
+	 * @return
+	 */
+    public Integer minimumNumber() {
+		return MIN_NUMBER_CLIENTS;
+	}
+
+	/**
+	 * true se c'è un solo client
+	 * @return
+	 */
+    public boolean hasOneClient() {
+		return this.clients.size() == 1;
+	}
 }
