@@ -1,6 +1,8 @@
 package it.polimi.server;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import it.polimi.common.observer.BaseObservable;
@@ -18,13 +20,15 @@ import it.polimi.view.View;
 
 public class GameRoom extends BaseObservable implements BaseObserver{
     
-    private Model model;
+    private static final Integer TIME_LIMIT_FOR_START = 2; // in minuti
+	private Model model;
     private ModelView modelView;
     private Controller controller;
     private View view;
     private ClientManager manager;
     private Boolean hasStarted = false;
     private Boolean hasFinished = false;
+    private Timer timer = new Timer();
     
     private static AtomicInteger NUMBER_OF_GAMEROOMS = new AtomicInteger(0);
     
@@ -65,11 +69,23 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     }
     
     /**
+     * true se si può far partire il gioco (al meno due partecipanti)
+     * @return
+     */
+    public Boolean canStart(){
+    	return this.manager.hasAtLeastMinimumNumberOfClients();
+    }
+    
+    /**
      * aggiunge il giocatore alla sala
      * @param client
      */
     public void addClient(Client client){
         this.manager.addClient(client);
+        if(this.manager.hasOneClient()){
+        	TimeLimitStartGameRoom task = new TimeLimitStartGameRoom(this);
+        	timer.schedule(task, TIME_LIMIT_FOR_START*60*1000);
+        }
     }
     
     /**
@@ -80,10 +96,11 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     }
     
     /**
-     * stop consigliato in
-     * http://docs.oracle.com/javase/1.5.0/docs/guide/misc/threadPrimitiveDeprecation.html
+     * chiude la sala e notifica che una sala si è liberata
      */
-    private void stop(){
+    void close(){
+    	GameRoom.NUMBER_OF_GAMEROOMS.decrementAndGet();
+		this.notify(new ServerGameRoomTurnedAvailable());
     	this.hasFinished = true;
     }
     
@@ -110,15 +127,28 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     public Boolean hasStarted(){
         return this.hasStarted;
     }
+    
+    /**
+     * getter per il ClientManager
+     * @return
+     */
+    public ClientManager clientManager(){
+    	return this.manager;
+    }
+    
+    /**
+     * cancella le task associate al timer
+     */
+    public void cancelTimer(){
+    	this.timer.cancel();
+    }
 
 	@Override
 	public void notifyRicevuto(BaseObservable source, Event event) {
 		if(!(source instanceof ClientManager) && !(source instanceof Controller)) throw new IllegalObservableForGameRoom(String.format("%s non è un observable ammissibile per questa classe %s", source.toString(), this.toString()));
 		switch(event.name()){
 			case "ServerCloseGameRoom":
-				GameRoom.NUMBER_OF_GAMEROOMS.decrementAndGet();
-				this.notify(new ServerGameRoomTurnedAvailable());
-				this.stop();
+				this.close();
 				break;
 			case "ControllerUpdateModel":
 				this.model = new Model(((ControllerUpdateModel)event).model());

@@ -91,6 +91,7 @@ public class GameServer implements BaseObserver{
 	                	this.currentGameRoom.addClient(clientSocket);
 	                    if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()){
 	                    	GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
+	                    	gameRoomToLaunch.cancelTimer();
 	                    	gameRoomToLaunch.start();
 	                    }
 	                }else {
@@ -154,6 +155,7 @@ public class GameServer implements BaseObserver{
 				this.currentGameRoom.addClient(((ServerNewClientRMIEvent)event).clientRMI());
 				if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()){
 					GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
+					gameRoomToLaunch.cancelTimer();
 					gameRoomToLaunch.start();
 				}
 			} else {
