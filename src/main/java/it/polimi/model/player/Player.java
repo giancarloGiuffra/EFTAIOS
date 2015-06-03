@@ -42,7 +42,7 @@ public abstract class Player {
      * @param personaggio
      */
     Player(Personaggio personaggio){
-        this.personaggio=personaggio;
+        this.personaggio = personaggio;
         this.mazzo = new Mazzo();
     }
     

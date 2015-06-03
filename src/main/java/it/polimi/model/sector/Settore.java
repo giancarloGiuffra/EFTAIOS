@@ -31,7 +31,7 @@ public class Settore {
      * @param riga riga del settore
      * @param tipo tipo di settore
      */
-    private Settore(char col, int riga, TipoSettore tipo){
+    Settore(char col, int riga, TipoSettore tipo){
         if (!this.isValidSectorName(col, riga)) throw new BadSectorException(String.format("Colonna %c e/o Riga %d non valida(e)", col, riga));
         this.col=Character.toUpperCase(col);
         this.riga=riga;
@@ -441,7 +441,8 @@ public class Settore {
             Settore settore = new Settore(nome,TipoSettore.INACCESSIBILE); //solo per poter chiamare il metodo
             settori.addAll(settore.getSettoriAdiacenti());
         }
-        Set<String> set = new HashSet<String>(settori);
+        Set<String> set = new HashSet<String>(settori); //elimina duplicati
+        set.remove(this.getNome()); //è stato aggiunto nel ciclo visto che è parte dei settori adiacenti dei settori a lui adiacenti
         return new ArrayList<String>(set);
     }
 }
