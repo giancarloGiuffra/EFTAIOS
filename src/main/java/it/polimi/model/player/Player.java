@@ -139,8 +139,9 @@ public abstract class Player {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(31, 17).
+		return new HashCodeBuilder(233, 17).
 				append(this.personaggio).
+				append(this.mazzo).
 				toHashCode();
 	}
 
@@ -155,6 +156,7 @@ public abstract class Player {
 		Player other = (Player) obj;
 		return new EqualsBuilder().
 				append(this.personaggio,other.personaggio).
+				append(this.mazzo, other.mazzo).
 				isEquals();
 	}
 

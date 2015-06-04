@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Classe per rappresentare un mazzo di carte
  *
@@ -20,7 +23,7 @@ public class Mazzo {
      * Costruttore
      * @param lista di carte
      */
-    private Mazzo(List<Carta> lista){
+    Mazzo(List<Carta> lista){
         this();
         Collections.shuffle(lista);
         this.carte.addAll(lista);
@@ -119,5 +122,32 @@ public class Mazzo {
 			Collections.shuffle(listaCarte);
 			this.carte.addAll(listaCarte);
 		}
+	}
+	
+	@Override
+	public int hashCode() {
+		HashCodeBuilder hash =  new HashCodeBuilder(23, 17);
+		for(Carta carta : this.carte)
+				hash.append((CartaSettore) carta); // ipotesi tutte le carte sono carte settore
+		return hash.toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Mazzo other = (Mazzo) obj;
+		if (this.carte.size() != other.carte.size())
+			return false;
+		EqualsBuilder equals = new EqualsBuilder();
+		List<Carta> thisList = new ArrayList<Carta>(this.carte);
+		List<Carta> otherList = new ArrayList<Carta>(other.carte);
+		for(int i = 0; i < this.carte.size(); i++)
+			equals.append((CartaSettore) thisList.get(i), (CartaSettore) otherList.get(i)); //ipotesi tutte le carte sono carte settore
+		return equals.isEquals();
 	}
 }

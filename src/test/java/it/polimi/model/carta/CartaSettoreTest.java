@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -16,8 +17,7 @@ public class CartaSettoreTest {
 	public void testCopyConstructor() {
 		CartaSettore carta = (CartaSettore) lista.get(0);
 		CartaSettore cartaCopia = new CartaSettore(carta);
-		assertThat(carta.tipo(), is(cartaCopia.tipo()));
-		assertThat(carta.hasIconaOgetto(), is(cartaCopia.hasIconaOgetto()));
+		assertThat(carta, is(cartaCopia));
 		assertNotSame(carta, cartaCopia);
 	}
 

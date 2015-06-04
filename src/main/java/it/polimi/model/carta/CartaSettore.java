@@ -89,7 +89,7 @@ public class CartaSettore extends Carta {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof CartaSettore))
+		if (getClass() != obj.getClass())
 			return false;
 		CartaSettore other = (CartaSettore) obj;
 		return new EqualsBuilder().
