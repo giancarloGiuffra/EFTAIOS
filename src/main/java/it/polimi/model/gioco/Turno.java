@@ -105,9 +105,8 @@ public class Turno {
 		while(iterator.hasNext()){
 			Player player = iterator.next();
 			if(player.equals(firstPlayer) && iterator.hasNext()) return iterator.next();
-			else return this.players.peek();
 		}
-		return this.players.peek(); //viene richiesto se no non compila
+		return this.players.peek(); //se arriva fin quà vuol dire che firstPlayer si trovava come ultimo elemento
 	}
 	
 	/**

@@ -34,7 +34,8 @@ public class Mazzo {
      * @param source
      */
     public Mazzo(Mazzo source){
-    	this(buildCopyOfCarte(source));
+    	this();
+    	this.carte.addAll(buildCopyOfCarte(source));
     }
     
     /**
@@ -42,16 +43,27 @@ public class Mazzo {
      * @param source
      * @return
      */
-    private static List<Carta> buildCopyOfCarte(Mazzo source){
+    public static List<Carta> buildCopyOfCarte(Mazzo source){
     	List<Carta> lista = new ArrayList<Carta>();
     	for(Carta carta : source.carte){
-    		lista.add(new CartaSettore((CartaSettore) carta)); //ipotesi implicita: tutte le carte sono carte settore
+    		lista.add(new CartaSettore((CartaSettore) carta)); //ipotesi implicita: tutte le carte sono carte settore (si dovrebbe utilizzare un metodo factory come per player ma per adesso il gioco ha solo carte settore)
     	}
     	return lista;
     }
     
+    /**
+     * Costruttore
+     */
     public Mazzo(){
     	this.carte = new ArrayDeque<Carta>();
+    }
+    
+    /**
+     * getter per carte
+     * @return
+     */
+    public List<Carta> carte(){
+    	return new ArrayList<Carta>(this.carte);
     }
 	
 	/**
@@ -83,7 +95,8 @@ public class Mazzo {
 	 * @return mazzo di carte di tipo settore con distribuzione indicata
 	 */
 	private static Mazzo creaNuovoMazzoCarteSettore(DistribuzioneCarteSettore distribuzione){
-	    List<Carta> listaRumoreMio = CartaSettore.getListCarteSettoreDiTipo(TipoCartaSettore.RUMORE_MIO, distribuzione.rumoreMio());
+	   
+		List<Carta> listaRumoreMio = CartaSettore.getListCarteSettoreDiTipo(TipoCartaSettore.RUMORE_MIO, distribuzione.rumoreMio());
 	    List<Carta> listaRumoreQualunque = CartaSettore.getListCarteSettoreDiTipo(TipoCartaSettore.RUMORE_QUALUNQUE, distribuzione.rumoreQualunque());
 	    List<Carta> listaSilenzio = CartaSettore.getListCarteSettoreDiTipo(TipoCartaSettore.SILENZIO, distribuzione.silenzio());
 	    
@@ -124,11 +137,19 @@ public class Mazzo {
 		}
 	}
 	
+	/**
+	 * size del mazzo (numero di carte)
+	 * @return
+	 */
+	public Integer size(){
+		return this.carte.size();
+	}
+	
 	@Override
 	public int hashCode() {
 		HashCodeBuilder hash =  new HashCodeBuilder(23, 17);
 		for(Carta carta : this.carte)
-				hash.append((CartaSettore) carta); // ipotesi tutte le carte sono carte settore
+				hash.append(carta);
 		return hash.toHashCode();
 	}
 
@@ -143,11 +164,10 @@ public class Mazzo {
 		Mazzo other = (Mazzo) obj;
 		if (this.carte.size() != other.carte.size())
 			return false;
-		EqualsBuilder equals = new EqualsBuilder();
 		List<Carta> thisList = new ArrayList<Carta>(this.carte);
 		List<Carta> otherList = new ArrayList<Carta>(other.carte);
-		for(int i = 0; i < this.carte.size(); i++)
-			equals.append((CartaSettore) thisList.get(i), (CartaSettore) otherList.get(i)); //ipotesi tutte le carte sono carte settore
-		return equals.isEquals();
+		return new EqualsBuilder().
+				append(thisList, otherList).
+				isEquals();
 	}
 }
