@@ -10,6 +10,7 @@ import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.ControllerUpdateModel;
 import it.polimi.common.observer.Event;
 import it.polimi.controller.Controller;
+import it.polimi.gui.GUI;		// ...
 import it.polimi.model.Model;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
@@ -43,8 +44,11 @@ public class Main implements BaseObserver{
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Main main = new Main();
-		main.run();		
+		/*Main main = new Main();
+		main.run(); */
+		View vista = new View(System.in, System.out);
+		GUI nuovaGUI = new GUI(vista);
+		nuovaGUI.sceltaTecnologiaDiComunicazione(); 
 	}
 
 	/**

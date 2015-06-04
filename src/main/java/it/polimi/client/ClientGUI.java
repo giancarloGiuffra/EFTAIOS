@@ -1,5 +1,8 @@
 package it.polimi.client;
 
+import it.polimi.gui.*;
+import it.polimi.view.View;
+
 public class ClientGUI{
     
     private NetworkInterfaceForClient networkInterface;
@@ -7,8 +10,11 @@ public class ClientGUI{
     /**
      * Costruttore
      */
-    private ClientGUI(){
-        //TODO deve inizializzare il field networkInterface tra SOCKET_GUI e RMI_GUI
+    private ClientGUI(View view){
+    	//GUI nuovaGUI = new GUI();
+    	GUI nuovaGUI = view.returnGUI();
+    	TipoInterface tipoInterfaccia = nuovaGUI.sceltaTecnologiaDiComunicazione();
+    	this.networkInterface = NetworkInterfaceFactory.getInterface(tipoInterfaccia);
     }
     
     /**
@@ -24,9 +30,9 @@ public class ClientGUI{
      * @param args
      */
     public static void main(String[] args) {
-        ClientGUI client = new ClientGUI();
+        /*ClientGUI client = new ClientGUI();
         if(client.networkInterface.connectToServer()) (new Thread(client.networkInterface)).start();
-        else client.comunicaConnessioneFallita();
+        else client.comunicaConnessioneFallita();*/
     }
 
 }

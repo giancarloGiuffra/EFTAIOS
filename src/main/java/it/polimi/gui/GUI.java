@@ -1,10 +1,11 @@
 package it.polimi.gui;
 
-import it.polimi.gioco.Partita;
+//import it.polimi.client.Comando;
+import it.polimi.client.TipoInterface;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
 import it.polimi.model.tabellone.*;
-import it.polimi.model.gioco.*;
+import it.polimi.view.View;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,19 +15,19 @@ import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-// per il posizionamento pulsanti: https://docs.oracle.com/javase/tutorial/uiswing/layout/none.html
 
 /** 
- *  Classe adibita alla generazione dell'interfaccia grafica che l'utente utilizzerà
- *  per interagire con il gioco.
+ *  Italian: Classe adibita alla generazione dell'interfaccia grafica che l'utente utilizzerà
+ *  	per interagire con il gioco.
+ *  English: Class whose function is to create the graphical interface that the user will
+ *  	adopt to interact with the game. 
  */
 public class GUI {
 	
 	private final static String lettere[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W"};
 	private final static String numeri[] = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14"};
-	private final static int numeroMassimoPulsanti = lettere.length * numeri.length;
-	private final static int altezzaPulsante = 40;
-	private final static int larghezzaPulsante = 58;
+	private final static int altezzaPulsanteSettore = 40;
+	private final static int larghezzaPulsanteSettore = 58;
 	private final static int numeroColonne = lettere.length;
 	private final static int numeroRighe = numeri.length;
 	private final static int xIniziale = 15;
@@ -34,70 +35,92 @@ public class GUI {
 	private static int xCorrente = xIniziale;
 	private static int yCorrente = yIniziale;
 	private static Tabellone galilei = TabelloneFactory.createTabellone("GALILEI");
-	private static String numeroGiocatori;
-	private static Partita nuovaPartita;
-	private ArrayList<Pulsante> listaPulsanti;
+	private ArrayList<PulsanteSettore> listaPulsantiSettore;
+	private ArrayList<AltroPulsante> listaAltriPulsanti;
 	private static int indicePulsante = 0;
 	private static ListaSettore settoriInaccessibili;
 	private static ListaSettore settoriSicuri;
 	private static ListaSettore settoriPericolosi;
 	private static ListaSettore basi;
 	private static ListaSettore scialuppe;
-	private boolean isSettorePericoloso = false;
-	private boolean giocaAlieno = false;
-	private Gioco gioco;
+	private final AltroPulsante attacco = new AltroPulsante("Attacco");
+	private final AltroPulsante pescaCarta = new AltroPulsante("Pesca una carta");
+	private JLabel cartaPescata = new JLabel();
+	final JFrame finestraIniziale = new JFrame("Start");
+	private final String startConSocket = new String("Start con Socket");
+	private final String startConRMI = new String("Start con RMI");
+	private TipoInterface tipoInterfaccia;
+	private View viewAssociata;
 	
-	private void creaListaPulsanti() {
-		listaPulsanti = new ArrayList<Pulsante>();
+	public GUI(View view) {
+		this.viewAssociata = view;
+	}
+	
+	public View returnView() {
+		return this.viewAssociata;
+	}
+	
+	private void creaListaPulsantiSettore() {
+		listaPulsantiSettore = new ArrayList<PulsanteSettore>();
 		for (int j = 0; j < numeroColonne; j++) {
 			for (int i = 0; i < numeroRighe; i++) {
-				listaPulsanti.add(new Pulsante(lettere[j] + numeri[i], indicePulsante));
-				listaPulsanti.get(indicePulsante).setOrdinata(yCorrente);
-				listaPulsanti.get(indicePulsante).setAscissa(xCorrente); 
-				listaPulsanti.get(indicePulsante).evidenziaPosizione(); // eliminare
-				yCorrente += altezzaPulsante;
+				listaPulsantiSettore.add(new PulsanteSettore(lettere[j] + numeri[i]));
+				listaPulsantiSettore.get(indicePulsante).setOrdinata(yCorrente);
+				listaPulsantiSettore.get(indicePulsante).setAscissa(xCorrente); 
+				listaPulsantiSettore.get(indicePulsante).azionePulsante(); // ?
+				yCorrente += altezzaPulsanteSettore;
 				indicePulsante++;
 			}
 			// se la colonna ha indice pari, abbassa la posizione dei pulsanti della colonna successiva
 			if (j%2 == 0) {  
-				yCorrente = yIniziale + altezzaPulsante/2;
+				yCorrente = yIniziale + altezzaPulsanteSettore/2;
 			}
 			else {
 				yCorrente = yIniziale;
 			}
-			xCorrente += larghezzaPulsante;
+			xCorrente += larghezzaPulsanteSettore;
 		}
 		
 	}
 
 	/**
-	 * Metodo utilizzato per la definizione della GUI vera e propria.
+	 * Italian: Metodo utilizzato per la definizione della GUI vera e propria.
+	 * English: Method used to actually define the GUI.
 	 */
 	public void creaGUI() {
+		listaAltriPulsanti = new ArrayList<AltroPulsante>();
+		PulsanteSettore pulsanteI;
 		JFrame frame = new JFrame("Escape from the aliens");
 		JLabel topLabel = new JLabel("Giocatore corrente: ", SwingConstants.CENTER);
 		JPanel centralPanel = new JPanel();
 		JPanel topPanel = new JPanel();
 		JPanel bottomPanel = new JPanel();
 		JLabel bottomLabel = new JLabel("Posizione attuale: ", SwingConstants.CENTER);
+		bottomLabel.setBorder(new EmptyBorder(0, 300, 0, 0));
 		frame.setLayout(new BorderLayout());
 		topPanel.setLayout(new BorderLayout());
 		topPanel.setBorder(new EmptyBorder(15, 0, 0, 0));
 		topPanel.add(topLabel, BorderLayout.CENTER);
-		//bottomPanel.setLayout(new BorderLayout());
 		FlowLayout flow = new FlowLayout();
 		flow.setHgap(20);
 		bottomPanel.setLayout(flow);
 		bottomPanel.setBorder(new EmptyBorder(0, 30, 20, 200));
-		creaPulsanteAttacco(bottomPanel);
-		creaPulsantePescaCarta(bottomPanel);
+		attacco.getButton().setEnabled(false);
+		pescaCarta.getButton().setEnabled(false);
+		listaAltriPulsanti.add(attacco);
+		listaAltriPulsanti.add(pescaCarta);
+		cartaPescata.setVisible(false);
+		bottomPanel.add(attacco.getButton());
+		bottomPanel.add(pescaCarta.getButton());
+		bottomPanel.add(cartaPescata);
 		bottomPanel.add(bottomLabel);
 		frame.add(topPanel, BorderLayout.NORTH);
 		centralPanel.setLayout(null);
-		creaListaPulsanti();
-		for (int i = 0; i < listaPulsanti.size(); i++) {
-			listaPulsanti.get(i).getButton().setBounds(listaPulsanti.get(i).getAscissa(), listaPulsanti.get(i).getOrdinata(), larghezzaPulsante, altezzaPulsante);
-			centralPanel.add(listaPulsanti.get(i).getButton());
+		creaListaPulsantiSettore();
+		for (int i = 0; i < listaPulsantiSettore.size(); i++) {
+			pulsanteI = listaPulsantiSettore.get(i);
+			pulsanteI.getButton().setBounds(pulsanteI.getAscissa(), pulsanteI.getOrdinata(), larghezzaPulsanteSettore, altezzaPulsanteSettore);
+			centralPanel.add(pulsanteI.getButton());
 		}
 		frame.add(centralPanel, BorderLayout.CENTER);
 		frame.add(bottomPanel, BorderLayout.SOUTH);
@@ -109,7 +132,8 @@ public class GUI {
 	}
 	
 	/**
-	 * Metodo che raccoglie i settori in appositi ArrayList, in base alla loro tipologia.
+	 * Italian: Metodo che raccoglie i settori in appositi ArrayList, in base alla loro tipologia.
+	 * English: Method used to collect sectors in ArrayLists, according to their type.
 	 */
 	public static void ricavaSettori() {
 		settoriInaccessibili = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.INACCESSIBILE), "Inaccessibili");
@@ -143,17 +167,22 @@ public class GUI {
 	}
 	
 	private void coloraSettoriPerTipo(ListaSettore listaSettori) {
-		for (int i = 0; i < listaPulsanti.size(); i++) {
+		PulsanteSettore pulsanteI;
+		Settore settoreJ;
+		for (int i = 0; i < listaPulsantiSettore.size(); i++) {
 			for (int j = 0; j < listaSettori.getLista().size(); j++) {
-				if (listaPulsanti.get(i).getNomePulsante().equals(listaSettori.getLista().get(j).getNome())) {
-					setColorePulsante(listaSettori.getNomeLista(), listaPulsanti.get(i).getButton());
+				pulsanteI = listaPulsantiSettore.get(i);
+				settoreJ = listaSettori.getLista().get(j);
+				if (pulsanteI.getNomePulsante().equals(settoreJ.getNome())) {
+					setColorePulsante(listaSettori.getNomeLista(), pulsanteI.getButton());
 				}
 			}
 		}
 	}
 	
 	/**
-	 * Metodo che colora i pulsanti corrispondenti ai settori, in base alla loro tipologia.
+	 * Italian: Metodo che colora i pulsanti corrispondenti ai settori, in base alla loro tipologia.
+	 * English: Method used to color the buttons corresponding to the sectors, according to their type.
 	 */
 	public void coloraGUI() {
 		ricavaSettori();
@@ -163,79 +192,105 @@ public class GUI {
 		coloraSettoriPerTipo(basi);
 		coloraSettoriPerTipo(scialuppe);
 	}
-
-	public void setNumeroGiocatori() { // necessario?
-		JFrame finestra = new JFrame("Numero dei giocatori");
-		JLabel etichetta = new JLabel("Inserire il numero dei giocatori: ");
-		final JTextField inserimentoNumero = new JTextField(" " , 5);
-		inserimentoNumero.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				numeroGiocatori = inserimentoNumero.getText();
-				creaGUI();
-				coloraGUI();
-				//nuovaPartita = new Partita(GUI.getNumeroGiocatori());  //qui?
-			}
-		});
-		finestra.setLayout(new FlowLayout());
-		finestra.add(etichetta);
-		finestra.add(inserimentoNumero);
-		finestra.setSize(300, 80);
-		finestra.getContentPane();
-		finestra.setVisible(true);
-		finestra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	
+	/**
+	 * Italian: Metodo che genera una finestra dotata di pulsanti. Cliccando su un pulsante, 
+	 * 		l'utente si 'registra' come partecipante alla partita utilizzando una delle
+	 * 		tecnologie fornite per la giocabilità online.
+	 * English: Method which creates a frame endowed with buttons. Clicking on a button
+	 * 		the user will join to the list of players, using one of the available technologies
+	 * 		to play online.
+	 */
+	public TipoInterface sceltaTecnologiaDiComunicazione() {
+		ArrayList<AltroPulsante> pulsantiStart = new ArrayList<AltroPulsante>();
+		AltroPulsante inizioPartitaConSocket = new AltroPulsante(startConSocket);
+		AltroPulsante inizioPartitaConRMI = new AltroPulsante(startConRMI);
+		pulsantiStart.add(inizioPartitaConSocket);
+		pulsantiStart.add(inizioPartitaConRMI);
+		for (int i = 0; i < pulsantiStart.size(); i++) {
+			final AltroPulsante modalità = pulsantiStart.get(i);
+			modalità.getButton().addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					visualizzaTabellone(modalità.getNomePulsante());
+				}
+			});
+		}
+		finestraIniziale.setLayout(new FlowLayout());
+		finestraIniziale.add(inizioPartitaConSocket.getButton());
+		finestraIniziale.add(inizioPartitaConRMI.getButton());
+		finestraIniziale.getContentPane();
+		finestraIniziale.pack();
+		finestraIniziale.setVisible(true);
+		finestraIniziale.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		return tipoInterfaccia;
+	}
+	
+	private void visualizzaTabellone(String nomePulsante) {
+		creaGUI();
+		coloraGUI();
+		finestraIniziale.setVisible(false);
+		if (nomePulsante.equals(startConSocket)) {
+			tipoInterfaccia = TipoInterface.SOCKET_GUI;
+		}
+		else if (nomePulsante.equals(startConRMI)) {
+			tipoInterfaccia = TipoInterface.RMI_GUI;
+		}
 	}
 	
 	/**
-	 * Metodo che genera una finestra dotata di pulsante. Cliccando sul pulsante, 
-	 * l'utente si 'registra' come partecipante alla partita.
+	 * Italian: Metodo utilizzato per attivare il pulsante "attacco" dopo che un giocatore di 
+	 * 		razza aliena ha effettuato il movimento.
+	 * English: Method used to activate the button "attacco" after the movement of
+	 * 		 an alien player.
 	 */
-	public void partecipazionePartita() {
-		final JFrame finestra = new JFrame();
-		JButton inizioPartita = new JButton("Start");
-		inizioPartita.addActionListener(new ActionListener() {
+	public void attivaPulsanteAttacco() {
+		attacco.getButton().setEnabled(true);
+	}
+	
+	/**
+	 * Italian: Metodo utilizzato per:
+	 * 	1) 	attivare il pulsante "pescaCarta" se uno spostamento porta il giocatore in un 
+	 * 		settore pericoloso;
+	 * 	2)	visualizzare l'etichetta che informa il giocatore riguardo la tipologia 
+	 * 		della carta pescata;
+	 * English: Method used to:
+	 * 	1)	activate the button "pescaCarta" if a player ends up in a dangerous sector 
+	 * 		after a movement;
+	 * 	2)	inform the player about the kind of card received;
+	 */	
+	public void attivaPulsantePescaCarta() {
+		pescaCarta.getButton().setEnabled(true);
+		tipoCartaPescata();
+		cartaPescata.setVisible(true);
+	}
+	
+	private void tipoCartaPescata() {
+		pescaCarta.getButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				creaGUI();
-				coloraGUI();
-				finestra.setVisible(false);
+				cartaPescata = new JLabel("Carta pescata: ");
+				
 			}
 		});
-		finestra.setLayout(new FlowLayout());
-		finestra.add(inizioPartita);
-		finestra.getContentPane();
-		finestra.pack();
-		finestra.setVisible(true);
-		finestra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	} 
+	
+	/**
+	 * Italian: Metodo che restituisce la lista contenente tutti i pulsanti corrispondenti a settori.
+	 * English: Method which returns the list containing all the buttons that correspond to sectors.
+	 * @return listaPulsantiSettore
+	 */
+	public ArrayList<PulsanteSettore> getListaPulsantiSettore() {
+		return this.listaPulsantiSettore;
 	}
 	
-	public static int getNumeroGiocatori() {  // necessario?
-		return Integer.parseInt(numeroGiocatori);
-	}
-	
-	public static Partita creaNuovaPartita() {
-		return nuovaPartita;
-	}
-	
-	private void creaPulsantePescaCarta(JPanel pannello) {
-		Pulsante pescaCarta = new Pulsante("Pesca una carta", indicePulsante+1);
-		JLabel cartaPescata = new JLabel("Carta pescata: ");
-		JPanel contenitore = new JPanel();
-		contenitore.setBorder(new EmptyBorder(0, 0, 0, 100));
-		contenitore.add(cartaPescata);
-		if (isSettorePericoloso == false) {
-			cartaPescata.setVisible(false);
-		}
-		pannello.add(pescaCarta.getButton());
-		pannello.add(contenitore);
-		// if (settore non pericoloso) pulsante disabilitato
-		// + label con carta pescata
-	}
-	
-	private void creaPulsanteAttacco(JPanel pannello) {
-		Pulsante attacco = new Pulsante("Attacco", indicePulsante+1);
-		if (giocaAlieno == false) {
-			attacco.getButton().setEnabled(false);
-		}
-		pannello.add(attacco.getButton());
+	/**
+	 * Italian: Metodo che restituisce la lista contenente tutti i pulsanti della schermata di gioco non 
+	 * 	corrispondenti a settori.
+	 * English: Method which returns the list containing all the buttons in the game screen that
+	 * 	do not represent sectors.
+	 * @return listaAltriPulsanti
+	 */
+	public ArrayList<AltroPulsante> getListaAltriPulsanti() {
+		return this.listaAltriPulsanti;
 	}
 	
 }

@@ -1,34 +1,37 @@
 package it.polimi.gui;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import it.polimi.client.Comando;
 
 import javax.swing.*;
 
 /**
- * Classe utilizzata per la creazione di un oggetto complesso, composto da un JButton e da
- * altri elementi identificativi come il nome del settore associato al pulsante e le 
- * coordinate del pulsante sullo schermo.
+ * Italian: Classe utilizzata per la creazione di un oggetto complesso, composto da un JButton e da
+ * 	altri elementi identificativi come il nome del settore associato al pulsante e le 
+ * 	coordinate del pulsante sullo schermo.
+ * English: Class used to create a complex object, composed by a JButton and other 
+ * 	characteristic elements like the name associated to the button itself and its
+ * 	coordinates on the screen.
  */
-public class Pulsante {
+public abstract class Pulsante {
 	
 	private static int idPulsante;
 	private String nomePulsante;
 	private final JButton button;
 	private int ascissa;
 	private int ordinata;
-	private static String pulsanteEvidenziato;
+	private GUI guiProprietaria;  // necessario?
+	private Comando nomeComando;
+	//private String patternSintassiComando;
 	
 	/**
-	 * Costruttore della classe 'Pulsante'.
+	 * Italian: Costruttore della classe 'Pulsante'.
+	 * English: Constructor for the class 'Pulsante'.
 	 * @param nome Nome del settore associato al pulsante
 	 * @param indicePulsante
 	 */
-	public Pulsante(String nome, int indicePulsante) {
+	public Pulsante(String nome) {
 		nomePulsante = nome;
 		button = new JButton(nome);
-		setIdPulsante(indicePulsante);
 	}
 
 	public static int getIdPulsante() {
@@ -40,7 +43,8 @@ public class Pulsante {
 	}
 	
 	/**
-	 * Metodo che restituisce il nome del settore associato al pulsante.
+	 * Italian: Metodo che restituisce il nome del settore associato al pulsante.
+	 * English: Method which returns the name of the sector associated to the button.
 	 * @return Nome del settore associato al pulsante.
 	 */
 	public String getNomePulsante() {
@@ -48,14 +52,16 @@ public class Pulsante {
 	}
 	
 	/**
-	 * Metodo utilizzato per assegnare un nome (e quindi un settore) al pulsante.
+	 * Italian: Metodo utilizzato per assegnare un nome (e quindi un settore) al pulsante.
+	 * English: Method used to assign a name (and so a sector) to the button.
 	 */
 	public void setNomePulsante(String nomePulsante) {
 		this.nomePulsante = nomePulsante;
 	}
 	
 	/**
-	 * Metodo utilizzato per estrarre il JButton da un oggetto della classe 'Pulsante'.
+	 * Italian: Metodo utilizzato per estrarre il JButton da un oggetto della classe 'Pulsante'.
+	 * English: Method used to extract the corresponding JButton from a 'Pulsante' object.
 	 * @return JButton associato all'oggetto 'Pulsante'
 	 */
 	public JButton getButton() {
@@ -63,7 +69,8 @@ public class Pulsante {
 	}
 	
 	/**
-	 * Metodo utilizzato per ricavare la posizione orizzontale del pulsante sullo schermo.
+	 * Italian: Metodo utilizzato per ricavare la posizione orizzontale del pulsante sullo schermo.
+	 * English: Method used to get the horizontal position of a button on the screen.
 	 * @return Ascissa relativa al pulsante
 	 */
 	public int getAscissa() {
@@ -71,7 +78,8 @@ public class Pulsante {
 	}
 	
 	/**
-	 * Metodo utilizzato per settare la posizione orizzontale del pulsante sullo schermo.
+	 * Italian: Metodo utilizzato per settare la posizione orizzontale del pulsante sullo schermo.
+	 * English: Method used to set the horizontal position of a button on the screen.
 	 * @param ascissa Intero che rappresenterà l'ascissa relativa al pulsante
 	 */
 	public void setAscissa(int ascissa) {
@@ -79,7 +87,8 @@ public class Pulsante {
 	}
 	
 	/**
-	 * Metodo utilizzato per ricavare la posizione verticale del pulsante sullo schermo.
+	 * Italian: Metodo utilizzato per ricavare la posizione verticale del pulsante sullo schermo.
+	 * English: Method used to get the vertical position of a button on the screen.
 	 * @return Ordinata relativa al pulsante
 	 */
 	public int getOrdinata() {
@@ -87,23 +96,31 @@ public class Pulsante {
 	}
 	
 	/**
-	 * Metodo utilizzato per settare la posizione verticale del pulsante sullo schermo.
+	 * Italian: Metodo utilizzato per settare la posizione verticale del pulsante sullo schermo.
+	 * English: Method used to set the vertical position of a button on the screen.
 	 * @param ordinata Intero che rappresenterà l'ordinata relativa al pulsante
 	 */
 	public void setOrdinata(int ordinata) {
 		this.ordinata = ordinata;
 	}
 	
+	public abstract void azionePulsante();
+	
 	/**
-	 * Metodo utilizzato per evidenziare la posizione corrente del giocatore.
+	 * Italian: metodo utilizzato per settare l'azione associata alla pressione del pulsante.
+	 * English: method used to set the action performed after the click on the button.
+	 * @param nomeComando tipo di comando determinato dalla pressione del pulsante
 	 */
-	public void evidenziaPosizione() {
-		this.button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				button.setBackground(Color.GREEN);
-				//gioco.moveCurrentPlayer(pulsante.getNomePulsante());
-			}
-		});
+	public void setComando(Comando nomeComando) {
+		this.nomeComando = nomeComando;
+	}
+	
+	public void setGUIProprietaria(GUI gui) {
+		this.guiProprietaria = gui;
+	}
+	
+	public GUI getGUIProprietaria() {
+		return this.guiProprietaria;
 	}
 	
 }

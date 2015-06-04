@@ -4,7 +4,8 @@ import it.polimi.model.sector.Settore;
 import java.util.ArrayList;
 
 /**
- * Classe utilizzata per assegnare ad un ArrayList di settori un nome che lo identifichi. 
+ * Italian: Classe utilizzata per assegnare ad un ArrayList di settori un nome che lo identifichi.
+ * English: Class used to assign an identificative name to an ArrayList of sectors. 
  */
 public class ListaSettore {
 	
@@ -12,7 +13,8 @@ public class ListaSettore {
 	private String nomeLista;
 	
 	/**
-	 * Costruttore della classe 'ListaSettore'.
+	 * Italian: Costruttore della classe 'ListaSettore'.
+	 * English: Constructor of the class 'ListaSettore'.
 	 * @param lista ArrayList di settori per un determinato tipo
 	 * @param nomeLista Nome da assegnare all'ArrayList
 	 */
@@ -22,7 +24,8 @@ public class ListaSettore {
 	}
 	
 	/**
-	 * Metodo che restituisce il nome assegnato all'ArrayList.
+	 * Italian: Metodo che restituisce il nome assegnato all'ArrayList.
+	 * English: Method used to get the name of the ArrayList.
 	 * @return Nome dell'ArrayList di settori
 	 */
 	public String getNomeLista() {
@@ -30,7 +33,8 @@ public class ListaSettore {
 	}
 	
 	/**
-	 * Metodo che restituisce l'ArrayList di settori desiderato.
+	 * Italian: Metodo che restituisce l'ArrayList di settori desiderato.
+	 * English: Method used to get the ArrayList of sectors desired.
 	 * @return ArrayList di settori
 	 */
 	public ArrayList<Settore> getLista() {
