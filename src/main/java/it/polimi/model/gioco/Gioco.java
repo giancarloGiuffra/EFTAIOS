@@ -11,6 +11,7 @@ import it.polimi.common.observer.ModelGameOver;
 import it.polimi.common.observer.ModelMoveDoneEvent;
 import it.polimi.model.carta.Carta;
 import it.polimi.model.carta.Mazzo;
+import it.polimi.model.exceptions.BadSectorException;
 import it.polimi.model.exceptions.FalsoGameOver;
 import it.polimi.model.exceptions.IllegalAzioneGiocatoreException;
 import it.polimi.model.exceptions.IllegalMoveException;
@@ -386,18 +387,26 @@ public class Gioco extends BaseObservable {
     private List<String> calcolaSettoriValidiForAlien(Player player) {
         List<String> settori = new ArrayList<String>();
         for(String settore : this.positions.get(player).getSettoriAdiacentiADistanzaDue()){
-            if(this.tabellone.getSettore(settore).isValidDestinationForAlien() &&
+            try{
+        	if(this.tabellone.getSettore(settore).isValidDestinationForAlien() &&
                this.tabellone.esisteSentieroValido(this.positions.get(player), this.tabellone.getSettore(settore)))
                settori.add(settore);
+            } catch (BadSectorException ex){
+            	//skip
             }
-            return settori;
+        }
+        return settori;
     }
 
     private List<String> calcolaSettoriValidiForHuman(Player player) {
         List<String> settori = new ArrayList<String>();
         for(String settore : this.positions.get(player).getSettoriAdiacenti()){
-            if(this.tabellone.getSettore(settore).isValidDestinationForHuman())
+            try{
+        	if(this.tabellone.getSettore(settore).isValidDestinationForHuman())
                 settori.add(settore);
+            } catch (BadSectorException ex){
+            	//skip
+            }
         }
         return settori;
     }
