@@ -121,6 +121,7 @@ public class View extends BaseObservable implements Runnable {
 		this.sendCommandChiediMossa(event);
 		printRichiedeInput();
 		String mossa = this.readLine();
+		if(connectionError(mossa)) return; //esce
 		while(!isValidMossa(mossa)){
 			print("La mossa inserita non è valida. Inserirne un'altra.");
 			printRichiedeInput();
@@ -234,6 +235,7 @@ public class View extends BaseObservable implements Runnable {
 		Pattern indexPattern = Pattern.compile("\\d+");
 		printRichiedeInput();
 		String scelta = this.readLine();
+		if(connectionError(scelta)) return mappa.get(1); //esce con un valore valido
 		Matcher matcher = indexPattern.matcher(scelta);
 		while(!matcher.matches() ||
 		        !mappa.containsKey(Integer.parseInt(scelta)) ){
@@ -342,6 +344,7 @@ public class View extends BaseObservable implements Runnable {
 		this.sendCommandChiediSettoreDaAnnunciare();
 		printRichiedeInput();
 		String announce = this.readLine();
+		if(connectionError(announce)) return; //esce
 		while(!isValidAnnouncement(announce)){
 			print("L'annuncio inserito non è valido. Inserirne un altro.");
 			printRichiedeInput();
@@ -506,7 +509,7 @@ public class View extends BaseObservable implements Runnable {
 	public String readLine(){
 	    try {
             String read = this.input.readLine();
-	        if(read != null) return read;
+	        if(read != null && !read.equals("ABORT")) return read; //ABORT arriva dal Client nel caso si dia il timeout nell'input 
 	        else{
 	            this.notify(new ServerConnessionePersaConClient());
 	            return "ABORT"; //in OS X non lancia l'exception invece restituisce null quando cade la connessione

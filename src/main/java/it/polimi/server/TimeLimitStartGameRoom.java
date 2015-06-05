@@ -16,10 +16,12 @@ public class TimeLimitStartGameRoom extends TimerTask {
 	
 	@Override
 	public void run() {
+		this.gameRoom.cancelTimer();
 		if(this.gameRoom.canStart())
 			this.gameRoom.start();
 		else{
 			this.gameRoom.clientManager().broadcast(String.format("Non è stato raggiunto il numero minimo di partecipanti (%d).\nLa connessione verrà chiusa.", this.gameRoom.clientManager().minimumNumber()));
+			this.gameRoom.clientManager().close();
 			this.gameRoom.close();
 		}
 	}

@@ -176,7 +176,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
 	/**
 	 * chiude le connessioni con i client
 	 */
-    private void close() {
+    void close() {
 		this.closeClients();
 		this.closeClientsMorti();
 	}

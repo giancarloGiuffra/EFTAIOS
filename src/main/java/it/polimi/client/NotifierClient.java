@@ -1,5 +1,6 @@
 package it.polimi.client;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
 import it.polimi.common.observer.RMIEvent;
@@ -26,7 +27,11 @@ public class NotifierClient implements RemoteNotifier {
 				this.rmiInterface.print(event.getMsg());
 				return "OK";
 			case "ReadEvent":
+			try {
 				return this.rmiInterface.read();
+			} catch (IOException e) {
+				return "ABORT";
+			}
 			default:
 				throw new ServerUnknownRMIEvent(event.name());
 		}
