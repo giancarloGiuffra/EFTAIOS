@@ -20,7 +20,7 @@ import it.polimi.view.View;
 
 public class GameRoom extends BaseObservable implements BaseObserver{
     
-    private static final Integer TIME_LIMIT_FOR_START = 2; // in minuti
+    private static final Integer TIME_LIMIT_FOR_START = 1; // in minuti
 	private Model model;
     private ModelView modelView;
     private Controller controller;
@@ -28,7 +28,7 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     private ClientManager manager;
     private Boolean hasStarted = false;
     private Boolean hasFinished = false;
-    private Timer timer = new Timer();
+    private Timer timer;
     
     private static AtomicInteger NUMBER_OF_GAMEROOMS = new AtomicInteger(0);
     
@@ -83,6 +83,7 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     public void addClient(Client client){
         this.manager.addClient(client);
         if(this.manager.hasOneClient()){
+        	timer = new Timer();
         	TimeLimitStartGameRoom task = new TimeLimitStartGameRoom(this);
         	timer.schedule(task, TIME_LIMIT_FOR_START*60*1000);
         }
