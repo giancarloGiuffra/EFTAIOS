@@ -10,6 +10,7 @@ import it.polimi.common.observer.ModelDichiaratoSilenzioEvent;
 import it.polimi.common.observer.ServerCloseGameRoom;
 import it.polimi.common.observer.ServerConnessionePersaConClient;
 import it.polimi.model.player.Player;
+import it.polimi.model.sector.Settore;
 import it.polimi.server.exceptions.IllegalObservableForClientManager;
 import it.polimi.view.View;
 
@@ -307,11 +308,38 @@ public class ClientManager extends BaseObservable implements BaseObserver{
      * inizializza il client manager
      * @param playersList
      */
-    public void inizializza(List<Player> playersList){
+    public void inizializza(List<Player> playersList, Map<Player,Settore> posizioni){
         this.createMap(playersList);
+        this.broadcastCommandInfoIniziali(posizioni);
         this.broadcast("Siamo al completo, il gioco inizia!");
     }
     
+    /**
+     * invia il comando con le informazioni iniziali a ciascun giocatore:
+     * nome personaggio, razza
+     */
+    private void broadcastCommandInfoIniziali(Map<Player,Settore> posizioni) {
+        for(Player player : players.keySet()){
+            this.players.get(player).write(buildCommandInfoIniziali(player.nome(),posizioni.get(player).getNome(),player.razza().toString()));
+        }
+    }
+
+    /**
+     * crea il comando con le informazioni iniziali
+     * @param nomePlayer
+     * @param nomeSettore
+     * @param razza
+     * @return
+     */
+    private String buildCommandInfoIniziali(String nomePlayer, String nomeSettore,
+            String razza) {
+        return new StringBuilder().append("COMANDO%").append(Comando.INIZIO.toString()).append("%").
+                append(nomePlayer).append("%").
+                append(nomeSettore).append("%").
+                append(razza).append("%").
+                append("COMANDO").toString();
+        }
+
     /**
      * scrive nel outputsream dei client in gioco
      * @param message
