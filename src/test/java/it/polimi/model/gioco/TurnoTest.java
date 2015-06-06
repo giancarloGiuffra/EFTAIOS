@@ -28,8 +28,10 @@ public class TurnoTest{
 
 	@Test
 	public void testFinishTurn() {
+		for(Player player : lista){
+		assertThat(turno.currentPlayer(),is(player));
 		turno.finishTurn();
-		assertTrue(turno.currentPlayer().equals(lista.get(1)));
+		}
 	}
 
 	@Test
@@ -37,13 +39,13 @@ public class TurnoTest{
 		for(int i = 0; i < turno.numeroMassimoDiTurni()*turno.players().size(); i++){
 			turno.finishTurn();
 		}
-		//assertThat(turno.turnsOver(), equalTo(true));
+		assertThat(turno.turnsOver(), equalTo(true));
 	}
 
 	@Test
 	public void testCurrentTurnAfterOneRound() {
 		for(Player player : new ArrayList<Player>(turno.players())) turno.finishTurn();
-		//assertThat(turno.currentTurn(),equalTo(2));
+		assertThat(turno.currentTurn(),equalTo(2));
 	}
 
 
@@ -51,6 +53,20 @@ public class TurnoTest{
 	public void testRemove() {
 		turno.remove(lista.get(0));
 		assertTrue(turno.currentPlayer().equals(lista.get(1)));	
+	}
+	
+	@Test
+	public void testGetNextFirstPlayer(){
+		for(Player player : lista){
+			assertThat(turno.getNextFirstPlayer(), is(lista.get(1)));
+		}
+	}
+	
+	@Test
+	public void testCopyConstructor(){
+	    Turno copia = new Turno(turno);
+	    assertThat(copia, is(turno));
+	    assertNotSame(copia,turno);
 	}
 
 }
