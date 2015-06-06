@@ -93,7 +93,7 @@ public abstract class Player {
     }
 
 	/**
-	 * Metodo per chiedere un settore al giocatore e annunciarlo
+	 * Metodo per far annunciare un settore al giocatore
 	 */
     public void annunciaSettore(Settore settore){
 		if(!settore.isValidSectorForAnnouncement()) throw new InvalidSectorForAnnouncement("Non si può dichiarare rumore in questo settore");
