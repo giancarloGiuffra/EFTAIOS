@@ -56,7 +56,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	 * controlla se il server ha chiuso la connessione
 	 * @return
 	 */
-	private Boolean isClosed(){
+	protected Boolean isClosed(){
 	    return this.closed;
 	}
 	
@@ -116,7 +116,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	 * @param string
 	 * @return
 	 */
-	private Boolean mustPrint(String string){
+	protected Boolean mustPrint(String string){
 	    return !string.equals("FINE_MESSAGGIO") && 
 	           !string.equals("RICHIEDE_INPUT") &&
 	           !string.equals("CHIUSURA") &&
@@ -124,7 +124,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	           !isCommand(string);
 	}
 	
-	private boolean isCommand(String string){
+	protected boolean isCommand(String string){
         Matcher matcher = PATTERN_COMANDO.matcher(string);
         return matcher.matches();
     }
@@ -146,7 +146,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	 * legge dal server
 	 * @return
 	 */
-	private String readLineFromServer(){
+	protected String readLineFromServer(){
 	    try {
             return this.in.readLine();
         } catch (IOException e) {

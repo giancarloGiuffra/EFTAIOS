@@ -6,11 +6,15 @@ import it.polimi.model.carta.Carta;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 
+import it.polimi.gui.GUI; // ...
+
 import java.util.List;
 
 public class ModelView extends BaseObservable {
 
 	private Model model;
+	
+	private GUI nuovaGUI;	//...
 
 	/**
 	 * Constructor
@@ -18,6 +22,7 @@ public class ModelView extends BaseObservable {
 	 */
 	public ModelView(Model model){
 		this.model = new Model(model);
+		nuovaGUI = new GUI(this); //...
 	}
 	
 	@Override

@@ -19,15 +19,12 @@ public abstract class Pulsante {
 	private final JButton button;
 	private int ascissa;
 	private int ordinata;
-	private GUI guiProprietaria;  // necessario?
-	private Comando nomeComando;
-	//private String patternSintassiComando;
+	private GUI guiProprietaria;  
 	
 	/**
 	 * Italian: Costruttore della classe 'Pulsante'.
 	 * English: Constructor for the class 'Pulsante'.
 	 * @param nome Nome del settore associato al pulsante
-	 * @param indicePulsante
 	 */
 	public Pulsante(String nome) {
 		nomePulsante = nome;
@@ -105,15 +102,6 @@ public abstract class Pulsante {
 	}
 	
 	public abstract void azionePulsante();
-	
-	/**
-	 * Italian: metodo utilizzato per settare l'azione associata alla pressione del pulsante.
-	 * English: method used to set the action performed after the click on the button.
-	 * @param nomeComando tipo di comando determinato dalla pressione del pulsante
-	 */
-	public void setComando(Comando nomeComando) {
-		this.nomeComando = nomeComando;
-	}
 	
 	public void setGUIProprietaria(GUI gui) {
 		this.guiProprietaria = gui;

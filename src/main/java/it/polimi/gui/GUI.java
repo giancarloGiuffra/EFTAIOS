@@ -1,7 +1,7 @@
 package it.polimi.gui;
 
-//import it.polimi.client.Comando;
 import it.polimi.client.TipoInterface;
+import it.polimi.model.ModelView;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
 import it.polimi.model.tabellone.*;
@@ -46,18 +46,37 @@ public class GUI {
 	private final AltroPulsante attacco = new AltroPulsante("Attacco");
 	private final AltroPulsante pescaCarta = new AltroPulsante("Pesca una carta");
 	private JLabel cartaPescata = new JLabel();
-	final JFrame finestraIniziale = new JFrame("Start");
+	private final JFrame finestraIniziale = new JFrame("Start");
 	private final String startConSocket = new String("Start con Socket");
 	private final String startConRMI = new String("Start con RMI");
 	private TipoInterface tipoInterfaccia;
 	private View viewAssociata;
+	private ModelView modelViewAssociato;
 	
+	/**
+	 * Italian: costruttore della classe 'GUI'
+	 * English: constructor of the class 'GUI'
+	 * @param view view associata alla GUI
+	 */
 	public GUI(View view) {
 		this.viewAssociata = view;
 	}
 	
+	public GUI(ModelView modelView) {
+		this.modelViewAssociato = modelView;
+	}
+	
+	/**
+	 * Italian: metodo che ritorna la view associata alla GUI
+	 * English: method used to return the view associated to the GUI
+	 * @return viewAssociata
+	 */
 	public View returnView() {
 		return this.viewAssociata;
+	}
+	
+	public ModelView returnModelView() {
+		return this.modelViewAssociato;
 	}
 	
 	private void creaListaPulsantiSettore() {
@@ -120,6 +139,7 @@ public class GUI {
 		for (int i = 0; i < listaPulsantiSettore.size(); i++) {
 			pulsanteI = listaPulsantiSettore.get(i);
 			pulsanteI.getButton().setBounds(pulsanteI.getAscissa(), pulsanteI.getOrdinata(), larghezzaPulsanteSettore, altezzaPulsanteSettore);
+			pulsanteI.setGUIProprietaria(this); 	//...
 			centralPanel.add(pulsanteI.getButton());
 		}
 		frame.add(centralPanel, BorderLayout.CENTER);
@@ -128,14 +148,9 @@ public class GUI {
 		frame.pack();
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
 	}
 	
-	/**
-	 * Italian: Metodo che raccoglie i settori in appositi ArrayList, in base alla loro tipologia.
-	 * English: Method used to collect sectors in ArrayLists, according to their type.
-	 */
-	public static void ricavaSettori() {
+	private static void ricavaSettori() {
 		settoriInaccessibili = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.INACCESSIBILE), "Inaccessibili");
 		settoriSicuri = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.SICURO), "Sicuri");
 		settoriPericolosi = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.PERICOLOSO), "Pericolosi");

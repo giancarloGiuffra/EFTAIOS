@@ -1,7 +1,12 @@
 package it.polimi.model.carta;
 
+import it.polimi.model.player.Player;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Classe per rappresentare la carta settore
@@ -24,7 +29,7 @@ public class CartaSettore extends Carta {
 	}
 	
 	/**
-	 * Copy COnstructor
+	 * Copy Constructor
 	 * @param source
 	 */
 	public CartaSettore(CartaSettore source){
@@ -68,6 +73,29 @@ public class CartaSettore extends Carta {
 	@Override
 	public String nome(){
 	    return this.tipo.nome();
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(31, 17).
+				append(this.tipo).
+				append(this.iconaOgetto).
+				toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CartaSettore other = (CartaSettore) obj;
+		return new EqualsBuilder().
+				append(this.tipo,other.tipo).
+				append(this.iconaOgetto, other.iconaOgetto).
+				isEquals();
 	}
 
 }

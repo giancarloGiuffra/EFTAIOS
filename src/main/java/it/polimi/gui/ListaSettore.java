@@ -34,7 +34,7 @@ public class ListaSettore {
 	
 	/**
 	 * Italian: Metodo che restituisce l'ArrayList di settori desiderato.
-	 * English: Method used to get the ArrayList of sectors desired.
+	 * English: Method used to get the desired ArrayList of sectors.
 	 * @return ArrayList di settori
 	 */
 	public ArrayList<Settore> getLista() {

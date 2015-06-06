@@ -1,5 +1,8 @@
 package it.polimi.model.tabellone;
 
+import it.polimi.model.carta.Carta;
+import it.polimi.model.carta.CartaSettore;
+import it.polimi.model.carta.Mazzo;
 import it.polimi.model.exceptions.BadSectorException;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
@@ -9,6 +12,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Classe per rappresentare il tabellone
@@ -39,12 +45,10 @@ public class Tabellone {
     	this.baseUmana = new Settore(source.baseUmana);
     	this.baseAliena = new Settore(source.baseAliena);
     	this.sectors = new HashMap<String,Settore>();
-    	for(Character colonna : this.listalistaColonne){
-            for(Integer riga : this.listaRighe){
-            	Settore settore = new Settore(source.getSettore(Settore.buildNomeSettore(colonna, riga)));
-            	sectors.put(settore.getNome(),settore);
-            }
-        }
+    	for(Settore settore : source.sectors.values()){
+    		Settore copia = new Settore(settore);
+    		sectors.put(copia.getNome(), copia);
+    	}
     }
     
     /**
@@ -121,4 +125,32 @@ public class Tabellone {
         }
         return lista;
     }
+    
+    @Override
+	public int hashCode() {
+		HashCodeBuilder hash =  new HashCodeBuilder(211, 17);
+		for(String nome : this.sectors.keySet()){
+				hash.append(nome).append(this.sectors.get(nome));
+		}
+		return hash.toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Tabellone))
+			return false;
+		Tabellone other = (Tabellone) obj;
+		if (!this.sectors.equals(other.sectors))
+			return false;
+		EqualsBuilder equals = new EqualsBuilder();
+		for(String nome : this.sectors.keySet()){
+			equals.append(this.sectors.get(nome), other.sectors.get(nome));
+		}
+		return equals.isEquals();
+	}
+	
 }

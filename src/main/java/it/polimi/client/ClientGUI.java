@@ -1,3 +1,4 @@
+// la GUI non può partire se non viene eseguito clientGUI
 package it.polimi.client;
 
 import it.polimi.gui.*;
@@ -30,7 +31,7 @@ public class ClientGUI{
      * @param args
      */
     public static void main(String[] args) {
-        /*ClientGUI client = new ClientGUI();
+        /*ClientGUI client = new ClientGUI(); // view come parametro per il costruttore
         if(client.networkInterface.connectToServer()) (new Thread(client.networkInterface)).start();
         else client.comunicaConnessioneFallita();*/
     }

@@ -27,10 +27,8 @@ public class AltroPulsante extends Pulsante {
 	private void possibiliAzioniPulsante(String nomePulsante) {
 		switch(nomePulsante) {
 		case "attacco":   // meglio delle costanti?
-			setComando(Comando.RISULTATO_ATTACCO);
 			break;
 		case "pescaCarta":
-			setComando(Comando.PESCA_CARTA);
 			//cartaPescata(...);
 			break;
 		}

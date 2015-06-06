@@ -45,9 +45,12 @@ public class Main implements BaseObserver{
 	 */
 	public static void main(String[] args) {
 		/*Main main = new Main();
-		main.run(); */
-		View vista = new View(System.in, System.out);
-		GUI nuovaGUI = new GUI(vista);
+		main.run();*/ 
+		//View vista = new View(System.in, System.out);
+		//GUI nuovaGUI = new GUI(view);
+		Model model = new Model(3);
+		ModelView modelView = new ModelView(model);
+		GUI nuovaGUI = new GUI(modelView);
 		nuovaGUI.sceltaTecnologiaDiComunicazione(); 
 	}
 
