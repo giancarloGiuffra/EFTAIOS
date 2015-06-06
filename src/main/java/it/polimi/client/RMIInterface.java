@@ -3,6 +3,9 @@ package it.polimi.client;
 import it.polimi.server.rmi.ClientRMIFactory;
 import it.polimi.server.rmi.RemoteNotifier;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -24,7 +27,7 @@ import java.util.regex.Pattern;
 
 public class RMIInterface implements NetworkInterfaceForClient {
 
-	private Scanner stdIn = new Scanner(System.in);
+	private BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 65534; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
@@ -32,7 +35,8 @@ public class RMIInterface implements NetworkInterfaceForClient {
     private Boolean closed = false;
     private static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
     private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO(.+%){1,}COMANDO");
-    private static final Integer TIME_LIMIT = 60; //in secondi
+    private static final Integer TIME_LIMIT = 10; //in secondi
+	private static final long TIME_BETWEEN_INPUT_CHECKS = 1; //in secondi
 	
 	/**
 	 * Costruttore
@@ -43,7 +47,11 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	
 	@Override
 	public Boolean connectToServer() {
-		return registerServerInClient() && registerClientInServer();
+		try {
+			return registerServerInClient() && registerClientInServer();
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 	/**
@@ -169,22 +177,40 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	/**
 	 * legge da stdIn
 	 * @return
+	 * @throws IOException 
 	 */
-	public String read(){
+	public String read() throws IOException{
 	    Timer timer = new Timer();
-	    timer.schedule( new TimeLimitInput(this), TIME_LIMIT*1000 );
-	    print("(ricorda che hai 60 secondi)");
-		String input = stdIn.nextLine();
-		timer.cancel();
-		return input;
+	    timer.schedule( new TimeLimitInput(this, timer), TIME_LIMIT*1000 );
+	    print(String.format("(hai %s secondi)",TIME_LIMIT));
+	    while(!stdIn.ready() && !isClosed()){
+			synchronized(this){
+				try {
+					this.wait(TIME_BETWEEN_INPUT_CHECKS*1000);
+				} catch (InterruptedException e) {
+					LOGGER.log(Level.WARNING, "InterruptedException in wait in read", e);
+				}
+			}
+		}
+        if(!isClosed()){
+        	String input = stdIn.readLine();
+            timer.cancel();
+            if(input.equals("ABORT")) this.close(); //cleint decide di chiudere
+            return input;
+        } else {
+        	return "ABORT";
+        }
+		
 	}
 	
 	/**
 	 * inizializza oggetto remoto per interagire con il server
+	 * @throws IOException 
 	 */
-	private Boolean registerServerInClient(){
+	private Boolean registerServerInClient() throws IOException{
 		print("Inserisci l'Indirizzo IP del Server: ");
-		String server = stdIn.nextLine();
+		String server = stdIn.readLine();
+		//String server = "127.0.0.1";
 		String clientRMIFactoryName = "ClientRMIFactory";
 		Registry registry;
 		try {
@@ -209,15 +235,16 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	/**
 	 * crea notifier per poter ricevere richiesta dal server
 	 * @return
+	 * @throws IOException 
 	 */
-	private Boolean registerClientInServer(){
+	private Boolean registerClientInServer() throws IOException{
 		print("Inserisci la porta locale da utilizzare per la comunicazione: ");
 		Pattern portPattern = Pattern.compile("\\d+");
-		String portName = stdIn.nextLine();
+		String portName = stdIn.readLine();
 		Matcher matcher = portPattern.matcher(portName);
 		while(!matcher.matches() || !notValidPort(portName)){
 			print("Porta non valida. Deve essere un numero nel range [49152,65535]. Inserisce ancora: ");
-			portName = stdIn.nextLine();
+			portName = stdIn.readLine();
 			matcher.reset(portName);
 		}
 		Integer port = Integer.parseInt(portName);

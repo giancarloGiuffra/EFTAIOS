@@ -18,13 +18,14 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	private Socket socket;
 	private BufferedReader in;
 	private PrintWriter out;
-	private Scanner stdIn = new Scanner(System.in);
+	private BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 65535; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
     private Boolean closed = false;
     private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO(.+%){1,}COMANDO");
-    private static final Integer TIME_LIMIT = 60; //in secondi
+    private static final Integer TIME_LIMIT = 10; //in secondi
+	private static final long TIME_BETWEEN_INPUT_CHECKS = 1; // in secondi
 	
 	/**
 	 * Costruttore
@@ -101,7 +102,13 @@ public class SocketInterface implements NetworkInterfaceForClient {
     	        print(fromServer);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
-    	    	printToServer(this.read());
+    	    	String read = "";
+				try {
+					read = this.read();
+				} catch (IOException e) {
+					LOGGER.log(Level.SEVERE, "IOException in System.in", e);
+				}
+    	    	if(!read.equals("ABORT")) printToServer(read);
     	    }
     	    if(fromServer.equals("CHIUSURA")) this.close();
     	    if(fromServer.equals("ERROR FROM SERVER")){
@@ -132,14 +139,29 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	/**
      * legge da stdIn
      * @return
+	 * @throws IOException 
      */
-    public String read(){
+    public String read() throws IOException{
         Timer timer = new Timer();
-        timer.schedule( new TimeLimitInput(this), TIME_LIMIT*1000 );
-        print("(ricorda che hai 60 secondi)");
-        String input = stdIn.nextLine();
-        timer.cancel();
-        return input;
+        timer.schedule( new TimeLimitInput(this, timer), TIME_LIMIT*1000 );
+	    print(String.format("(hai %s secondi)",TIME_LIMIT));
+		while(!stdIn.ready() && !isClosed()){
+			synchronized(this){
+				try {
+					this.wait(TIME_BETWEEN_INPUT_CHECKS*1000);
+				} catch (InterruptedException e) {
+					LOGGER.log(Level.WARNING, "InterruptedException in wait in read", e);
+				}
+			}
+		}
+        if(!isClosed()){
+        	String input = stdIn.readLine();
+            timer.cancel();
+            if(input.equals("ABORT")) this.close(); //client decide di chiudere
+            return input;
+        } else {
+        	return "ABORT";
+        }
     }
 	
 	/**

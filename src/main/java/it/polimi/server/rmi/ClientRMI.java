@@ -29,7 +29,7 @@ public class ClientRMI implements Client {
 			return this.notifierToClient.notifyRMIEvent(new ReadEvent(), "server");
 		} catch (RemoteException e) {
 			LOGGER.log(Level.SEVERE, "Errore remoto nel reader", e);
-			return "ERROR";
+			return "ABORT";
 		}
 	}
 	
