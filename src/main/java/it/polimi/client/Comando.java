@@ -2,6 +2,7 @@ package it.polimi.client;
 
 public enum Comando {
     
+    INIZIO,
     MUOVE,
     ABILITA_SETTORI,
     SCEGLIE_AZIONE,

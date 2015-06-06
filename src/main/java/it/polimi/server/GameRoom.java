@@ -49,7 +49,7 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     public void start() {
         this.model = new Model(this.manager.numeroGiocatori());
         this.modelView = new ModelView(this.model);
-        this.manager.inizializza(this.model.players());
+        this.manager.inizializza(this.model.players(), this.model.posizioni());
         this.view = new View(this.manager.currentClient().in(), this.manager.currentClient().out());
         this.controller = new Controller(modelView,view);
         this.controller.addObserver(this);

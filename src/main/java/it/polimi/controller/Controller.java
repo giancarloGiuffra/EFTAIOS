@@ -94,7 +94,7 @@ public class Controller extends BaseObservable implements BaseObserver {
             this.comunicaTurnoFinito();
             break;
         case "ModelGameOver":
-            this.comunicaGiocoFinito(event );
+            this.comunicaGiocoFinito(event);
             break;
         case "ModelGameContinues":
             this.startTurn();

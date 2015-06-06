@@ -410,4 +410,11 @@ public class Gioco extends BaseObservable {
         }
         return settori;
     }
+    
+    /**
+     * getter per positions
+     */
+    public Map<Player,Settore> posizioni(){
+        return positions;
+    }
 }
