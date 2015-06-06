@@ -1,5 +1,7 @@
 package it.polimi.model.gioco;
 
+import it.polimi.model.carta.Carta;
+import it.polimi.model.carta.Mazzo;
 import it.polimi.model.player.Player;
 import it.polimi.model.player.PlayerFactory;
 
@@ -9,6 +11,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Classe per gestire i turni
@@ -128,5 +133,36 @@ public class Turno {
 	public Boolean isThisLastPlayerDisconnecting() {
 		return this.players.isEmpty();
 	}
+	
+	@Override
+    public int hashCode() {
+	    List<Player> thisList = new ArrayList<Player>(this.players);
+        thisList.addAll(this.playersInStandBy);
+        thisList.add(this.firstPlayer);
+        HashCodeBuilder hash =  new HashCodeBuilder(23, 1063);
+        for(Player player : thisList)
+                hash.append(player);
+        return hash.toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Turno other = (Turno) obj;
+        List<Player> thisList = new ArrayList<Player>(this.players);
+        List<Player> otherList = new ArrayList<Player>(other.players);
+        thisList.addAll(this.playersInStandBy);
+        otherList.addAll(other.playersInStandBy);
+        thisList.add(this.firstPlayer);
+        otherList.add(other.firstPlayer);
+        return new EqualsBuilder().
+                append(thisList, otherList).
+                isEquals();
+    }
 
 }

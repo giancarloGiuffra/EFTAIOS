@@ -61,5 +61,12 @@ public class TurnoTest{
 			assertThat(turno.getNextFirstPlayer(), is(lista.get(1)));
 		}
 	}
+	
+	@Test
+	public void testCopyConstructor(){
+	    Turno copia = new Turno(turno);
+	    assertThat(copia, is(turno));
+	    assertNotSame(copia,turno);
+	}
 
 }

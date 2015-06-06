@@ -50,7 +50,8 @@ public abstract class Player {
      *  Metodo per controllare se la mossa è valida
      * @param from  settore di partenza
      * @param to    settore di arrivo
-     * @return true se la mossa è valida, false altrimenti
+     * @return true se la mossa è valida
+     * @throws BadSectorException
      */
      public abstract boolean isMoveValid(Settore from, Settore to);
 

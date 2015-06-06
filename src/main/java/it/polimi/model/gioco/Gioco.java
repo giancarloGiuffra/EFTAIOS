@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class Gioco extends BaseObservable {
 
     private final Tabellone tabellone;
@@ -73,7 +76,7 @@ public class Gioco extends BaseObservable {
     /**
      * @return il giocatore corrente
      */
-    private Player currentPlayer(){
+    Player currentPlayer(){
     	return this.turni.currentPlayer();
     }
     
@@ -416,5 +419,42 @@ public class Gioco extends BaseObservable {
      */
     public Map<Player,Settore> posizioni(){
         return positions;
+    }
+    
+    /**
+     * getter per tabellone
+     * @return
+     */
+    public Tabellone tabellone(){
+        return tabellone;
+    }
+    
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(211, 6427).
+                append(this.tabellone).
+                append(this.mazzoDiCarteSettore).
+                append(this.turni).
+                append(this.positions).
+                append(this.positionsOfPlayersInStandBy).
+                toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof Gioco))
+            return false;
+        Gioco other = (Gioco) obj;
+        return new EqualsBuilder().
+                append(this.tabellone,other.tabellone).
+                append(this.mazzoDiCarteSettore, other.mazzoDiCarteSettore).
+                append(this.turni, other.turni).
+                append(this.positions, other.positions).
+                append(this.positionsOfPlayersInStandBy, other.positionsOfPlayersInStandBy).
+                isEquals();
     }
 }
