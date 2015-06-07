@@ -42,6 +42,7 @@ public class SettoreTest {
 		Settore L09Copy = new Settore(L09);
 		assertThat(L09,is(L09Copy));
 		assertNotSame(L09,L09Copy);
+		assertThat(L09.hashCode(), is(L09Copy.hashCode()));
 	}
 	
 	@Test

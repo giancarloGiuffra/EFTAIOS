@@ -74,6 +74,11 @@ public class Mazzo {
 		return carte.pop();
 	}
 	
+	public Carta showCarta(){
+	     if(this.isEmpty()) throw new MazzoVuotoException("Il Mazzo è vuoto");
+	     return carte.peekFirst();
+	}
+	
 	/**
 	 * Inserisce la carta nel mazzo
 	 * @param carta da inserire

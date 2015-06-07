@@ -124,10 +124,9 @@ public abstract class Player {
 	/**
 	 * Metodo per pescare una carta dal mazzo
 	 * @param mazzo mazzo da cui pescare la carta
-	 * @return carta pescata
 	 */
-    public Carta pescaCarta(Mazzo mazzoDaCuiPescare){
-		return mazzoDaCuiPescare.getCarta();
+    public void pescaCarta(Mazzo mazzoDaCuiPescare){
+		this.salvaCarta(mazzoDaCuiPescare.getCarta());
 	}
     
     /**
@@ -137,12 +136,19 @@ public abstract class Player {
     public void salvaCarta(Carta carta){
         this.mazzo.putCarta(carta);
     }
+    
+    /**
+     * l'ultima carta inserita nel mazzo
+     * @return
+     */
+    public Carta getLastCard(){
+        return this.mazzo.showCarta();
+    }
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(233, 17).
 				append(this.personaggio).
-				append(this.mazzo).
 				toHashCode();
 	}
 
@@ -157,7 +163,6 @@ public abstract class Player {
 		Player other = (Player) obj;
 		return new EqualsBuilder().
 				append(this.personaggio,other.personaggio).
-				append(this.mazzo, other.mazzo).
 				isEquals();
 	}
 

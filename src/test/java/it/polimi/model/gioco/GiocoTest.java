@@ -37,6 +37,7 @@ public class GiocoTest {
         Gioco copia = new Gioco(gioco);
         assertThat(copia, is(gioco));
         assertNotSame(copia, gioco);
+        assertThat(copia.hashCode(), is(gioco.hashCode()));
     }
     
     @Test

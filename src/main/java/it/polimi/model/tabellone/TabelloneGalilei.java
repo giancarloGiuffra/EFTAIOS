@@ -51,4 +51,5 @@ public class TabelloneGalilei extends Tabellone {
         this.baseUmana = baseUmana.get(0);
         this.baseAliena = baseAliena.get(0);
     }
+    
 }
