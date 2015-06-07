@@ -36,7 +36,8 @@ public class AlienPlayer extends Player {
      * Metodo per controllare se la mossa è valida
      * @param from  settore di partenza
      * @param to    settore di arrivo
-     * @return true se la mossa è valida, false altrimenti
+     * @return true se la mossa è valida
+     * @throws BadSectorException
      */
     @Override
     public boolean isMoveValid(Settore from, Settore to) {

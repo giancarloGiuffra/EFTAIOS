@@ -73,7 +73,7 @@ public class Gioco extends BaseObservable {
     /**
      * @return il giocatore corrente
      */
-    private Player currentPlayer(){
+    Player currentPlayer(){
     	return this.turni.currentPlayer();
     }
     
