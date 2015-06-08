@@ -12,6 +12,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -32,9 +33,10 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	private static final Integer PORT = 65534; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
     private ClientRMIFactory clientRMIFactory;
+    private RemoteNotifier notifier;
     private Boolean closed = false;
     private static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
-    private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO(.+%){1,}COMANDO");
+    private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO%(.+%){1,}COMANDO");
     private static final Integer TIME_LIMIT = 10; //in secondi
 	private static final long TIME_BETWEEN_INPUT_CHECKS = 1; //in secondi
 	
@@ -66,6 +68,11 @@ public class RMIInterface implements NetworkInterfaceForClient {
 
 	@Override
 	public Boolean close() {
+		try {
+			UnicastRemoteObject.unexportObject(notifier, true);
+		} catch (NoSuchObjectException e) {
+			LOGGER.log(Level.WARNING, "Errore nel chiudere l'oggetto remoto notifierStub", e);
+		}
 		this.closed = true;
 	    return true;
 	}
@@ -209,8 +216,8 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 */
 	private Boolean registerServerInClient() throws IOException{
 		print("Inserisci l'Indirizzo IP del Server: ");
-		String server = stdIn.readLine();
-		//String server = "127.0.0.1";
+		//String server = stdIn.readLine();
+		String server = "127.0.0.1";
 		String clientRMIFactoryName = "ClientRMIFactory";
 		Registry registry;
 		try {
@@ -252,7 +259,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 		String ipAddress = "127.0.0.1";
 		if(!"ERROR".equals(ipAddress)){
 			try {
-				RemoteNotifier notifier = new NotifierClient(this);
+				this.notifier = new NotifierClient(this);
 				RemoteNotifier notifierStub = (RemoteNotifier) UnicastRemoteObject.exportObject(notifier, port);
 				Registry registry = LocateRegistry.createRegistry(port);
 				String notifierName = "Notifier".concat(port.toString());
