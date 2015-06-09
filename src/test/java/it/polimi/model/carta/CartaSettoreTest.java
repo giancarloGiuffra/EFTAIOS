@@ -19,6 +19,7 @@ public class CartaSettoreTest {
 		CartaSettore cartaCopia = new CartaSettore(carta);
 		assertThat(carta, is(cartaCopia));
 		assertNotSame(carta, cartaCopia);
+		assertThat(carta.hashCode(), is(cartaCopia.hashCode()));
 	}
 
 }

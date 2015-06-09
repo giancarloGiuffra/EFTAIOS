@@ -23,7 +23,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	private static final Integer PORT = 65535; //porta di ascolto del server
     private static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
     private Boolean closed = false;
-    private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO(.+%){1,}COMANDO");
+    private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO%(.+%){1,}COMANDO");
     private static final Integer TIME_LIMIT = 10; //in secondi
 	private static final long TIME_BETWEEN_INPUT_CHECKS = 1; // in secondi
 	

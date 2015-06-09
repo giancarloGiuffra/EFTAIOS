@@ -67,6 +67,7 @@ public class TurnoTest{
 	    Turno copia = new Turno(turno);
 	    assertThat(copia, is(turno));
 	    assertNotSame(copia,turno);
+	    assertThat(copia.hashCode(), is(turno.hashCode()));
 	}
 
 }

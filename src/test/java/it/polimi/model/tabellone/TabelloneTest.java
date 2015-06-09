@@ -21,6 +21,7 @@ public class TabelloneTest {
 		Tabellone copia = new Tabellone(this.tabellone);
 		assertThat(tabellone, is(copia));
 		assertNotSame(copia, tabellone);
+		assertThat(copia.hashCode(), is(tabellone.hashCode()));
 	}
 	
 	@Test

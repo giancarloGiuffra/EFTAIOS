@@ -185,12 +185,24 @@ public class Gioco extends BaseObservable {
         if(this.isUmanoInScialuppa()){
             this.notify(new ModelGameOver(this.umanoInScialuppa()));
         } else if(this.isUmaniMorti()){
-            this.notify(new ModelGameOver(TipoGameOver.UMANI_MORTI));
+            this.notify(new ModelGameOver(TipoGameOver.UMANI_MORTI, this.aliens()));
         } else if(this.isTurniFiniti()){
-            this.notify(new ModelGameOver(TipoGameOver.TURNI_FINITI));
+            this.notify(new ModelGameOver(TipoGameOver.TURNI_FINITI, this.aliens()));
         } else {
             this.notify(new ModelGameContinues("Il gioco continua..."));
         }
+    }
+
+    /**
+     * 
+     * @return lista con i giocatori alien
+     */
+    private List<Player> aliens() {
+        List<Player> aliens = new ArrayList<Player>();
+        for(Player player : this.players()){
+            if(player.isAlien()) aliens.add(player);
+        }
+        return aliens;   
     }
 
     private Player umanoInScialuppa() {
@@ -243,9 +255,8 @@ public class Gioco extends BaseObservable {
      */
     private void pescaCartaSettore(Player player) {
 		if(this.mazzoDiCarteSettore.isEmpty()) this.ricostruisciMazzoCarteSettore();
-		Carta carta = player.pescaCarta(this.mazzoDiCarteSettore);
-		player.salvaCarta(carta); //salviamo nel mazzo del giocatore prima di lanciare il notify per semplicità di gestione
-		this.notify(new ModelCartaPescataEvent(carta));
+		player.pescaCarta(this.mazzoDiCarteSettore);
+		this.notify(new ModelCartaPescataEvent(player.getLastCard()));
 	}
     
     /**

@@ -1,5 +1,8 @@
 package it.polimi.common.observer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import it.polimi.model.exceptions.PlayerNonSignificativoPerQuestoGameOver;
 import it.polimi.model.gioco.TipoGameOver;
 import it.polimi.model.player.Player;
@@ -8,7 +11,8 @@ import it.polimi.model.player.PlayerFactory;
 public final class ModelGameOver extends Event {
 
     private final TipoGameOver tipo;
-    private Player player = PlayerFactory.createPlayer();
+    private Player player;
+    private List<Player> aliens;
     
     /**
      * Costruttore
@@ -24,9 +28,10 @@ public final class ModelGameOver extends Event {
      * Costruttore
      * @param tipo
      */
-    public ModelGameOver(TipoGameOver tipo){
+    public ModelGameOver(TipoGameOver tipo, List<Player> aliens){
         super(buildMsg(tipo));
         this.tipo = tipo;
+        this.aliens = aliens;
     }
 
     /**
@@ -76,6 +81,17 @@ public final class ModelGameOver extends Event {
     public Player player(){
         if(this.tipo == TipoGameOver.UMANO_IN_SCIALUPPA) return this.player;
         throw new PlayerNonSignificativoPerQuestoGameOver("Il giocatore non è significativo per questo tipo di game over");
+    }
+    
+    /**
+     * 
+     * @return i nomi degli alieni che hanno vinto
+     */
+    public List<String> aliens(){
+        List<String> aliens = new ArrayList<String>();
+        for(Player alien : this.aliens)
+            aliens.add(alien.nome());
+        return aliens;
     }
 
 }

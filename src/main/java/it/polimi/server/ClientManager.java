@@ -311,7 +311,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
     public void inizializza(List<Player> playersList, Map<Player,Settore> posizioni){
         this.createMap(playersList);
         this.broadcastCommandInfoIniziali(posizioni);
-        this.broadcast("Siamo al completo, il gioco inizia!");
+        this.broadcast(String.format("Si inizia! (siete in %d)", this.clients.size()));
     }
     
     /**
