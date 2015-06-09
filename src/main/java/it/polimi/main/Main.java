@@ -30,7 +30,7 @@ public class Main implements BaseObserver{
 	 * Costruttore
 	 */
 	private Main() {
-		this.model = new Model(3); //TODO dovrà essere modificato per gestire nro giocatore a seconda degli utenti connessi
+		this.model = new Model(2); //TODO dovrà essere modificato per gestire nro giocatore a seconda degli utenti connessi
 		this.modelView = new ModelView(this.model);
 		this.view = new View(System.in, System.out); //NOSONAR si vuole usare System.out per interagire con l'utente
 		this.controller = new Controller(this.modelView, this.view);

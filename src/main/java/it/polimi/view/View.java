@@ -46,6 +46,7 @@ public class View extends BaseObservable implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(View.class.getName());    
 	private static final Pattern PATTERN_MOSSA = Pattern.compile("move to: (?<nomeSettore>.{3})");
 	private static final Pattern PATTERN_ANNOUNCE = Pattern.compile("announce: (?<nomeSettore>.{3})");
+	private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO%(.+%){1,}COMANDO");
 	private BufferedReaderPlus input;
 	private PrintWriterPlus output;
 	private Boolean printWelcomeMessagge = true;
@@ -86,7 +87,8 @@ public class View extends BaseObservable implements Runnable {
 	 * @param message
 	 */
 	public void print(String message) {
-		output.println(message);		
+		if(isCommand(message)) return;
+	    output.println(message);		
 	}
 	
 	public void printFineMessaggio(){
@@ -554,4 +556,9 @@ public class View extends BaseObservable implements Runnable {
 		return this.buildCommand(comando, new ArrayList<String>(Arrays.asList(arg)));
 	}
 	
+	
+	private Boolean isCommand(String string){
+	    Matcher matcher = PATTERN_COMANDO.matcher(string);
+        return matcher.matches();
+	}
 }

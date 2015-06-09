@@ -128,11 +128,9 @@ public class Tabellone {
     
     @Override
 	public int hashCode() {
-		HashCodeBuilder hash =  new HashCodeBuilder(211, 17);
-		for(String nome : this.sectors.keySet()){
-				hash.append(nome).append(this.sectors.get(nome));
-		}
-		return hash.toHashCode();
+		return new HashCodeBuilder(211, 17).
+		        append(this.sectors).
+		        toHashCode();
 	}
 
 	@Override
@@ -144,13 +142,9 @@ public class Tabellone {
 		if (!(obj instanceof Tabellone))
 			return false;
 		Tabellone other = (Tabellone) obj;
-		if (!this.sectors.equals(other.sectors))
-			return false;
-		EqualsBuilder equals = new EqualsBuilder();
-		for(String nome : this.sectors.keySet()){
-			equals.append(this.sectors.get(nome), other.sectors.get(nome));
-		}
-		return equals.isEquals();
+		return new EqualsBuilder().
+		        append(this.sectors,other.sectors).
+		        isEquals();
 	}
 	
 }
