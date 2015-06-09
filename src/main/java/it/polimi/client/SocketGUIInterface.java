@@ -7,15 +7,18 @@ import java.util.ArrayList;
 public class SocketGUIInterface extends SocketInterface {
 	
 	//private GUI gui = new GUI();  // variabile provvisoria: ClientGUI restituirà quella desiderata
-    private GUI gui = ClientGUI.returnGUI();
+    private GUI gui = new GUI();
 	
     @Override
     public void run() {
 		String fromServer;
+		gui.visualizzaTabellone();
 	    while(!isClosed()){
     	    while( mustPrint(fromServer = readLineFromServer()) ){
-    	    	ArrayList<String> comandoRicevuto = getComando(fromServer);
-    	    	decoderComando(comandoRicevuto);
+    	    	if(this.isCommand(fromServer)){
+    	    	    ArrayList<String> comandoRicevuto = getComando(fromServer);
+        	    	decoderComando(comandoRicevuto);
+        	    }
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
     	    	//printToServer(this.read());
@@ -31,13 +34,11 @@ public class SocketGUIInterface extends SocketInterface {
     private ArrayList<String> getComando(String fromServer){
     	ArrayList<String> datiComando = new ArrayList<String>();
 		String splitStringa[] = fromServer.split("%");
-    	if (this.isCommand(fromServer) == true) {
-    		for (int i = 0; i < splitStringa.length; i++) {
-    			if (splitStringa[i].equals("COMANDO") == false && splitStringa[i].isEmpty() == false) {
-    				datiComando.add(fromServer.split("%")[i]);
-    			}
-    		}
-    	}
+		for (int i = 0; i < splitStringa.length; i++) {
+			if (splitStringa[i].equals("COMANDO") == false && splitStringa[i].isEmpty() == false) {
+				datiComando.add(fromServer.split("%")[i]);
+			}
+		}
     	return datiComando;
     }
     

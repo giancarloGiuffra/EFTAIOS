@@ -5,14 +5,14 @@ import it.polimi.gui.*;
 public class ClientGUI{
     
     private NetworkInterfaceForClient networkInterface;
-    private static GUI gui;
+    private GUISceltaInterfaccia interfaccia;
     
     /**
      * Costruttore
      */
     private ClientGUI(){
-    	gui = new GUI();
-    	TipoInterface tipoInterfaccia = gui.sceltaTecnologiaDiComunicazione();
+        interfaccia = new GUISceltaInterfaccia();
+    	TipoInterface tipoInterfaccia = interfaccia.sceltaTecnologiaDiComunicazione();
     	// networkInterface sarà null fino a quando l'utente non effettua la sua scelta
     	/*do{		// provvisorio: modificare
     		
@@ -27,11 +27,7 @@ public class ClientGUI{
      * comunica all'utente della GUI che la connessione non è stata possibile
      */
     private void comunicaConnessioneFallita() {
-       gui.comunicaMessaggio("Connessione fallita");    
-    }
-    
-    public static GUI returnGUI() {
-    	return gui;
+        interfaccia.comunicaConnessioneFallita();    
     }
     
     /**

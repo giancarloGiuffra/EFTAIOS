@@ -229,7 +229,7 @@ public class GUI {
 		visualizzaTabellone();
 	}
 	
-	private void visualizzaTabellone() {
+	public void visualizzaTabellone() {
 		creaGUI();
 		coloraGUI();
 	}
