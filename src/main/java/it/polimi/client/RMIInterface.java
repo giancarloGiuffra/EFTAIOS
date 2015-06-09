@@ -88,7 +88,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * Controlla se il serve è ancora attivo, in caso negativo comunica all'utente
 	 * di tale condizione e chiude il programma
 	 */
-	private void checkConnectionToServer() {
+	protected void checkConnectionToServer() {
 		try {
 			this.clientRMIFactory.checkConnection();
 		} catch (RemoteException e) {
@@ -98,7 +98,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 		}
 	}
 
-	private boolean isClosed() {
+	protected boolean isClosed() {
 		return this.closed;
 	}
 

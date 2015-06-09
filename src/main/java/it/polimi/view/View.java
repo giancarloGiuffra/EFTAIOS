@@ -41,8 +41,6 @@ import it.polimi.server.Client;
 import it.polimi.server.ClientManager;
 import it.polimi.server.GameServer;
 
-import it.polimi.gui.GUI;
-
 public class View extends BaseObservable implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(View.class.getName());    
@@ -52,8 +50,6 @@ public class View extends BaseObservable implements Runnable {
 	private PrintWriterPlus output;
 	private Boolean printWelcomeMessagge = true;
 	
-	private GUI nuovaGUI; //...
-	
 	/**
 	 * Costruttore
 	 * @param inputStream
@@ -62,8 +58,6 @@ public class View extends BaseObservable implements Runnable {
 	public View(InputStream inputStream, OutputStream output) {
 		this.input = new BufferedReaderPlus(inputStream);
 		this.output = new PrintWriterPlus(output, true);
-		
-		nuovaGUI = new GUI(this);	//...
 	}
 	
 	/**
@@ -558,10 +552,6 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	public String buildCommand(Comando comando, String arg) {
 		return this.buildCommand(comando, new ArrayList<String>(Arrays.asList(arg)));
-	}
-	
-	public GUI returnGUI() {	//...
-		return this.nuovaGUI;
 	}
 	
 }

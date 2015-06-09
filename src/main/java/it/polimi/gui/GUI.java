@@ -1,11 +1,9 @@
 package it.polimi.gui;
 
 import it.polimi.client.TipoInterface;
-import it.polimi.model.ModelView;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
 import it.polimi.model.tabellone.*;
-import it.polimi.view.View;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -50,34 +48,9 @@ public class GUI {
 	private final String startConSocket = new String("Start con Socket");
 	private final String startConRMI = new String("Start con RMI");
 	private TipoInterface tipoInterfaccia;
-	private View viewAssociata;
-	private ModelView modelViewAssociato;
-	
-	/**
-	 * Italian: costruttore della classe 'GUI'
-	 * English: constructor of the class 'GUI'
-	 * @param view view associata alla GUI
-	 */
-	public GUI(View view) {
-		this.viewAssociata = view;
-	}
-	
-	public GUI(ModelView modelView) {
-		this.modelViewAssociato = modelView;
-	}
-	
-	/**
-	 * Italian: metodo che ritorna la view associata alla GUI
-	 * English: method used to return the view associated to the GUI
-	 * @return viewAssociata
-	 */
-	public View returnView() {
-		return this.viewAssociata;
-	}
-	
-	public ModelView returnModelView() {
-		return this.modelViewAssociato;
-	}
+	private String nomeGiocatore;
+	private String razzaGiocatore;
+	private String posizioneAttuale;
 	
 	private void creaListaPulsantiSettore() {
 		listaPulsantiSettore = new ArrayList<PulsanteSettore>();
@@ -110,11 +83,11 @@ public class GUI {
 		listaAltriPulsanti = new ArrayList<AltroPulsante>();
 		PulsanteSettore pulsanteI;
 		JFrame frame = new JFrame("Escape from the aliens");
-		JLabel topLabel = new JLabel("Giocatore corrente: ", SwingConstants.CENTER);
+		JLabel topLabel = new JLabel("Giocatore corrente: " + nomeGiocatore + " (" + razzaGiocatore + ")", SwingConstants.CENTER);
 		JPanel centralPanel = new JPanel();
 		JPanel topPanel = new JPanel();
 		JPanel bottomPanel = new JPanel();
-		JLabel bottomLabel = new JLabel("Posizione attuale: ", SwingConstants.CENTER);
+		JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
 		bottomLabel.setBorder(new EmptyBorder(0, 300, 0, 0));
 		frame.setLayout(new BorderLayout());
 		topPanel.setLayout(new BorderLayout());
@@ -226,7 +199,7 @@ public class GUI {
 			final AltroPulsante modalità = pulsantiStart.get(i);
 			modalità.getButton().addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					visualizzaTabellone(modalità.getNomePulsante());
+					comunicaTecnologiaDiComunicazione(modalità.getNomePulsante());
 				}
 			});
 		}
@@ -237,12 +210,15 @@ public class GUI {
 		finestraIniziale.pack();
 		finestraIniziale.setVisible(true);
 		finestraIniziale.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		return tipoInterfaccia;
+		do {  
+			// SwingTimer ??
+			// Label in alto per avvertire l'utente del timer
+		}
+		while (tipoInterfaccia == null); // while (tipoInterfaccia == null && timer < valoreDiSoglia)
+		return tipoInterfaccia; // è nullo finché non viene eseguito 'comunicaTecnologiaDiComunicazione'
 	}
 	
-	private void visualizzaTabellone(String nomePulsante) {
-		creaGUI();
-		coloraGUI();
+	private void comunicaTecnologiaDiComunicazione(String nomePulsante) {
 		finestraIniziale.setVisible(false);
 		if (nomePulsante.equals(startConSocket)) {
 			tipoInterfaccia = TipoInterface.SOCKET_GUI;
@@ -250,6 +226,12 @@ public class GUI {
 		else if (nomePulsante.equals(startConRMI)) {
 			tipoInterfaccia = TipoInterface.RMI_GUI;
 		}
+		visualizzaTabellone();
+	}
+	
+	private void visualizzaTabellone() {
+		creaGUI();
+		coloraGUI();
 	}
 	
 	/**
@@ -306,6 +288,64 @@ public class GUI {
 	 */
 	public ArrayList<AltroPulsante> getListaAltriPulsanti() {
 		return this.listaAltriPulsanti;
+	}
+	
+	/**
+	 * Italian: metodo che ricava le informazioni iniziali per il giocatore corrente, quali
+	 * 	il nome, la razza e la posizione iniziale del giocatore.
+	 * English: method which extracts the starting informations about the current player, such
+	 * 	as its name, its race and its initial position.
+	 * @param informazioniIniziali ArrayList contenente le informazioni iniziali
+	 */
+	public void ricavaInformazioniIniziali(ArrayList<String> informazioniIniziali) {
+		nomeGiocatore = informazioniIniziali.get(0);
+		posizioneAttuale = informazioniIniziali.get(1);
+		razzaGiocatore = informazioniIniziali.get(2);
+		evidenziaPosizioneIniziale(posizioneAttuale);
+	}
+	
+	private void evidenziaPosizioneIniziale(String nomeSettore) {
+		for (int i = 0; i < listaPulsantiSettore.size(); i++) {
+			Pulsante pulsante = listaPulsantiSettore.get(i);
+			if (pulsante.getNomePulsante().equals(nomeSettore)) {
+				pulsante.getButton().setBackground(Color.GREEN);
+			}
+		}
+		visualizzaTabellone();
+	}
+	
+	/**
+	 * Italian: metodo che informerà il giocatore riguardo eventi che possono verificarsi 
+	 * 	durante la partita.
+	 * English: method used to inform the player about events that can possibly happen during 
+	 * 	the game.
+	 * @param tipoMessaggio messaggio da comunicare
+	 */
+	public void comunicaMessaggio(String tipoMessaggio) {
+		JFrame frame = new JFrame();
+		JLabel messaggio = new JLabel(tipoMessaggio, SwingConstants.CENTER);
+		frame.add(messaggio);
+		frame.getContentPane();
+		frame.pack();
+		frame.setVisible(true);
+	}
+	
+	/**
+	 * Italian: metodo che può abilitare i pulsanti 'attacco' e/o 'pescaCarta', al verificarsi 
+	 * 	di determinate condizioni di gioco.
+	 * English: method whose function is to enable 'attacco' and/or 'pescaCarta' buttons, 
+	 * 	assuming that some game conditions are satisfied.
+	 */
+	public void abilitaAltriPulsanti() {
+		if (razzaGiocatore == "ALIEN") {
+			attivaPulsanteAttacco();
+		}
+		ArrayList<Settore> pericolosi = settoriPericolosi.getLista();
+		for (Settore p : pericolosi) {
+			if (posizioneAttuale.equals(p.getNome())) {
+				attivaPulsantePescaCarta();
+			}
+		}
 	}
 	
 }

@@ -1,29 +1,37 @@
-// la GUI non può partire se non viene eseguito clientGUI
 package it.polimi.client;
 
 import it.polimi.gui.*;
-import it.polimi.view.View;
 
 public class ClientGUI{
     
     private NetworkInterfaceForClient networkInterface;
+    private static GUI gui;
     
     /**
      * Costruttore
      */
-    private ClientGUI(View view){
-    	//GUI nuovaGUI = new GUI();
-    	GUI nuovaGUI = view.returnGUI();
-    	TipoInterface tipoInterfaccia = nuovaGUI.sceltaTecnologiaDiComunicazione();
-    	this.networkInterface = NetworkInterfaceFactory.getInterface(tipoInterfaccia);
+    private ClientGUI(){
+    	gui = new GUI();
+    	TipoInterface tipoInterfaccia = gui.sceltaTecnologiaDiComunicazione();
+    	// networkInterface sarà null fino a quando l'utente non effettua la sua scelta
+    	/*do{		// provvisorio: modificare
+    		
+    	}
+    	while (this.networkInterface == null);*/
+    	this.networkInterface = NetworkInterfaceFactory.getInterface(tipoInterfaccia); 
+    	if(this.networkInterface.connectToServer()) (new Thread(this.networkInterface)).start();
+        else this.comunicaConnessioneFallita();
     }
     
     /**
      * comunica all'utente della GUI che la connessione non è stata possibile
      */
     private void comunicaConnessioneFallita() {
-        // TODO Auto-generated method stub
-        
+       gui.comunicaMessaggio("Connessione fallita");    
+    }
+    
+    public static GUI returnGUI() {
+    	return gui;
     }
     
     /**
@@ -31,8 +39,8 @@ public class ClientGUI{
      * @param args
      */
     public static void main(String[] args) {
-        /*ClientGUI client = new ClientGUI(); // view come parametro per il costruttore
-        if(client.networkInterface.connectToServer()) (new Thread(client.networkInterface)).start();
+        ClientGUI client = new ClientGUI(); 
+        /*if(client.networkInterface.connectToServer()) (new Thread(client.networkInterface)).start();
         else client.comunicaConnessioneFallita();*/
     }
 

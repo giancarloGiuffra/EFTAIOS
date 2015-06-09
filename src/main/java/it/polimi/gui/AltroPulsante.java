@@ -1,3 +1,4 @@
+// classe da modificare
 package it.polimi.gui;
 
 import java.awt.event.ActionEvent;
@@ -26,7 +27,7 @@ public class AltroPulsante extends Pulsante {
 	
 	private void possibiliAzioniPulsante(String nomePulsante) {
 		switch(nomePulsante) {
-		case "attacco":   // meglio delle costanti?
+		case "attacco":   
 			break;
 		case "pescaCarta":
 			//cartaPescata(...);
