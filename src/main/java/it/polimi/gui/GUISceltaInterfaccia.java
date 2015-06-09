@@ -1,5 +1,6 @@
 package it.polimi.gui;
 
+import it.polimi.client.ClientGUI;
 import it.polimi.client.TipoInterface;
 
 import java.awt.FlowLayout;
@@ -17,11 +18,16 @@ public class GUISceltaInterfaccia {
     private final String startConSocket = new String("Start con Socket");
     private final String startConRMI = new String("Start con RMI");
     private TipoInterface tipoInterfaccia;
+    private ClientGUI clientGUI;
     
     /**
      * Costruttore
+     * @param clientGUI 
      */
-    public GUISceltaInterfaccia(){}
+    public GUISceltaInterfaccia(ClientGUI clientGUI){
+        this.clientGUI = clientGUI;
+        this.sceltaTecnologiaDiComunicazione();
+    }
     
     /**
      * Italian: Metodo che genera una finestra dotata di pulsanti. Cliccando su un pulsante, 
@@ -31,7 +37,7 @@ public class GUISceltaInterfaccia {
      *      the user will join to the list of players, using one of the available technologies
      *      to play online.
      */
-    public TipoInterface sceltaTecnologiaDiComunicazione() {
+    public void sceltaTecnologiaDiComunicazione() {
         ArrayList<AltroPulsante> pulsantiStart = new ArrayList<AltroPulsante>();
         AltroPulsante inizioPartitaConSocket = new AltroPulsante(startConSocket);
         AltroPulsante inizioPartitaConRMI = new AltroPulsante(startConRMI);
@@ -52,12 +58,6 @@ public class GUISceltaInterfaccia {
         finestraIniziale.pack();
         finestraIniziale.setVisible(true);
         finestraIniziale.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        do {  
-            // SwingTimer ??
-            // Label in alto per avvertire l'utente del timer
-        }
-        while (tipoInterfaccia == null); // while (tipoInterfaccia == null && timer < valoreDiSoglia)
-        return tipoInterfaccia; // è nullo finché non viene eseguito 'comunicaTecnologiaDiComunicazione'
     }
     
     private void comunicaTecnologiaDiComunicazione(String nomePulsante) {
@@ -68,6 +68,7 @@ public class GUISceltaInterfaccia {
         else if (nomePulsante.equals(startConRMI)) {
             tipoInterfaccia = TipoInterface.RMI_GUI;
         }
+        this.clientGUI.runNetworkInterface(tipoInterfaccia);
     }
     
     /**

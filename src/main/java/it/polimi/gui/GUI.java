@@ -72,7 +72,7 @@ public class GUI {
 			}
 			xCorrente += larghezzaPulsanteSettore;
 		}
-		
+		indicePulsante = 0;
 	}
 
 	/**

@@ -11,16 +11,7 @@ public class ClientGUI{
      * Costruttore
      */
     private ClientGUI(){
-        interfaccia = new GUISceltaInterfaccia();
-    	TipoInterface tipoInterfaccia = interfaccia.sceltaTecnologiaDiComunicazione();
-    	// networkInterface sarà null fino a quando l'utente non effettua la sua scelta
-    	/*do{		// provvisorio: modificare
-    		
-    	}
-    	while (this.networkInterface == null);*/
-    	this.networkInterface = NetworkInterfaceFactory.getInterface(tipoInterfaccia); 
-    	if(this.networkInterface.connectToServer()) (new Thread(this.networkInterface)).start();
-        else this.comunicaConnessioneFallita();
+        interfaccia = new GUISceltaInterfaccia(this);
     }
     
     /**
@@ -28,6 +19,12 @@ public class ClientGUI{
      */
     private void comunicaConnessioneFallita() {
         interfaccia.comunicaConnessioneFallita();    
+    }
+    
+    public void runNetworkInterface(TipoInterface tipo){
+        this.networkInterface = NetworkInterfaceFactory.getInterface(tipo);
+        if(this.networkInterface.connectToServer()) (new Thread(this.networkInterface)).start();
+        else this.comunicaConnessioneFallita();
     }
     
     /**

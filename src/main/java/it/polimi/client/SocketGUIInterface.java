@@ -14,11 +14,10 @@ public class SocketGUIInterface extends SocketInterface {
 		String fromServer;
 		gui.visualizzaTabellone();
 	    while(!isClosed()){
-    	    while( mustPrint(fromServer = readLineFromServer()) ){
-    	    	if(this.isCommand(fromServer)){
-    	    	    ArrayList<String> comandoRicevuto = getComando(fromServer);
-        	    	decoderComando(comandoRicevuto);
-        	    }
+    	    fromServer = readLineFromServer();
+    	    if(this.isCommand(fromServer)){
+	    	    ArrayList<String> comandoRicevuto = getComando(fromServer);
+    	    	decoderComando(comandoRicevuto);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
     	    	//printToServer(this.read());
