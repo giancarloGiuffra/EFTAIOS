@@ -501,6 +501,7 @@ public class View extends BaseObservable implements Runnable {
 		List<String> args = new ArrayList<String>();
 		args.add(gameOver.tipo().toString());
 		if(gameOver.tipo()==TipoGameOver.UMANO_IN_SCIALUPPA) args.add(gameOver.player().nome());
+		if(gameOver.tipo()==TipoGameOver.UMANI_MORTI || gameOver.tipo()==TipoGameOver.TURNI_FINITI) args.addAll(gameOver.aliens());
 		return args;
 	}
 
