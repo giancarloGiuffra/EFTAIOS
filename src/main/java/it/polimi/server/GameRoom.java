@@ -20,7 +20,7 @@ import it.polimi.view.View;
 
 public class GameRoom extends BaseObservable implements BaseObserver{
     
-    private static final Integer TIME_LIMIT_FOR_START = 1; // in minuti
+    private static final Integer TIME_LIMIT_FOR_START = 5; // in minuti
 	private Model model;
     private ModelView modelView;
     private Controller controller;

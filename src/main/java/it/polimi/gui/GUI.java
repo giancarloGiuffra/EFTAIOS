@@ -24,8 +24,8 @@ public class GUI {
 	
 	private final static String lettere[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W"};
 	private final static String numeri[] = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14"};
-	private final static int altezzaPulsanteSettore = 40;
-	private final static int larghezzaPulsanteSettore = 58;
+	private final static int altezzaPulsanteSettore = 37;
+	private final static int larghezzaPulsanteSettore = 57;
 	private final static int numeroColonne = lettere.length;
 	private final static int numeroRighe = numeri.length;
 	private final static int xIniziale = 15;
@@ -47,6 +47,7 @@ public class GUI {
 	private final JFrame finestraIniziale = new JFrame("Start");
 	private final String startConSocket = new String("Start con Socket");
 	private final String startConRMI = new String("Start con RMI");
+	private final JLabel legenda = new JLabel("Settori sicuri: colore bianco \tSettori pericolosi: colore grigio\t Basi: colore nero\t Scialuppe: colore azzurro");
 	private TipoInterface tipoInterfaccia;
 	private String nomeGiocatore;
 	private String razzaGiocatore;
@@ -57,9 +58,9 @@ public class GUI {
 		for (int j = 0; j < numeroColonne; j++) {
 			for (int i = 0; i < numeroRighe; i++) {
 				listaPulsantiSettore.add(new PulsanteSettore(lettere[j] + numeri[i]));
+				listaPulsantiSettore.get(indicePulsante).getButton().setFont(new Font("Dialog", Font.BOLD, 11));
 				listaPulsantiSettore.get(indicePulsante).setOrdinata(yCorrente);
 				listaPulsantiSettore.get(indicePulsante).setAscissa(xCorrente); 
-				listaPulsantiSettore.get(indicePulsante).azionePulsante(); // ?
 				yCorrente += altezzaPulsanteSettore;
 				indicePulsante++;
 			}
@@ -72,7 +73,9 @@ public class GUI {
 			}
 			xCorrente += larghezzaPulsanteSettore;
 		}
-		
+		indicePulsante = 0;
+		xCorrente = xIniziale;
+		yCorrente = yIniziale;
 	}
 
 	/**
@@ -87,8 +90,9 @@ public class GUI {
 		JPanel centralPanel = new JPanel();
 		JPanel topPanel = new JPanel();
 		JPanel bottomPanel = new JPanel();
+		// usare label.setText() nel metodo che aggiorna la GUI ("ricavaInfoIniziali", non qui)
 		JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
-		bottomLabel.setBorder(new EmptyBorder(0, 300, 0, 0));
+		bottomLabel.setBorder(new EmptyBorder(0, 300, 20, 0));
 		frame.setLayout(new BorderLayout());
 		topPanel.setLayout(new BorderLayout());
 		topPanel.setBorder(new EmptyBorder(15, 0, 0, 0));
@@ -96,7 +100,7 @@ public class GUI {
 		FlowLayout flow = new FlowLayout();
 		flow.setHgap(20);
 		bottomPanel.setLayout(flow);
-		bottomPanel.setBorder(new EmptyBorder(0, 30, 20, 200));
+		bottomPanel.setBorder(new EmptyBorder(0, 30, 20, 200)); 
 		attacco.getButton().setEnabled(false);
 		pescaCarta.getButton().setEnabled(false);
 		listaAltriPulsanti.add(attacco);
@@ -229,7 +233,7 @@ public class GUI {
 		visualizzaTabellone();
 	}
 	
-	private void visualizzaTabellone() {
+	public void visualizzaTabellone() {
 		creaGUI();
 		coloraGUI();
 	}

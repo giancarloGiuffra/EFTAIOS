@@ -7,14 +7,16 @@ import java.util.ArrayList;
 public class SocketGUIInterface extends SocketInterface {
 	
 	//private GUI gui = new GUI();  // variabile provvisoria: ClientGUI restituirà quella desiderata
-    private GUI gui = ClientGUI.returnGUI();
+    private GUI gui = new GUI();
 	
     @Override
     public void run() {
 		String fromServer;
+		gui.visualizzaTabellone();
 	    while(!isClosed()){
-    	    while( mustPrint(fromServer = readLineFromServer()) ){
-    	    	ArrayList<String> comandoRicevuto = getComando(fromServer);
+    	    fromServer = readLineFromServer();
+    	    if(this.isCommand(fromServer)){
+	    	    ArrayList<String> comandoRicevuto = getComando(fromServer);
     	    	decoderComando(comandoRicevuto);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
@@ -31,13 +33,11 @@ public class SocketGUIInterface extends SocketInterface {
     private ArrayList<String> getComando(String fromServer){
     	ArrayList<String> datiComando = new ArrayList<String>();
 		String splitStringa[] = fromServer.split("%");
-    	if (this.isCommand(fromServer) == true) {
-    		for (int i = 0; i < splitStringa.length; i++) {
-    			if (splitStringa[i].equals("COMANDO") == false && splitStringa[i].isEmpty() == false) {
-    				datiComando.add(fromServer.split("%")[i]);
-    			}
-    		}
-    	}
+		for (int i = 0; i < splitStringa.length; i++) {
+			if (splitStringa[i].equals("COMANDO") == false && splitStringa[i].isEmpty() == false) {
+				datiComando.add(fromServer.split("%")[i]);
+			}
+		}
     	return datiComando;
     }
     
@@ -71,7 +71,7 @@ public class SocketGUIInterface extends SocketInterface {
     			gui.comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
     			break;
     		case "GIOCO_FINITO":
-    			gui.comunicaMessaggio(nomeComando); // + \nvincitore?
+    			gui.comunicaMessaggio(nomeComando + "\n" + comando.get(1)); // + \nvincitore?
     	}
     }
     

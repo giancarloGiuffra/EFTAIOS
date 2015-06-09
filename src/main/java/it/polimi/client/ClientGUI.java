@@ -5,33 +5,26 @@ import it.polimi.gui.*;
 public class ClientGUI{
     
     private NetworkInterfaceForClient networkInterface;
-    private static GUI gui;
+    private GUISceltaInterfaccia interfaccia;
     
     /**
      * Costruttore
      */
     private ClientGUI(){
-    	gui = new GUI();
-    	TipoInterface tipoInterfaccia = gui.sceltaTecnologiaDiComunicazione();
-    	// networkInterface sarà null fino a quando l'utente non effettua la sua scelta
-    	/*do{		// provvisorio: modificare
-    		
-    	}
-    	while (this.networkInterface == null);*/
-    	this.networkInterface = NetworkInterfaceFactory.getInterface(tipoInterfaccia); 
-    	if(this.networkInterface.connectToServer()) (new Thread(this.networkInterface)).start();
-        else this.comunicaConnessioneFallita();
+        interfaccia = new GUISceltaInterfaccia(this);
     }
     
     /**
      * comunica all'utente della GUI che la connessione non è stata possibile
      */
     private void comunicaConnessioneFallita() {
-       gui.comunicaMessaggio("Connessione fallita");    
+        interfaccia.comunicaConnessioneFallita();    
     }
     
-    public static GUI returnGUI() {
-    	return gui;
+    public void runNetworkInterface(TipoInterface tipo){
+        this.networkInterface = NetworkInterfaceFactory.getInterface(tipo);
+        if(this.networkInterface.connectToServer()) (new Thread(this.networkInterface)).start();
+        else this.comunicaConnessioneFallita();
     }
     
     /**
