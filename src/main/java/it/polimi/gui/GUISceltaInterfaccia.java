@@ -56,6 +56,7 @@ public class GUISceltaInterfaccia {
         finestraIniziale.add(inizioPartitaConRMI.getButton());
         finestraIniziale.getContentPane();
         finestraIniziale.pack();
+        finestraIniziale.setLocationRelativeTo(null);
         finestraIniziale.setVisible(true);
         finestraIniziale.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }

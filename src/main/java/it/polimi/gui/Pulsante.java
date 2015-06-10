@@ -89,4 +89,8 @@ public class Pulsante {
 		this.ordinata = ordinata;
 	}
 	
+	protected void evidenziaPulsante() { // ?
+		
+	}
+	
 }

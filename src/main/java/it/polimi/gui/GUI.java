@@ -1,6 +1,5 @@
 package it.polimi.gui;
 
-import it.polimi.client.TipoInterface;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
 import it.polimi.model.tabellone.*;
@@ -24,10 +23,13 @@ public class GUI {
 	
 	private final static String lettere[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W"};
 	private final static String numeri[] = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14"};
-	private final static int altezzaPulsanteSettore = 37;
-	private final static int larghezzaPulsanteSettore = 57;
+	private static Dimension dimensioneSchermo = Toolkit.getDefaultToolkit().getScreenSize(); 
+	private static int altezzaSchermo = dimensioneSchermo.height;  
+	private static int larghezzaSchermo = dimensioneSchermo.width; 
 	private final static int numeroColonne = lettere.length;
 	private final static int numeroRighe = numeri.length;
+	private final static int altezzaPulsanteSettore = (altezzaSchermo - altezzaSchermo/3)/numeroRighe;
+	private final static int larghezzaPulsanteSettore = (larghezzaSchermo - larghezzaSchermo/45)/numeroColonne;
 	private final static int xIniziale = 15;
 	private final static int yIniziale = 20;
 	private static int xCorrente = xIniziale;
@@ -44,11 +46,6 @@ public class GUI {
 	private final Pulsante attacco = new Pulsante("Attacco");
 	private final Pulsante pescaCarta = new Pulsante("Pesca una carta");
 	private JLabel cartaPescata = new JLabel();
-	private final JFrame finestraIniziale = new JFrame("Start");
-	private final String startConSocket = new String("Start con Socket");
-	private final String startConRMI = new String("Start con RMI");
-	//private final JLabel legenda = new JLabel("Settori sicuri: colore bianco \tSettori pericolosi: colore grigio\t Basi: colore nero\t Scialuppe: colore azzurro");
-	private TipoInterface tipoInterfaccia;
 	private String nomeGiocatore;
 	private String razzaGiocatore;
 	private String posizioneAttuale;
@@ -86,10 +83,13 @@ public class GUI {
 	public void creaGUI() {
 		listaAltriPulsanti = new ArrayList<Pulsante>();
 		Pulsante pulsanteI;
+		JLabel spiegazioneColori = new JLabel("Settori sicuri: colore bianco   |   Settori pericolosi: colore grigio   |   Basi: colore nero   |   Scialuppe: colore azzurro");
 		JFrame frame = new JFrame("Escape from the aliens");
 		JPanel centralPanel = new JPanel();
 		JPanel topPanel = new JPanel();
 		JPanel bottomPanel = new JPanel();
+		JPanel contenitoreLegenda = new JPanel(); 
+		JPanel contenitoreAltriPulsanti = new JPanel(); 
 		bottomLabel.setBorder(new EmptyBorder(0, 300, 0, 0));
 		frame.setLayout(new BorderLayout());
 		topPanel.setLayout(new BorderLayout());
@@ -97,17 +97,24 @@ public class GUI {
 		topPanel.add(topLabel, BorderLayout.CENTER);
 		FlowLayout flow = new FlowLayout();
 		flow.setHgap(20);
-		bottomPanel.setLayout(flow);
-		bottomPanel.setBorder(new EmptyBorder(0, 30, 20, 200)); 
+		contenitoreAltriPulsanti.setLayout(flow); 
+		bottomPanel.setBorder(new EmptyBorder(0, 0, 20, 200));
 		attacco.getButton().setEnabled(false);
 		pescaCarta.getButton().setEnabled(false);
 		listaAltriPulsanti.add(attacco);
 		listaAltriPulsanti.add(pescaCarta);
 		cartaPescata.setVisible(false);
-		bottomPanel.add(attacco.getButton());
-		bottomPanel.add(pescaCarta.getButton());
-		bottomPanel.add(cartaPescata);
-		bottomPanel.add(bottomLabel);
+		BorderLayout border = new BorderLayout(); 
+		border.setVgap(10); 
+		bottomPanel.setLayout(border); 
+		bottomPanel.add(contenitoreAltriPulsanti, BorderLayout.NORTH); 
+		bottomPanel.add(contenitoreLegenda, BorderLayout.SOUTH); 
+		spiegazioneColori.setBorder(new EmptyBorder(0, 120, 0, 0));
+		contenitoreLegenda.add(spiegazioneColori); 
+		contenitoreAltriPulsanti.add(attacco.getButton());  
+		contenitoreAltriPulsanti.add(pescaCarta.getButton()); 
+		contenitoreAltriPulsanti.add(cartaPescata); 
+		contenitoreAltriPulsanti.add(bottomLabel); 
 		frame.add(topPanel, BorderLayout.NORTH);
 		centralPanel.setLayout(null);
 		creaListaPulsantiSettore();
@@ -122,6 +129,7 @@ public class GUI {
 		frame.add(bottomPanel, BorderLayout.SOUTH);
 		frame.getContentPane();
 		frame.pack();
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -182,54 +190,6 @@ public class GUI {
 		coloraSettoriPerTipo(settoriPericolosi);
 		coloraSettoriPerTipo(basi);
 		coloraSettoriPerTipo(scialuppe);
-	}
-	
-	/**
-	 * Italian: Metodo che genera una finestra dotata di pulsanti. Cliccando su un pulsante, 
-	 * 		l'utente si 'registra' come partecipante alla partita utilizzando una delle
-	 * 		tecnologie fornite per la giocabilità online.
-	 * English: Method which creates a frame endowed with buttons. Clicking on a button
-	 * 		the user will join to the list of players, using one of the available technologies
-	 * 		to play online.
-	 */
-	public TipoInterface sceltaTecnologiaDiComunicazione() {
-		ArrayList<Pulsante> pulsantiStart = new ArrayList<Pulsante>();
-		Pulsante inizioPartitaConSocket = new Pulsante(startConSocket);
-		Pulsante inizioPartitaConRMI = new Pulsante(startConRMI);
-		pulsantiStart.add(inizioPartitaConSocket);
-		pulsantiStart.add(inizioPartitaConRMI);
-		for (int i = 0; i < pulsantiStart.size(); i++) {
-			final Pulsante modalità = pulsantiStart.get(i);
-			modalità.getButton().addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					comunicaTecnologiaDiComunicazione(modalità.getNomePulsante());
-				}
-			});
-		}
-		finestraIniziale.setLayout(new FlowLayout());
-		finestraIniziale.add(inizioPartitaConSocket.getButton());
-		finestraIniziale.add(inizioPartitaConRMI.getButton());
-		finestraIniziale.getContentPane();
-		finestraIniziale.pack();
-		finestraIniziale.setVisible(true);
-		finestraIniziale.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		do {  
-			// SwingTimer ??
-			// Label in alto per avvertire l'utente del timer
-		}
-		while (tipoInterfaccia == null); // while (tipoInterfaccia == null && timer < valoreDiSoglia)
-		return tipoInterfaccia; // è nullo finché non viene eseguito 'comunicaTecnologiaDiComunicazione'
-	}
-	
-	private void comunicaTecnologiaDiComunicazione(String nomePulsante) {
-		finestraIniziale.setVisible(false);
-		if (nomePulsante.equals(startConSocket)) {
-			tipoInterfaccia = TipoInterface.SOCKET_GUI;
-		}
-		else if (nomePulsante.equals(startConRMI)) {
-			tipoInterfaccia = TipoInterface.RMI_GUI;
-		}
-		visualizzaTabellone();
 	}
 	
 	public void visualizzaTabellone() {
@@ -328,9 +288,11 @@ public class GUI {
 	public void comunicaMessaggio(String tipoMessaggio) {
 		JFrame frame = new JFrame();
 		JLabel messaggio = new JLabel(tipoMessaggio, SwingConstants.CENTER);
+		messaggio.setBorder(new EmptyBorder(10, 20, 10, 20));
 		frame.add(messaggio);
 		frame.getContentPane();
 		frame.pack();
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 	
@@ -365,6 +327,10 @@ public class GUI {
 				}
 			}
 		}
+	}
+	
+	public void spostamento(JButton pulsante) {
+		
 	}
 	
 }
