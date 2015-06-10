@@ -38,13 +38,13 @@ public class GUISceltaInterfaccia {
      *      to play online.
      */
     public void sceltaTecnologiaDiComunicazione() {
-        ArrayList<AltroPulsante> pulsantiStart = new ArrayList<AltroPulsante>();
-        AltroPulsante inizioPartitaConSocket = new AltroPulsante(startConSocket);
-        AltroPulsante inizioPartitaConRMI = new AltroPulsante(startConRMI);
+        ArrayList<Pulsante> pulsantiStart = new ArrayList<Pulsante>();
+        Pulsante inizioPartitaConSocket = new Pulsante(startConSocket);
+        Pulsante inizioPartitaConRMI = new Pulsante(startConRMI);
         pulsantiStart.add(inizioPartitaConSocket);
         pulsantiStart.add(inizioPartitaConRMI);
         for (int i = 0; i < pulsantiStart.size(); i++) {
-            final AltroPulsante modalità = pulsantiStart.get(i);
+            final Pulsante modalità = pulsantiStart.get(i);
             modalità.getButton().addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     comunicaTecnologiaDiComunicazione(modalità.getNomePulsante());

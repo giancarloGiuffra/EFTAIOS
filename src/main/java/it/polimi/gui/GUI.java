@@ -33,32 +33,33 @@ public class GUI {
 	private static int xCorrente = xIniziale;
 	private static int yCorrente = yIniziale;
 	private static Tabellone galilei = TabelloneFactory.createTabellone("GALILEI");
-	private ArrayList<PulsanteSettore> listaPulsantiSettore;
-	private ArrayList<AltroPulsante> listaAltriPulsanti;
+	private ArrayList<Pulsante> listaPulsantiSettore;
+	private ArrayList<Pulsante> listaAltriPulsanti;
 	private static int indicePulsante = 0;
 	private static ListaSettore settoriInaccessibili;
 	private static ListaSettore settoriSicuri;
 	private static ListaSettore settoriPericolosi;
 	private static ListaSettore basi;
 	private static ListaSettore scialuppe;
-	private final AltroPulsante attacco = new AltroPulsante("Attacco");
-	private final AltroPulsante pescaCarta = new AltroPulsante("Pesca una carta");
+	private final Pulsante attacco = new Pulsante("Attacco");
+	private final Pulsante pescaCarta = new Pulsante("Pesca una carta");
 	private JLabel cartaPescata = new JLabel();
 	private final JFrame finestraIniziale = new JFrame("Start");
 	private final String startConSocket = new String("Start con Socket");
 	private final String startConRMI = new String("Start con RMI");
-	private final JLabel legenda = new JLabel("Settori sicuri: colore bianco \tSettori pericolosi: colore grigio\t Basi: colore nero\t Scialuppe: colore azzurro");
+	//private final JLabel legenda = new JLabel("Settori sicuri: colore bianco \tSettori pericolosi: colore grigio\t Basi: colore nero\t Scialuppe: colore azzurro");
 	private TipoInterface tipoInterfaccia;
 	private String nomeGiocatore;
 	private String razzaGiocatore;
 	private String posizioneAttuale;
+	private JLabel topLabel = new JLabel("Giocatore corrente: " + nomeGiocatore + " (" + razzaGiocatore + ")", SwingConstants.CENTER);
+	private JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
 	
 	private void creaListaPulsantiSettore() {
-		listaPulsantiSettore = new ArrayList<PulsanteSettore>();
+		listaPulsantiSettore = new ArrayList<Pulsante>();
 		for (int j = 0; j < numeroColonne; j++) {
 			for (int i = 0; i < numeroRighe; i++) {
-				listaPulsantiSettore.add(new PulsanteSettore(lettere[j] + numeri[i]));
-				listaPulsantiSettore.get(indicePulsante).getButton().setFont(new Font("Dialog", Font.BOLD, 11));
+				listaPulsantiSettore.add(new Pulsante(lettere[j] + numeri[i]));
 				listaPulsantiSettore.get(indicePulsante).setOrdinata(yCorrente);
 				listaPulsantiSettore.get(indicePulsante).setAscissa(xCorrente); 
 				yCorrente += altezzaPulsanteSettore;
@@ -83,16 +84,13 @@ public class GUI {
 	 * English: Method used to actually define the GUI.
 	 */
 	public void creaGUI() {
-		listaAltriPulsanti = new ArrayList<AltroPulsante>();
-		PulsanteSettore pulsanteI;
+		listaAltriPulsanti = new ArrayList<Pulsante>();
+		Pulsante pulsanteI;
 		JFrame frame = new JFrame("Escape from the aliens");
-		JLabel topLabel = new JLabel("Giocatore corrente: " + nomeGiocatore + " (" + razzaGiocatore + ")", SwingConstants.CENTER);
 		JPanel centralPanel = new JPanel();
 		JPanel topPanel = new JPanel();
 		JPanel bottomPanel = new JPanel();
-		// usare label.setText() nel metodo che aggiorna la GUI ("ricavaInfoIniziali", non qui)
-		JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
-		bottomLabel.setBorder(new EmptyBorder(0, 300, 20, 0));
+		bottomLabel.setBorder(new EmptyBorder(0, 300, 0, 0));
 		frame.setLayout(new BorderLayout());
 		topPanel.setLayout(new BorderLayout());
 		topPanel.setBorder(new EmptyBorder(15, 0, 0, 0));
@@ -116,7 +114,8 @@ public class GUI {
 		for (int i = 0; i < listaPulsantiSettore.size(); i++) {
 			pulsanteI = listaPulsantiSettore.get(i);
 			pulsanteI.getButton().setBounds(pulsanteI.getAscissa(), pulsanteI.getOrdinata(), larghezzaPulsanteSettore, altezzaPulsanteSettore);
-			pulsanteI.setGUIProprietaria(this); 	//...
+			pulsanteI.getButton().setFont(new Font("Dialog", Font.BOLD, 11));
+			pulsanteI.getButton().setEnabled(false);
 			centralPanel.add(pulsanteI.getButton());
 		}
 		frame.add(centralPanel, BorderLayout.CENTER);
@@ -159,7 +158,7 @@ public class GUI {
 	}
 	
 	private void coloraSettoriPerTipo(ListaSettore listaSettori) {
-		PulsanteSettore pulsanteI;
+		Pulsante pulsanteI;
 		Settore settoreJ;
 		for (int i = 0; i < listaPulsantiSettore.size(); i++) {
 			for (int j = 0; j < listaSettori.getLista().size(); j++) {
@@ -194,13 +193,13 @@ public class GUI {
 	 * 		to play online.
 	 */
 	public TipoInterface sceltaTecnologiaDiComunicazione() {
-		ArrayList<AltroPulsante> pulsantiStart = new ArrayList<AltroPulsante>();
-		AltroPulsante inizioPartitaConSocket = new AltroPulsante(startConSocket);
-		AltroPulsante inizioPartitaConRMI = new AltroPulsante(startConRMI);
+		ArrayList<Pulsante> pulsantiStart = new ArrayList<Pulsante>();
+		Pulsante inizioPartitaConSocket = new Pulsante(startConSocket);
+		Pulsante inizioPartitaConRMI = new Pulsante(startConRMI);
 		pulsantiStart.add(inizioPartitaConSocket);
 		pulsantiStart.add(inizioPartitaConRMI);
 		for (int i = 0; i < pulsantiStart.size(); i++) {
-			final AltroPulsante modalità = pulsantiStart.get(i);
+			final Pulsante modalità = pulsantiStart.get(i);
 			modalità.getButton().addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					comunicaTecnologiaDiComunicazione(modalità.getNomePulsante());
@@ -279,7 +278,7 @@ public class GUI {
 	 * English: Method which returns the list containing all the buttons that correspond to sectors.
 	 * @return listaPulsantiSettore
 	 */
-	public ArrayList<PulsanteSettore> getListaPulsantiSettore() {
+	public ArrayList<Pulsante> getListaPulsantiSettore() {
 		return this.listaPulsantiSettore;
 	}
 	
@@ -290,7 +289,7 @@ public class GUI {
 	 * 	do not represent sectors.
 	 * @return listaAltriPulsanti
 	 */
-	public ArrayList<AltroPulsante> getListaAltriPulsanti() {
+	public ArrayList<Pulsante> getListaAltriPulsanti() {
 		return this.listaAltriPulsanti;
 	}
 	
@@ -306,6 +305,8 @@ public class GUI {
 		posizioneAttuale = informazioniIniziali.get(1);
 		razzaGiocatore = informazioniIniziali.get(2);
 		evidenziaPosizioneIniziale(posizioneAttuale);
+		topLabel.setText("Giocatore corrente: " + nomeGiocatore + " (" + razzaGiocatore + ")");
+		bottomLabel.setText("Posizione attuale: " + posizioneAttuale);
 	}
 	
 	private void evidenziaPosizioneIniziale(String nomeSettore) {
@@ -315,7 +316,6 @@ public class GUI {
 				pulsante.getButton().setBackground(Color.GREEN);
 			}
 		}
-		visualizzaTabellone();
 	}
 	
 	/**
@@ -348,6 +348,21 @@ public class GUI {
 		for (Settore p : pericolosi) {
 			if (posizioneAttuale.equals(p.getNome())) {
 				attivaPulsantePescaCarta();
+			}
+		}
+	}
+	
+	/**
+	 * Italian: metodo che, ad ogni turno, abilita per il giocatore corrente solo i settori in cui gli è possibile muoversi.
+	 * English: method that will enable, for the current player, only the sectors where he is allowed to move.
+	 * @param settoriAdiacenti lista dei settori su cui è possibile muoversi, a partire da quello su cui ci si trova
+	 */
+	public void abilitaSettoriAdiacenti(ArrayList<String> settoriAdiacenti) {
+		for (int i = 0; i < settoriAdiacenti.size(); i++) {
+			for (int j = 0; j < listaPulsantiSettore.size(); j++) {
+				if (settoriAdiacenti.get(i).equals(listaPulsantiSettore.get(j).getNomePulsante())) {
+					listaPulsantiSettore.get(j).getButton().setEnabled(true);
+				}
 			}
 		}
 	}

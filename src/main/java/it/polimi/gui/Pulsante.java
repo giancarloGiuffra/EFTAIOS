@@ -1,7 +1,5 @@
 package it.polimi.gui;
 
-import it.polimi.client.Comando;
-
 import javax.swing.*;
 
 /**
@@ -12,14 +10,12 @@ import javax.swing.*;
  * 	characteristic elements like the name associated to the button itself and its
  * 	coordinates on the screen.
  */
-public abstract class Pulsante {
+public class Pulsante {
 	
-	private static int idPulsante;
 	private String nomePulsante;
 	private final JButton button;
 	private int ascissa;
-	private int ordinata;
-	private GUI guiProprietaria;  
+	private int ordinata;  
 	
 	/**
 	 * Italian: Costruttore della classe 'Pulsante'.
@@ -29,14 +25,6 @@ public abstract class Pulsante {
 	public Pulsante(String nome) {
 		nomePulsante = nome;
 		button = new JButton(nome);
-	}
-
-	public static int getIdPulsante() {
-		return idPulsante;
-	}
-
-	public void setIdPulsante(int indicePulsante) {
-		Pulsante.idPulsante = indicePulsante;
 	}
 	
 	/**
@@ -99,16 +87,6 @@ public abstract class Pulsante {
 	 */
 	public void setOrdinata(int ordinata) {
 		this.ordinata = ordinata;
-	}
-	
-	public abstract void azionePulsante();
-	
-	public void setGUIProprietaria(GUI gui) {
-		this.guiProprietaria = gui;
-	}
-	
-	public GUI getGUIProprietaria() {
-		return this.guiProprietaria;
 	}
 	
 }

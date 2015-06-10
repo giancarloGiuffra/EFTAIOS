@@ -15,6 +15,7 @@ public class SocketGUIInterface extends SocketInterface {
 		gui.visualizzaTabellone();
 	    while(!isClosed()){
     	    fromServer = readLineFromServer();
+    	    //System.out.println(fromServer);
     	    if(this.isCommand(fromServer)){
 	    	    ArrayList<String> comandoRicevuto = getComando(fromServer);
     	    	decoderComando(comandoRicevuto);
@@ -51,6 +52,10 @@ public class SocketGUIInterface extends SocketInterface {
     			gui.ricavaInformazioniIniziali(informazioniIniziali);
     			break;
     		case "ABILITA_SETTORI":
+    			ArrayList<String> settoriAdiacenti = new ArrayList<String>();
+    			comando.remove(0);
+    			settoriAdiacenti = comando;
+    			gui.abilitaSettoriAdiacenti(settoriAdiacenti);
     			break;
     		case "CONNESSIONE_PERSA":
     			gui.comunicaMessaggio(nomeComando);
@@ -71,7 +76,7 @@ public class SocketGUIInterface extends SocketInterface {
     			gui.comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
     			break;
     		case "GIOCO_FINITO":
-    			gui.comunicaMessaggio(nomeComando + "\n" + comando.get(1)); // + \nvincitore?
+    			gui.comunicaMessaggio(nomeComando + "\n" + comando.get(1)); 
     	}
     }
     
