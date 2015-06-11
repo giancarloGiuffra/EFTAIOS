@@ -6,7 +6,10 @@ import static org.hamcrest.Matchers.*;
 
 import java.util.ArrayList;
 
+import it.polimi.model.carta.Carta;
 import it.polimi.model.exceptions.BadSectorException;
+import it.polimi.model.exceptions.BadSectorPositionNameException;
+import it.polimi.model.exceptions.InvalidSectorForAnnouncement;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.model.player.Player;
 
@@ -87,5 +90,44 @@ public class GiocoTest {
     	gioco.moveCurrentPlayer("L09");
     	assertThat(gioco.getValidActionsForCurrentPlayer().isEmpty(), is(true));
     }
-
+    
+    @Test
+    public void testCurrentPlayerPescaCartaSettore(){
+    	gioco.currentPlayerPescaCartaSettore();
+    	assertThat(gioco.currentPlayer().mazzo().size(), is(1));
+    }
+    
+    @Test
+    public void testCalcolaSettoriValidiForCurrentPlayerHuman(){
+    	while(!gioco.currentPlayer().isHuman())
+    		gioco.finishTurn();
+    	assertThat(gioco.calcolaSettoriValidiForCurrentPlayer().size(), is(5));
+    	assertThat(gioco.calcolaSettoriValidiForCurrentPlayer(), containsInAnyOrder("K08","K09","L09","M09","M08"));
+    }
+    
+    @Test
+    public void testCalcolaSettoriValidiForCurrentPlayerAlien(){
+    	while(!gioco.currentPlayer().isAlien())
+    		gioco.finishTurn();
+    	assertThat(gioco.calcolaSettoriValidiForCurrentPlayer().size(), is(10));
+    	assertThat(gioco.calcolaSettoriValidiForCurrentPlayer(), containsInAnyOrder("J06","J05","K06","K05","L04","L05","M05","M06","N05","N06"));
+    }
+    
+    @Test
+    public void testCurrentPlayerAnnunciaSettoreThrowsInvalidcurrentPlayerAnnunciaSettore(){
+    	exception.expect(InvalidSectorForAnnouncement.class);
+    	gioco.currentPlayerAnnunciaSettore("L06");
+    }
+    
+    @Test
+    public void testCurrentPlayerAnnunciaSettoreThrowsBadSectorPositionNameException(){
+    	exception.expect(BadSectorPositionNameException.class);
+    	gioco.currentPlayerAnnunciaSettore("asfasf");
+    }
+    
+    @Test
+    public void testIsThisLastPlayerDisconnecting(){
+    	assertThat(gioco.isThisLastPlayerDisconnecting(), is(false));
+    }
+    
 }
