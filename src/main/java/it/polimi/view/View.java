@@ -87,7 +87,7 @@ public class View extends BaseObservable implements Runnable {
 	 * @param message
 	 */
 	public void print(String message) {
-		if(isCommand(message)) return;
+		if(isCommand(message) && this.printWelcomeMessagge) return;
 	    output.println(message);		
 	}
 	
@@ -558,6 +558,11 @@ public class View extends BaseObservable implements Runnable {
 	}
 	
 	
+	/**
+	 * 
+	 * @param string
+	 * @return vero se la string rappresenta un comando
+	 */
 	private Boolean isCommand(String string){
 	    Matcher matcher = PATTERN_COMANDO.matcher(string);
         return matcher.matches();
