@@ -53,6 +53,14 @@ public class Main implements BaseObserver{
 	private Main(){
 		this(2); // di default due giocatrori
 	}
+	
+	/**
+	 * il model della ModelView (cioè quello aggiornato real time)
+	 * @return
+	 */
+	public Model model(){
+		return this.modelView.model();
+	}
 
 	/**
 	 * main

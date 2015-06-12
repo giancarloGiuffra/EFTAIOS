@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -124,6 +125,29 @@ public class Tabellone {
                 break;
         }
         return lista;
+    }
+    
+    /**
+     * settore adiacenti aleatorio valido per umano
+     * @param settore
+     * @return
+     */
+    public Settore getRandomAdjacentSector(Settore settore){
+    	Random random = new Random();
+    	List<String> adiacenti = settore.getSettoriAdiacenti();
+		Settore scelto = this.getSettore(adiacenti.get(random.nextInt(adiacenti.size()-1)));
+		while(scelto.isBase() || scelto.isInaccessibile()) //se il player fosse alien questa funzione dovrebbe essere chiamata di nuovo
+			scelto = this.getSettore(adiacenti.get(random.nextInt(adiacenti.size()-1)));
+		return scelto;
+    }
+    
+    /**
+     * settore adiacente aleatorio valido per umano 
+     * @param nomeSettore
+     * @return
+     */
+    public Settore getRandomAdjacentSector(String nomeSettore){
+    	return this.getRandomAdjacentSector(this.getSettore(nomeSettore));
     }
     
     @Override

@@ -52,6 +52,13 @@ public class View extends BaseObservable implements Runnable {
 	private Boolean printWelcomeMessagge = true;
 	
 	/**
+	 * Costruttore vuoto
+	 */
+	public View(){
+		
+	}
+	
+	/**
 	 * Costruttore
 	 * @param inputStream
 	 * @param output
@@ -299,7 +306,7 @@ public class View extends BaseObservable implements Runnable {
 	 * @param mossa
 	 * @return true se la mossa è nel formato valido
 	 */
-	private static boolean isValidMossa(String mossa){
+	private boolean isValidMossa(String mossa){
 		Matcher matcher = PATTERN_MOSSA.matcher(mossa);
 		return matcher.matches();
 	}
