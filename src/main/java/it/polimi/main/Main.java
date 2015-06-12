@@ -29,14 +29,29 @@ public class Main implements BaseObserver{
 	/**
 	 * Costruttore
 	 */
-	private Main() {
-		this.model = new Model(2); //TODO dovrà essere modificato per gestire nro giocatore a seconda degli utenti connessi
+	public Main(Integer numeroGiocatori, View view) {
+		this.model = new Model(numeroGiocatori);
 		this.modelView = new ModelView(this.model);
-		this.view = new View(System.in, System.out); //NOSONAR si vuole usare System.out per interagire con l'utente
+		this.view = view;
 		this.controller = new Controller(this.modelView, this.view);
 		controller.addObserver(this); //controller notificherà a main per il update di model
 		view.addObserver(controller);
 		modelView.addObserver(controller);
+	}
+	
+	/**
+	 * Costruttore
+	 * @param numeroGiocatori
+	 */
+	private Main(Integer numeroGiocatori){
+		this(numeroGiocatori, new View(System.in, System.out));
+	}
+	
+	/**
+	 * Costruttore
+	 */
+	private Main(){
+		this(2); // di default due giocatrori
 	}
 
 	/**
@@ -45,15 +60,13 @@ public class Main implements BaseObserver{
 	 */
 	public static void main(String[] args) {
 		Main main = new Main();
-		main.run(); /*
-		GUI nuovaGUI = new GUI();
-		nuovaGUI.sceltaTecnologiaDiComunicazione(); */
+		main.run();
 	}
 
 	/**
 	 * inizia il gioco
 	 */
-	private void run() {		
+	public void run() {		
 		(new Thread(view)).start();		
 	}	
 
