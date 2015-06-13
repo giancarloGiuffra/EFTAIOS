@@ -1,5 +1,6 @@
 package it.polimi.gui;
 
+import it.polimi.client.NetworkInterfaceForClient;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.sector.TipoSettore;
 import it.polimi.model.tabellone.*;
@@ -53,8 +54,17 @@ public class GUI {
 	private JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
 	private boolean inputInserito = false;
 	private String annuncioSpostamento;
+	private NetworkInterfaceForClient interfaccia;
 	
-	private void creaListaPulsantiSettore() {
+	/**
+	 * Costruttore
+	 * @param interfaccia
+	 */
+	public GUI(NetworkInterfaceForClient interfaccia){
+	    this.interfaccia = interfaccia;
+	}
+	
+    private void creaListaPulsantiSettore() {
 		listaPulsantiSettore = new ArrayList<Pulsante>();
 		for (int j = 0; j < numeroColonne; j++) {
 			for (int i = 0; i < numeroRighe; i++) {
@@ -368,5 +378,48 @@ public class GUI {
 			});
 		}
 	}
+	
+	public void decoderComando(ArrayList<String> comando) {
+        String nomeComando = comando.get(0);
+        switch(nomeComando) {
+            case "INIZIO":
+                ArrayList<String> informazioniIniziali = new ArrayList<String>();
+                comando.remove(0);
+                informazioniIniziali = comando; // tolto il nome del comando nella prima posizione, restano solo i parametri
+                ricavaInformazioniIniziali(informazioniIniziali);
+                break;
+            case "ABILITA_SETTORI":
+                ArrayList<String> settoriAdiacenti = new ArrayList<String>();
+                comando.remove(0);
+                settoriAdiacenti = comando;
+                abilitaSettoriAdiacenti(settoriAdiacenti);
+                break;
+            case "CONNESSIONE_PERSA":
+                comunicaMessaggio(nomeComando);
+                break;
+            case "SCEGLIE_AZIONE":
+                abilitaAltriPulsanti();
+                break;
+            case "RISULTATO_ATTACCO":
+                break;
+            case "CARTA_PESCATA":
+                String cartaPescata = comando.get(1);
+                comunicaMessaggio("Carta pescata: " + cartaPescata);
+                break;
+            case "TURNO_FINITO":
+                comunicaMessaggio("Non ci sono altre mosse possibili per il turno corrente");
+                break;
+            case "MORTO":
+                comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
+                break;
+            case "GIOCO_FINITO":
+                comunicaMessaggio(nomeComando + "\n" + comando.get(1)); 
+        }
+    }
+
+    public void countDown() {
+        // TODO Auto-generated method stub
+        
+    }
 	
 }

@@ -21,10 +21,10 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	private BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 65535; //porta di ascolto del server
-    private static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
+    protected static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
     private Boolean closed = false;
     private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO%(.+%){1,}COMANDO");
-    private static final Integer TIME_LIMIT = 300; //in secondi
+    protected static final Integer TIME_LIMIT = 30; //in secondi
 	private static final long TIME_BETWEEN_INPUT_CHECKS = 1; // in secondi
 	
 	/**

@@ -1,14 +1,25 @@
 package it.polimi.client;
 
+import it.polimi.gui.GUI;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RMIGUIInterface extends RMIInterface {
 	
-	private static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
-	private static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
+	private GUI gui;
+    
+    /**
+     * Costruttore
+     */
+    public RMIGUIInterface(){
+        gui = new GUI(this);
+    }
 	
-    @Override
+	@Override
     public void run() {
 	    while(!isClosed()){
 	    	try {
@@ -21,5 +32,47 @@ public class RMIGUIInterface extends RMIInterface {
 			}
 	    }
 	}
+	
+	/**
+     * @param string
+     */
+    @Override
+    public void print(String string){
+        if(isCommand(string)){
+            gui.decoderComando(getComando(string));
+        }
+        if("CHIUSURA".equals(string)){
+            this.close();
+            synchronized(this){
+                this.notifyAll();
+            }
+        }
+    }
+    
+    /**
+     * @return
+     * @throws IOException 
+     */
+    @Override
+    public String read() throws IOException{
+        gui.countDown();
+        if(gui.isInputInserito() == true)
+            return gui.annunciaSpostamento(); //generalizzare
+        else{ //se l'utente non ha inserito input si chiude la connessione
+            this.close();
+            return "ABORT";
+        }
+    }
+    
+    private ArrayList<String> getComando(String fromServer){
+        ArrayList<String> datiComando = new ArrayList<String>();
+        String splitStringa[] = fromServer.split("%");
+        for (int i = 0; i < splitStringa.length; i++) {
+            if (splitStringa[i].equals("COMANDO") == false && splitStringa[i].isEmpty() == false) {
+                datiComando.add(fromServer.split("%")[i]);
+            }
+        }
+        return datiComando;
+    }
 
 }
