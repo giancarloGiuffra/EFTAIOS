@@ -3,11 +3,19 @@ package it.polimi.client;
 import it.polimi.gui.GUI;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 public class SocketGUIInterface extends SocketInterface {
 	
-    private GUI gui = new GUI();
+    private GUI gui;
 	
+    /**
+     * Costruttore
+     */
+    public SocketGUIInterface(){
+        gui = new GUI(this);
+    }
+    
     @Override
     public void run() {
 		String fromServer;
@@ -16,14 +24,19 @@ public class SocketGUIInterface extends SocketInterface {
     	    fromServer = readLineFromServer();
     	    if(this.isCommand(fromServer)){
 	    	    ArrayList<String> comandoRicevuto = getComando(fromServer);
-    	    	decoderComando(comandoRicevuto);
+    	    	gui.decoderComando(comandoRicevuto);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
-    	    	do {
-    	    		
-    	    	}
-    	    	while (gui.isInputInserito() == false);
-    	    	printToServer(gui.annunciaSpostamento());
+    	        gui.countDown();
+                try {
+                    Thread.sleep(TIME_LIMIT*1000);
+                } catch (InterruptedException e) {
+                    LOGGER.log(Level.WARNING, e.getMessage(), e);
+                }
+    	    	if (gui.isInputInserito() == true)
+    	    	    printToServer(gui.annunciaSpostamento()); //generalizzare
+    	    	else // se l'utente non ha inserito input si chiude la connessione
+    	    	    this.close();
     	    }
     	    if(fromServer.equals("CHIUSURA")) this.close();
     	    if(fromServer.equals("ERROR FROM SERVER")){
@@ -43,46 +56,7 @@ public class SocketGUIInterface extends SocketInterface {
 		}
     	return datiComando;
     }
-    
-    private void decoderComando(ArrayList<String> comando) {
-    	String nomeComando = comando.get(0);
-    	switch(nomeComando) {
-    		case "INIZIO":
-    			ArrayList<String> informazioniIniziali = new ArrayList<String>();
-    	    	comando.remove(0);
-    	    	informazioniIniziali = comando;	// tolto il nome del comando nella prima posizione, restano solo i parametri
-    			gui.ricavaInformazioniIniziali(informazioniIniziali);
-    			break;
-    		case "ABILITA_SETTORI":
-    			ArrayList<String> settoriAdiacenti = new ArrayList<String>();
-    			comando.remove(0);
-    			settoriAdiacenti = comando;
-    			gui.abilitaSettoriAdiacenti(settoriAdiacenti);
-    			break;
-    		case "CONNESSIONE_PERSA":
-    			gui.comunicaMessaggio(nomeComando);
-    			break;
-    		case "SCEGLIE_AZIONE":
-    			gui.abilitaAltriPulsanti();
-    			break;
-    		case "RISULTATO_ATTACCO":
-    			break;
-    		case "CARTA_PESCATA":
-    			String cartaPescata = comando.get(1);
-    			gui.comunicaMessaggio("Carta pescata: " + cartaPescata);
-    			break;
-    		case "TURNO_FINITO":
-    			gui.comunicaMessaggio("Non ci sono altre mosse possibili per il turno corrente");
-    			break;
-    		case "MORTO":
-    			gui.comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
-    			break;
-    		case "GIOCO_FINITO":
-    			gui.comunicaMessaggio(nomeComando + "\n" + comando.get(1)); 
-    	}
-    }
-    
-    
+  
 }
 
 

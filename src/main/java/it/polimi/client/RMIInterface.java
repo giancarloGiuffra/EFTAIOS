@@ -31,14 +31,14 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	private BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 65534; //porta di ascolto del server
-    private static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
+    protected static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
     private ClientRMIFactory clientRMIFactory;
     private RemoteNotifier notifier;
     private Boolean closed = false;
-    private static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
+    protected static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
     private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO%(.+%){1,}COMANDO");
-    private static final Integer TIME_LIMIT = 300; //in secondi
-	private static final long TIME_BETWEEN_INPUT_CHECKS = 1; //in secondi
+    protected static final Integer TIME_LIMIT = 300; //in secondi
+	protected static final long TIME_BETWEEN_INPUT_CHECKS = 1; //in secondi
 	
 	/**
 	 * Costruttore
@@ -169,14 +169,14 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	    }
 	}
 	
-	private boolean mustPrint(String string) {
+	protected boolean mustPrint(String string) {
 		return !string.equals("FINE_MESSAGGIO") && 
 	           !string.equals("RICHIEDE_INPUT") &&
 	           !string.equals("CHIUSURA") &&
 	           !isCommand(string);
 	}
 	
-	private boolean isCommand(String string){
+	protected boolean isCommand(String string){
 	    Matcher matcher = PATTERN_COMANDO.matcher(string);
 	    return matcher.matches();
 	}
