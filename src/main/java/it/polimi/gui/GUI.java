@@ -51,6 +51,8 @@ public class GUI {
 	private String posizioneAttuale;
 	private JLabel topLabel = new JLabel("Giocatore corrente: " + nomeGiocatore + " (" + razzaGiocatore + ")", SwingConstants.CENTER);
 	private JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
+	private boolean inputInserito = false;
+	private String annuncioSpostamento;
 	
 	private void creaListaPulsantiSettore() {
 		listaPulsantiSettore = new ArrayList<Pulsante>();
@@ -118,13 +120,14 @@ public class GUI {
 		frame.add(topPanel, BorderLayout.NORTH);
 		centralPanel.setLayout(null);
 		creaListaPulsantiSettore();
-		for (int i = 0; i < listaPulsantiSettore.size(); i++) {
+		for (int i = 0; i < listaPulsantiSettore.size(); i++) {  // pulizia: svolgere con un nuovo metodo "setAspettoPulsante"
 			pulsanteI = listaPulsantiSettore.get(i);
 			pulsanteI.getButton().setBounds(pulsanteI.getAscissa(), pulsanteI.getOrdinata(), larghezzaPulsanteSettore, altezzaPulsanteSettore);
-			pulsanteI.getButton().setFont(new Font("Dialog", Font.BOLD, 11));
+			pulsanteI.getButton().setFont(new Font("Dialog", Font.BOLD, larghezzaPulsanteSettore/5));
 			pulsanteI.getButton().setEnabled(false);
 			centralPanel.add(pulsanteI.getButton());
 		}
+		assegnaActionListenerSpostamento();			
 		frame.add(centralPanel, BorderLayout.CENTER);
 		frame.add(bottomPanel, BorderLayout.SOUTH);
 		frame.getContentPane();
@@ -203,7 +206,7 @@ public class GUI {
 	 * English: Method used to activate the button "attacco" after the movement of
 	 * 		 an alien player.
 	 */
-	public void attivaPulsanteAttacco() {
+	private void attivaPulsanteAttacco() {
 		attacco.getButton().setEnabled(true);
 	}
 	
@@ -329,8 +332,41 @@ public class GUI {
 		}
 	}
 	
-	public void spostamento(JButton pulsante) {
-		
+	private void evidenziaSpostamento(Pulsante pulsante) {
+		coloraGUI();
+		evidenziaPulsante(pulsante);
+	}
+	
+	public boolean isInputInserito() {
+		return this.inputInserito;
+	}
+	
+	private void registraSpostamento(Pulsante destinazione) {
+		this.annuncioSpostamento = new String("move to: " + destinazione.getNomePulsante());
+		this.inputInserito = true;
+	}
+	
+	public String annunciaSpostamento() {
+		this.inputInserito = false;
+		return this.annuncioSpostamento;
+	}
+	
+	private void evidenziaPulsante(Pulsante pulsante) {
+		pulsante.getButton().setBackground(Color.GREEN);
+	}
+	
+	private void assegnaActionListenerSpostamento() {
+		for (final Pulsante p : listaPulsantiSettore) {
+			p.getButton().addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					evidenziaSpostamento(p);
+					posizioneAttuale = p.getNomePulsante();
+					bottomLabel.setText("Posizione attuale: " + posizioneAttuale);
+					registraSpostamento(p);
+					// + boolean mossaEffettuata (per evitare più spostamenti in uno stesso turno)
+				}
+			});
+		}
 	}
 	
 }

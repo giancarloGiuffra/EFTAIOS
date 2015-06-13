@@ -75,7 +75,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	 * stampa nel server
 	 * @param string
 	 */
-	private void printToServer(String string){
+	protected void printToServer(String string){
 	    out.println(string);
 	    out.flush();
 	}

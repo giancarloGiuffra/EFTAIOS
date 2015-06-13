@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 public class SocketGUIInterface extends SocketInterface {
 	
-	//private GUI gui = new GUI();  // variabile provvisoria: ClientGUI restituirà quella desiderata
     private GUI gui = new GUI();
 	
     @Override
@@ -15,13 +14,16 @@ public class SocketGUIInterface extends SocketInterface {
 		gui.visualizzaTabellone();
 	    while(!isClosed()){
     	    fromServer = readLineFromServer();
-    	    //System.out.println(fromServer);
     	    if(this.isCommand(fromServer)){
 	    	    ArrayList<String> comandoRicevuto = getComando(fromServer);
     	    	decoderComando(comandoRicevuto);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
-    	    	//printToServer(this.read());
+    	    	do {
+    	    		
+    	    	}
+    	    	while (gui.isInputInserito() == false);
+    	    	printToServer(gui.annunciaSpostamento());
     	    }
     	    if(fromServer.equals("CHIUSURA")) this.close();
     	    if(fromServer.equals("ERROR FROM SERVER")){
