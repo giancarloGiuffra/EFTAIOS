@@ -12,6 +12,7 @@ public class RispostaMossa extends Risposta {
 
 	private static final Pattern TURNO = Pattern.compile("Tocca a .* Posizione (?<posizione>.{3})");
 	private Model model;
+	private MainTest mainTest;
 	
 	/**
 	 * Costruttore
@@ -19,9 +20,10 @@ public class RispostaMossa extends Risposta {
 	 * @param string
 	 * @param model
 	 */
-	public RispostaMossa(View view, String string, Model model) {
+	public RispostaMossa(View view, String string, Model model, MainTest mainTest) {
 		super(view, string);
 		this.model = model;
+		this.mainTest = mainTest;
 	}
 	
 	/**
@@ -34,6 +36,7 @@ public class RispostaMossa extends Risposta {
 		if(matcher.matches()){
 			String posizione = matcher.group("posizione");
 			String risposta = String.format("move to: %s", model.tabellone().getRandomAdjacentSector(posizione).getNome());
+			this.mainTest.addPosizione(posizione);
 			this.view.setInput(risposta(risposta));
 		}
 		return null;

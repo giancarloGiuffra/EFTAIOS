@@ -7,6 +7,7 @@ public class RispostaPerView {
 	
 	private View view;
 	private Model model;
+	private MainTest mainTest;
 	
 	/**
 	 * Costruttore
@@ -25,13 +26,21 @@ public class RispostaPerView {
 	}
 	
 	/**
+     * setter per il mainTest
+     * @param model
+     */
+    public void setMainTest(MainTest mainTest){
+        this.mainTest = mainTest;
+    }
+	
+	/**
 	 * restituisce risposte per la view
 	 * @param string
 	 * @return
 	 */
 	public Risposta risposta(String string){
 		if("mossa_aleatoria".equals(string))
-			return new RispostaMossa(view, string, model);
+			return new RispostaMossa(view, string, model, mainTest);
 		return new Risposta(view, string);
 	}
 		
