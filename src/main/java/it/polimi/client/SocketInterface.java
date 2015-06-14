@@ -172,8 +172,12 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	    try {
             return this.in.readLine();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Errore nel leggere dal Server", e);
-            return "ERROR FROM SERVER";
+            if(!isClosed()){
+                LOGGER.log(Level.SEVERE, "Errore nel leggere dal Server", e);
+                return "ERROR FROM SERVER";
+            } else{
+                return "CLIENT CLOSED";
+            }
         }
 	}
 

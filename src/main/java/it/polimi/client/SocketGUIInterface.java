@@ -29,7 +29,10 @@ public class SocketGUIInterface extends SocketInterface {
     	    if(fromServer.equals("RICHIEDE_INPUT")){
     	        gui.countDown();
                 try {
-                    Thread.sleep(TIME_LIMIT*1000);
+                    //Thread.sleep(TIME_LIMIT*1000);
+                    synchronized(this){
+                        this.wait(TIME_LIMIT*1000);
+                    }
                 } catch (InterruptedException e) {
                     LOGGER.log(Level.WARNING, e.getMessage(), e);
                 }
