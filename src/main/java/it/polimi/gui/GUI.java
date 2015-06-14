@@ -8,10 +8,13 @@ import it.polimi.model.tabellone.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 
 /** 
@@ -52,9 +55,14 @@ public class GUI {
 	private String posizioneAttuale;
 	private JLabel topLabel = new JLabel("Giocatore corrente: " + nomeGiocatore + " (" + razzaGiocatore + ")", SwingConstants.CENTER);
 	private JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
+	private JPanel centralPanel = new JPanel();
 	private boolean inputInserito = false;
 	private String annuncioSpostamento;
 	private NetworkInterfaceForClient interfaccia;
+	private Timer timer;
+	private int countdownPerMossa = 30;   // il giocatore ha a disposizione 30 secondi per effettuare la sua mossa
+	private int tempoAggiornamentoCountdown = 1;  
+	private JLabel mostraCountdown = new JLabel("" + countdownPerMossa);
 	
 	/**
 	 * Costruttore
@@ -94,57 +102,58 @@ public class GUI {
 	 */
 	public void creaGUI() {
 		listaAltriPulsanti = new ArrayList<Pulsante>();
-		Pulsante pulsanteI;
 		JLabel spiegazioneColori = new JLabel("Settori sicuri: colore bianco   |   Settori pericolosi: colore grigio   |   Basi: colore nero   |   Scialuppe: colore azzurro");
 		JFrame frame = new JFrame("Escape from the aliens");
-		JPanel centralPanel = new JPanel();
 		JPanel topPanel = new JPanel();
 		JPanel bottomPanel = new JPanel();
 		JPanel contenitoreLegenda = new JPanel(); 
-		JPanel contenitoreAltriPulsanti = new JPanel(); 
-		bottomLabel.setBorder(new EmptyBorder(0, 300, 0, 0));
+		JPanel contenitoreAltriElementi = new JPanel(); 
 		frame.setLayout(new BorderLayout());
 		topPanel.setLayout(new BorderLayout());
 		topPanel.setBorder(new EmptyBorder(15, 0, 0, 0));
 		topPanel.add(topLabel, BorderLayout.CENTER);
+		frame.add(topPanel, BorderLayout.NORTH);
+		centralPanel.setLayout(null);
+		creaListaPulsantiSettore();
+		setAspettoPulsante();
+		assegnaActionListenerSpostamento();	
+		contenitoreAltriElementi.add(attacco.getButton());  
+		contenitoreAltriElementi.add(pescaCarta.getButton()); 
+		//contenitoreAltriPulsanti.add(cartaPescata); 
+		contenitoreAltriElementi.add(bottomLabel); 
 		FlowLayout flow = new FlowLayout();
 		flow.setHgap(20);
-		contenitoreAltriPulsanti.setLayout(flow); 
-		bottomPanel.setBorder(new EmptyBorder(0, 0, 20, 200));
+		contenitoreAltriElementi.setLayout(flow); 
+		contenitoreLegenda.add(spiegazioneColori); 
+		bottomPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
+		mostraCountdown.setBorder(new EmptyBorder(0, 0, 0, larghezzaSchermo/13));
+		BorderLayout border = new BorderLayout(); 
+		border.setVgap(10); 
+		bottomPanel.setLayout(border); 
+		bottomPanel.add(contenitoreAltriElementi, BorderLayout.CENTER); 
+		bottomPanel.add(contenitoreLegenda, BorderLayout.SOUTH);
+		bottomPanel.add(mostraCountdown, BorderLayout.EAST);
 		attacco.getButton().setEnabled(false);
 		pescaCarta.getButton().setEnabled(false);
 		listaAltriPulsanti.add(attacco);
 		listaAltriPulsanti.add(pescaCarta);
-		cartaPescata.setVisible(false);
-		BorderLayout border = new BorderLayout(); 
-		border.setVgap(10); 
-		bottomPanel.setLayout(border); 
-		bottomPanel.add(contenitoreAltriPulsanti, BorderLayout.NORTH); 
-		bottomPanel.add(contenitoreLegenda, BorderLayout.SOUTH); 
-		spiegazioneColori.setBorder(new EmptyBorder(0, 120, 0, 0));
-		contenitoreLegenda.add(spiegazioneColori); 
-		contenitoreAltriPulsanti.add(attacco.getButton());  
-		contenitoreAltriPulsanti.add(pescaCarta.getButton()); 
-		contenitoreAltriPulsanti.add(cartaPescata); 
-		contenitoreAltriPulsanti.add(bottomLabel); 
-		frame.add(topPanel, BorderLayout.NORTH);
-		centralPanel.setLayout(null);
-		creaListaPulsantiSettore();
-		for (int i = 0; i < listaPulsantiSettore.size(); i++) {  // pulizia: svolgere con un nuovo metodo "setAspettoPulsante"
-			pulsanteI = listaPulsantiSettore.get(i);
-			pulsanteI.getButton().setBounds(pulsanteI.getAscissa(), pulsanteI.getOrdinata(), larghezzaPulsanteSettore, altezzaPulsanteSettore);
-			pulsanteI.getButton().setFont(new Font("Dialog", Font.BOLD, larghezzaPulsanteSettore/5));
-			pulsanteI.getButton().setEnabled(false);
-			centralPanel.add(pulsanteI.getButton());
-		}
-		assegnaActionListenerSpostamento();			
+		//cartaPescata.setVisible(false);
+		bottomLabel.setBorder(new EmptyBorder(0, larghezzaSchermo/10, 0, larghezzaSchermo/5));
+		mostraCountdown.setFont(new Font("Dialog", Font.BOLD, 18));
+		mostraCountdown.setVisible(false);
+		spiegazioneColori.setBorder(new EmptyBorder(0, larghezzaSchermo/12, 0, 0)); 
 		frame.add(centralPanel, BorderLayout.CENTER);
 		frame.add(bottomPanel, BorderLayout.SOUTH);
 		frame.getContentPane();
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // sistemare
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent evt) {	// risolvere: se è il secondo giocatore ad uscire, si ha errore dal server
+				interfaccia.close();  
+			}
+		});
 	}
 	
 	private static void ricavaSettori() {
@@ -365,6 +374,15 @@ public class GUI {
 		pulsante.getButton().setBackground(Color.GREEN);
 	}
 	
+	private void setAspettoPulsante() {
+		for (Pulsante p : listaPulsantiSettore) {
+			p.getButton().setBounds(p.getAscissa(), p.getOrdinata(), larghezzaPulsanteSettore, altezzaPulsanteSettore);
+			p.getButton().setFont(new Font("Dialog", Font.BOLD, larghezzaPulsanteSettore/5));
+			p.getButton().setEnabled(false);
+			centralPanel.add(p.getButton());
+		}
+	}
+	
 	private void assegnaActionListenerSpostamento() {
 		for (final Pulsante p : listaPulsantiSettore) {
 			p.getButton().addActionListener(new ActionListener() {
@@ -374,6 +392,8 @@ public class GUI {
 					bottomLabel.setText("Posizione attuale: " + posizioneAttuale);
 					registraSpostamento(p);
 					// + boolean mossaEffettuata (per evitare più spostamenti in uno stesso turno)
+					timer.stop();
+					mostraCountdown.setVisible(false);
 				}
 			});
 		}
@@ -394,7 +414,7 @@ public class GUI {
                 settoriAdiacenti = comando;
                 abilitaSettoriAdiacenti(settoriAdiacenti);
                 break;
-            case "CONNESSIONE_PERSA":
+            case "CONNESSIONE_PERSA":		// modificare
                 comunicaMessaggio(nomeComando);
                 break;
             case "SCEGLIE_AZIONE":
@@ -413,13 +433,31 @@ public class GUI {
                 comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
                 break;
             case "GIOCO_FINITO":
-                comunicaMessaggio(nomeComando + "\n" + comando.get(1)); 
+                comunicaMessaggio(nomeComando + "\n" + comando.get(1));  // modificare
         }
     }
-
+	
+	/**
+	 * Italian: metodo che visualizza sullo schermo il tempo rimasto per effettuare una mossa.
+	 * English: method that shows on the screen the time left to perform an action.
+	 */
     public void countDown() {
-        // TODO Auto-generated method stub
-        
+        mostraCountdown.setVisible(true);
+        ActionListener scorrimentoSecondi = new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		mostraCountdown.setText("" + countdownPerMossa);
+        		if (countdownPerMossa == 0) {
+        			timer.stop();
+        		}
+        		else {
+        			countdownPerMossa--;
+        		}
+        	}
+        };
+        timer = new Timer(tempoAggiornamentoCountdown*1000, scorrimentoSecondi);
+        timer.setInitialDelay(0);
+        timer.start();
+        countdownPerMossa = 30;
     }
 	
 }
