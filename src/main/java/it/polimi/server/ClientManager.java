@@ -27,48 +27,21 @@ import com.google.common.collect.HashBiMap;
 
 public class ClientManager extends BaseObservable implements BaseObserver{
     
-    private static final Integer MAX_CLIENTS = 2;
+    private Integer MAX_NUM_CLIENTS;
 	private static final Integer MIN_NUMBER_CLIENTS = 2;
     private Queue<Client> clients;
     private BiMap<Player,Client> players;
     private List<Client> clientsMorti;
-    private File fileIn;
-    private File fileOut;
 	private List<Client> clientsDisconnected;
     
     /**
      * Costruttore
      */
-    public ClientManager(){
+    public ClientManager(int maxNumberOfClients){
         this.clients = new LinkedList<Client>();
         this.clientsMorti = new ArrayList<Client>();
         this.clientsDisconnected = new ArrayList<Client>();
-        this.fileIn = new File(this.toString().concat("IN"));
-        this.fileOut = new File(this.toString().concat("OUT"));
-    }
-    
-    /**
-     * Costruttore
-     */
-    public ClientManager(Client client){
-        this();
-        this.addClient(client);
-    }
-    
-    /**
-     * getter di fileIn
-     * @return
-     */
-    public File fileIn(){
-        return this.fileIn;
-    }
-    
-    /**
-     * getter di fileOut
-     * @return
-     */
-    public File fileOut(){
-        return this.fileOut;
+        this.MAX_NUM_CLIENTS = maxNumberOfClients;
     }
     
     /**
@@ -289,7 +262,7 @@ public class ClientManager extends BaseObservable implements BaseObserver{
      * @return
      */
     public Boolean isFull(){
-        return this.clients.size() >= MAX_CLIENTS;
+        return this.clients.size() >= MAX_NUM_CLIENTS;
     }
 
     /**

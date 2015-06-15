@@ -15,24 +15,38 @@ import java.net.ServerSocket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GameServer implements BaseObserver{
     
     private static final Logger LOGGER = Logger.getLogger(GameServer.class.getName());
-    private static final Integer MAX_GAMEROOMS = 2;
+    private Integer MAX_GAMEROOMS;
+    private Integer MAX_NUMBER_CLIENTS_PER_ROOM;
     private final Integer portSocket;
     private final Integer portRMI;
     private ServerSocket serverSocket;
-    private GameRoom currentGameRoom; 
+    private GameRoom currentGameRoom;
+    private Deque<GameRoom> gameRooms = new ArrayDeque<GameRoom>();
+    
+    /**
+     * Costruttore
+     */
+    public GameServer(int portSocket, int portRMI, int maxGameRooms){
+        this.portSocket = portSocket;
+        this.portRMI = portRMI;
+        this.MAX_GAMEROOMS = maxGameRooms;
+    }
     
     /**
      * Costruttore
      */
     public GameServer(int portSocket, int portRMI){
-        this.portSocket = portSocket;
-        this.portRMI = portRMI;
+        this(portSocket,portRMI,2); //default 2 game rooms
     }
     
     /**
@@ -49,9 +63,9 @@ public class GameServer implements BaseObserver{
      * @param args
      */
     public static void main(String[] args) {
-    	GameServer server = new GameServer(65535, 65534);
+    	GameServer server = new GameServer(65535, 65533);
     	try{                
-            server.startServer();
+            server.startServer(2); //default 8 giocatori al massimo per game room
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -61,10 +75,12 @@ public class GameServer implements BaseObserver{
      * lancia il server
      * @throws IOException
      */
-    public void startServer() throws IOException {
+    public void startServer(int maxNumberOfClientsPerRoom) throws IOException {
+    	
+    	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
     	
     	//creazione gameroom
-    	this.setCurrentGameRoom(new GameRoom(new ClientManager()));
+    	this.setCurrentGameRoom(new GameRoom(new ClientManager(MAX_NUMBER_CLIENTS_PER_ROOM)));
     	
     	
     	//server rmi
@@ -87,7 +103,7 @@ public class GameServer implements BaseObserver{
         while(true){
                 ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
                 synchronized(this){
-	                if(!this.currentGameRoom.isFull()){
+	                if(!lastGameRoomAvailableHasStarted()){
 	                	this.currentGameRoom.addClient(clientSocket);
 	                    if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()){
 	                    	GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
@@ -108,18 +124,19 @@ public class GameServer implements BaseObserver{
 	 */
     private void setCurrentGameRoom(GameRoom gameRoom) {
 		this.currentGameRoom = gameRoom;
+		this.gameRooms.add(currentGameRoom);
 		this.currentGameRoom.addObserver(this);
 	}
 
 	/**
 	 * Crea una nuova gameroom e la rende disponibile nel field currentGameRoom
 	 * se non ci sono più gameroom disponibili lascia il field nel suo stato attuale
-	 * @return gameroom precedente 
+	 * @return gameroom precedente o, nel caso nn ci siano gameroom disponibili, la current game room (cioè la game room da far partire)
 	 */
     private GameRoom makeNewGameRoomAvailable() {
 		if(!(GameRoom.numberOfRooms() < MAX_GAMEROOMS)) return this.currentGameRoom;
 		GameRoom previousGameRoom = this.currentGameRoom;
-		this.setCurrentGameRoom( new GameRoom(new ClientManager()) );
+		this.setCurrentGameRoom( new GameRoom(new ClientManager(MAX_NUMBER_CLIENTS_PER_ROOM)) );
 		return previousGameRoom;
 	}
 
@@ -131,7 +148,7 @@ public class GameServer implements BaseObserver{
 				this.gesticeServerNewClientRMIEvent(event);
 				break;
 			case "ServerGameRoomTurnedAvailable":
-				this.gesticeServerGameRoomTurnedAvailable();
+				this.gesticeServerGameRoomTurnedAvailable((GameRoom) source);
 				break;
 			default:
 				break;
@@ -140,9 +157,17 @@ public class GameServer implements BaseObserver{
 
 	/**
 	 * gestisce il fatto che si sta rendendo disponibile una gameroom
+	 * @param gameRoom 
 	 */
-	private void gesticeServerGameRoomTurnedAvailable() {
-		makeNewGameRoomAvailable();
+	private void gesticeServerGameRoomTurnedAvailable(GameRoom gameRoom) {
+		synchronized(this){ //synchronized così i thread che segnalano che la corrispondente game room è chiusa si sincronizzano
+			if(lastGameRoomAvailableHasStarted()){
+				this.gameRooms.remove(gameRoom);
+				makeNewGameRoomAvailable();
+			} else {
+				this.gameRooms.remove(gameRoom);
+			}
+		}
 	}
 
 	/**
@@ -151,7 +176,7 @@ public class GameServer implements BaseObserver{
 	 */
 	private void gesticeServerNewClientRMIEvent(Event event) {
 		synchronized(this){
-			if(!this.currentGameRoom.isFull()){
+			if(!lastGameRoomAvailableHasStarted()){
 				this.currentGameRoom.addClient(((ServerNewClientRMIEvent)event).clientRMI());
 				if(this.currentGameRoom.isFull() && !this.currentGameRoom.hasStarted()){
 					GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
@@ -164,6 +189,15 @@ public class GameServer implements BaseObserver{
 				clientRMI.close();
 			}
 		} //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
+	}
+
+	/**
+	 * true se tutte l'ultima sala disponibile si è riempita e di conseguenza è già stata lanciata
+	 * @return
+	 */
+	private boolean lastGameRoomAvailableHasStarted() {
+		return (this.gameRooms.size() == MAX_GAMEROOMS) &&
+				this.gameRooms.peekLast().hasStarted();
 	}
 	
 }
