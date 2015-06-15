@@ -56,6 +56,13 @@ public class RMIGUIInterface extends RMIInterface {
     @Override
     public String read() throws IOException{
         gui.countDown();
+        try {
+            synchronized(this){
+                this.wait(TIME_LIMIT*1000);
+            }
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.WARNING, e.getMessage(), e);
+        }
         if(gui.isInputInserito() == true)
             return gui.annunciaSpostamento(); //generalizzare
         else{ //se l'utente non ha inserito input si chiude la connessione

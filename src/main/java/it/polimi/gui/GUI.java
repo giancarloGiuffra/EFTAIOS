@@ -401,6 +401,9 @@ public class GUI {
 					impedisciAltriMovimenti();
 					timer.stop();
 					mostraCountdown.setVisible(false);
+					synchronized(interfaccia){
+					    interfaccia.notifyAll(); //l'intero blocco dovrà essere inserito in ogni metodo che generi un input per il server
+					}
 				}
 			});
 		}
