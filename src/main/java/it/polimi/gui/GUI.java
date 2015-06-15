@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 
 
 /** 
@@ -150,7 +149,7 @@ public class GUI {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent evt) {	// risolvere: se è il secondo giocatore ad uscire, si ha errore dal server
+			public void windowClosing(WindowEvent e) {	// risolvere: se è il secondo giocatore ad uscire, si ha errore dal server
 				interfaccia.close();  
 			}
 		});
@@ -324,14 +323,17 @@ public class GUI {
 	 * English: method whose function is to enable 'attacco' and/or 'pescaCarta' buttons, 
 	 * 	assuming that some game conditions are satisfied.
 	 */
-	public void abilitaAltriPulsanti() {
-		if (razzaGiocatore == "ALIEN") {
-			attivaPulsanteAttacco();
-		}
-		ArrayList<Settore> pericolosi = settoriPericolosi.getLista();
-		for (Settore p : pericolosi) {
-			if (posizioneAttuale.equals(p.getNome())) {
-				attivaPulsantePescaCarta();
+	public void abilitaAltriPulsanti(ArrayList<String> azioni) {
+		for (String azione : azioni) {
+			switch(azione) {
+				case "PESCA_CARTA":
+					attivaPulsantePescaCarta();
+					break;
+				case "ATTACCA":
+					attivaPulsanteAttacco();
+					break;
+				case "NON_ATTACCA":
+					break;
 			}
 		}
 	}
@@ -356,6 +358,11 @@ public class GUI {
 		evidenziaPulsante(pulsante);
 	}
 	
+	/**
+	 * Italian: metodo che controlla se il giocatore corrente ha inserito un input, ad esempio cliccando su un pulsante.
+	 * English: method that checks if the current player inserted an input, by clicking on a button for example.
+	 * @return
+	 */
 	public boolean isInputInserito() {
 		return this.inputInserito;
 	}
@@ -391,7 +398,7 @@ public class GUI {
 					posizioneAttuale = p.getNomePulsante();
 					bottomLabel.setText("Posizione attuale: " + posizioneAttuale);
 					registraSpostamento(p);
-					// + boolean mossaEffettuata (per evitare più spostamenti in uno stesso turno)
+					impedisciAltriMovimenti();
 					timer.stop();
 					mostraCountdown.setVisible(false);
 				}
@@ -399,28 +406,32 @@ public class GUI {
 		}
 	}
 	
+	private void impedisciAltriMovimenti() {  // direttamente "setAspettoPulsante"?
+		
+	}
+	
 	public void decoderComando(ArrayList<String> comando) {
         String nomeComando = comando.get(0);
         switch(nomeComando) {
             case "INIZIO":
-                ArrayList<String> informazioniIniziali = new ArrayList<String>();
-                comando.remove(0);
-                informazioniIniziali = comando; // tolto il nome del comando nella prima posizione, restano solo i parametri
+                ArrayList<String> informazioniIniziali = estraiInformazioniDaComando(comando);
                 ricavaInformazioniIniziali(informazioniIniziali);
                 break;
             case "ABILITA_SETTORI":
-                ArrayList<String> settoriAdiacenti = new ArrayList<String>();
-                comando.remove(0);
-                settoriAdiacenti = comando;
+                ArrayList<String> settoriAdiacenti = estraiInformazioniDaComando(comando);
                 abilitaSettoriAdiacenti(settoriAdiacenti);
                 break;
-            case "CONNESSIONE_PERSA":		// modificare
-                comunicaMessaggio(nomeComando);
+            case "CONNESSIONE_PERSA":	
+            	String giocatore = comando.get(1);
+                comunicaMessaggio("Connessione interrotta con " + giocatore);
                 break;
-            case "SCEGLIE_AZIONE":
-                abilitaAltriPulsanti();
+            case "SCEGLIE_AZIONE":		
+            	ArrayList<String> azioniPossibili = estraiInformazioniDaComando(comando);
+                abilitaAltriPulsanti(azioniPossibili);
                 break;
             case "RISULTATO_ATTACCO":
+            	ArrayList<String> informazioniAttacco = estraiInformazioniDaComando(comando);
+            	comunicaRisultatoAttacco(informazioniAttacco);
                 break;
             case "CARTA_PESCATA":
                 String cartaPescata = comando.get(1);
@@ -432,10 +443,41 @@ public class GUI {
             case "MORTO":
                 comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
                 break;
-            case "GIOCO_FINITO":
-                comunicaMessaggio(nomeComando + "\n" + comando.get(1));  // modificare
+            case "GIOCO_FINITO":					
+            	ArrayList<String> datiVincitori = estraiInformazioniDaComando(comando);
+            	datiVincitori.remove(0);	// il primo termine dell'ArrayList contiene il tipo di fine partita
+            	String nomiVincitori = estraiNomiGiocatori(datiVincitori);
+                comunicaMessaggio("Partita terminata " + "(" + comando.get(1) + "). I vincitori sono: " + nomiVincitori); 
         }
     }
+	
+	private void comunicaRisultatoAttacco(ArrayList<String> informazioniAttacco) {
+		if (informazioniAttacco.size() == 2) {
+    		comunicaMessaggio(informazioniAttacco.get(0) + " ha effettuato un attacco in " + informazioniAttacco.get(1) + ". Non ci sono stati morti");
+    	}
+    	else {
+    		ArrayList<String> datiGiocatoriMorti = informazioniAttacco;	// datiGiocatoriMorti = informazioniAttacco - (primi 2 elementi dell'ArrayList)
+    		datiGiocatoriMorti.remove(0);
+    		datiGiocatoriMorti.remove(1);
+    		String giocatoriMorti = estraiNomiGiocatori(datiGiocatoriMorti);
+    		comunicaMessaggio(informazioniAttacco.get(0) + " ha effettuato un attacco in " + informazioniAttacco.get(1) + ". Giocatori morti: " + giocatoriMorti);
+    	}
+	}
+	
+	private String estraiNomiGiocatori(ArrayList<String> nomi) {
+		StringBuilder elencoNomi = new StringBuilder();
+		int contatore = 0;
+		while (contatore < nomi.size()) {
+			elencoNomi.append(nomi.get(contatore) + ";  ");
+			contatore++;
+		}
+		return elencoNomi.toString();
+	}
+	
+	private ArrayList<String> estraiInformazioniDaComando(ArrayList<String> comando) {
+		comando.remove(0);	// tolto il nome del comando nella prima posizione, restano solo i parametri
+		return comando;
+	}
 	
 	/**
 	 * Italian: metodo che visualizza sullo schermo il tempo rimasto per effettuare una mossa.
