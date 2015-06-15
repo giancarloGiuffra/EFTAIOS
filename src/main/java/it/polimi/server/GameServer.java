@@ -1,5 +1,6 @@
 package it.polimi.server;
 
+import it.polimi.client.Comando;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
@@ -112,6 +113,7 @@ public class GameServer implements BaseObserver{
 	                    }
 	                }else {
 	                    clientSocket.write("Ci dispiace l'ultima sala si è riempita. Prova per favore a connetterti più tardi. Questa connessione verrà chiusa");
+	                    clientSocket.write(buildCommandNoGameRoomAvailable());
 	                    clientSocket.close();
 	                }
                 } //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
@@ -186,9 +188,20 @@ public class GameServer implements BaseObserver{
 			} else {
 				ClientRMI clientRMI = ((ServerNewClientRMIEvent)event).clientRMI();
 				clientRMI.write("Ci dispiace l'ultima sala si è riempita. Prova per favore a connetterti più tardi. Questa connessione verrà chiusa");
+				clientRMI.write(buildCommandNoGameRoomAvailable());
 				clientRMI.close();
 			}
 		} //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
+	}
+
+	/**
+	 * comando che segnala che non ci sono game room disponibili
+	 * @return
+	 */
+	private String buildCommandNoGameRoomAvailable() {
+		return new StringBuilder().append("COMANDO%").
+				append(Comando.NESSUNA_GAMEROOM_DISPONIBILE.toString()).append("%").
+                append("COMANDO").toString();
 	}
 
 	/**

@@ -15,6 +15,7 @@ public enum Comando {
     CARTA_PESCATA, //CARTA_PESCATA%nomecarta per comunicare la carta pescata
     GIOCO_FINITO, //GIOCO_FINITO%tipoGameOver%vincitore1%vincitore2%... , tipoGameOver:UMANO_IN_SCIALUPPA,UMANI_MORTI,TURNI_FINITI,
     MORTO, //nessun parametro
-    CONNESSIONE_PERSA;  //CONNESSIONE_PERSA%nomeGiocatore per comunciare agli altri giocatori
+    CONNESSIONE_PERSA,  //CONNESSIONE_PERSA%nomeGiocatore per comunciare agli altri giocatori
+    NESSUNA_GAMEROOM_DISPONIBILE; // nessun parametro, segnala che tutte le sale sono occupate, che chiuderà la connessione e invita al client a riprovare più tardi
 
 }
