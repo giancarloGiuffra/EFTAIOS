@@ -48,6 +48,7 @@ public class GUI {
 	private static ListaSettore scialuppe;
 	private final Pulsante attacco = new Pulsante("Attacco");
 	private final Pulsante pescaCarta = new Pulsante("Pesca una carta");
+	private final Pulsante nessunAttacco = new Pulsante("Nessun attacco");
 	private JLabel cartaPescata = new JLabel();
 	private String nomeGiocatore;
 	private String razzaGiocatore;
@@ -56,7 +57,7 @@ public class GUI {
 	private JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
 	private JPanel centralPanel = new JPanel();
 	private boolean inputInserito = false;
-	private String annuncioSpostamento;
+	private String inputDaInviare;
 	private NetworkInterfaceForClient interfaccia;
 	private Timer timer;
 	private int countdownPerMossa = 30;   // il giocatore ha a disposizione 30 secondi per effettuare la sua mossa
@@ -116,6 +117,7 @@ public class GUI {
 		creaListaPulsantiSettore();
 		setAspettoPulsante();
 		assegnaActionListenerSpostamento();	
+		contenitoreAltriElementi.add(nessunAttacco.getButton());
 		contenitoreAltriElementi.add(attacco.getButton());  
 		contenitoreAltriElementi.add(pescaCarta.getButton()); 
 		//contenitoreAltriPulsanti.add(cartaPescata); 
@@ -134,6 +136,8 @@ public class GUI {
 		bottomPanel.add(mostraCountdown, BorderLayout.EAST);
 		attacco.getButton().setEnabled(false);
 		pescaCarta.getButton().setEnabled(false);
+		nessunAttacco.getButton().setEnabled(false);
+		listaAltriPulsanti.add(nessunAttacco);
 		listaAltriPulsanti.add(attacco);
 		listaAltriPulsanti.add(pescaCarta);
 		//cartaPescata.setVisible(false);
@@ -333,9 +337,14 @@ public class GUI {
 					attivaPulsanteAttacco();
 					break;
 				case "NON_ATTACCA":
+					attivaPulsanteNessunAttacco();
 					break;
 			}
 		}
+	}
+	
+	private void attivaPulsanteNessunAttacco() {
+		nessunAttacco.getButton().setEnabled(true);
 	}
 	
 	/**
@@ -368,13 +377,13 @@ public class GUI {
 	}
 	
 	private void registraSpostamento(Pulsante destinazione) {
-		this.annuncioSpostamento = new String("move to: " + destinazione.getNomePulsante());
+		this.inputDaInviare = new String("move to: " + destinazione.getNomePulsante());
 		this.inputInserito = true;
 	}
 	
-	public String annunciaSpostamento() {
+	public String annunciaInput() {
 		this.inputInserito = false;
-		return this.annuncioSpostamento;
+		return this.inputDaInviare;
 	}
 	
 	private void evidenziaPulsante(Pulsante pulsante) {
@@ -403,14 +412,16 @@ public class GUI {
 					mostraCountdown.setVisible(false);
 					synchronized(interfaccia){
 					    interfaccia.notifyAll(); //l'intero blocco dovrà essere inserito in ogni metodo che generi un input per il server
-					}
+					} 
 				}
 			});
 		}
 	}
 	
-	private void impedisciAltriMovimenti() {  // direttamente "setAspettoPulsante"?
-		
+	private void impedisciAltriMovimenti() {  
+		for (Pulsante p : listaPulsantiSettore) {
+			p.getButton().setEnabled(false);
+		}
 	}
 	
 	public void decoderComando(ArrayList<String> comando) {
@@ -430,6 +441,7 @@ public class GUI {
                 break;
             case "SCEGLIE_AZIONE":		
             	ArrayList<String> azioniPossibili = estraiInformazioniDaComando(comando);
+            	assegnaActionListenerAltriPulsanti(azioniPossibili);
                 abilitaAltriPulsanti(azioniPossibili);
                 break;
             case "RISULTATO_ATTACCO":
@@ -503,6 +515,43 @@ public class GUI {
         timer.setInitialDelay(0);
         timer.start();
         countdownPerMossa = 30;
+    }
+    
+    private void assegnaActionListenerAltriPulsanti(final ArrayList<String> azioniPossibili) {
+    	for (final Pulsante p : listaAltriPulsanti) {
+    		p.getButton().addActionListener(new ActionListener() {
+    			public void actionPerformed(ActionEvent e) {
+    				switch(p.getNomePulsante()) {
+    					case "Attacco":
+    						inputDaInviare = getIndiceAzione(azioniPossibili, "ATTACCA");
+    						break;
+    					case "Pesca una carta":
+    						inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
+    						break;
+    					case "Nessun attacco":
+    						inputDaInviare = getIndiceAzione(azioniPossibili, "NON_ATTACCA");
+    						break;
+    				}
+    				inputInserito = true;
+    				p.getButton().setEnabled(false);
+    				timer.stop();
+					mostraCountdown.setVisible(false);
+					synchronized(interfaccia){
+					    interfaccia.notifyAll(); //l'intero blocco dovrà essere inserito in ogni metodo che generi un input per il server
+					}
+    			}
+    		});
+    	}
+    }
+    
+    private String getIndiceAzione(ArrayList<String> azioniPossibili, String azioneCercata) {
+    	int indice = 0;
+    	for (int i = 0; i < azioniPossibili.size(); i++) {
+    		if (azioniPossibili.get(i) == azioneCercata) {
+    			indice = i+1;
+    		}
+    	}
+    	return String.valueOf(indice);
     }
 	
 }
