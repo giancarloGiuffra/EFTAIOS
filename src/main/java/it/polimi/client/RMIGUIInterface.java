@@ -21,6 +21,7 @@ public class RMIGUIInterface extends RMIInterface {
 	
 	@Override
     public void run() {
+	    gui.visualizzaTabellone();
 	    while(!isClosed()){
 	    	try {
 				synchronized(this){

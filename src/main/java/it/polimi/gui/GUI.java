@@ -444,6 +444,21 @@ public class GUI {
             	assegnaActionListenerAltriPulsanti(azioniPossibili);
                 abilitaAltriPulsanti(azioniPossibili);
                 break;
+            case "PESCA_CARTA":
+                //TODO
+                break;
+            case "SILENZIO_DICHIARATO":
+                //TODO
+                break;
+            case "SETTORE_ANNUNCIATO":
+                //TODO
+                break;
+            case "SETTORE_DA_ANNUNCIARE":
+                //TODO
+                break;
+            case "NESSUNA_GAMEROOM_DISPONIBILE":
+                //TODO
+                break;
             case "RISULTATO_ATTACCO":
             	ArrayList<String> informazioniAttacco = estraiInformazioniDaComando(comando);
             	comunicaRisultatoAttacco(informazioniAttacco);
@@ -519,9 +534,6 @@ public class GUI {
     
     private void assegnaActionListenerAltriPulsanti(final ArrayList<String> azioniPossibili) {
     	for (final Pulsante p : listaAltriPulsanti) {
-    	    inputDaInviare = getIndiceAzione(azioniPossibili, "ATTACCA");
-    	    inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
-    	    inputDaInviare = getIndiceAzione(azioniPossibili, "NON_ATTACCA");
     		p.getButton().addActionListener(new ActionListener() {
     			public void actionPerformed(ActionEvent e) {
     				switch(p.getNomePulsante()) {
