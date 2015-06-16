@@ -459,10 +459,10 @@ public class GUI {
                 comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
                 break;
             case "GIOCO_FINITO":					
-            	ArrayList<String> datiVincitori = estraiInformazioniDaComando(comando);
+            	ArrayList<String> datiVincitori = new ArrayList<String>(estraiInformazioniDaComando(comando));
             	datiVincitori.remove(0);	// il primo termine dell'ArrayList contiene il tipo di fine partita
             	String nomiVincitori = estraiNomiGiocatori(datiVincitori);
-                comunicaMessaggio("Partita terminata " + "(" + comando.get(1) + "). I vincitori sono: " + nomiVincitori); 
+                comunicaMessaggio("Partita terminata " + "(" + comando.get(0) + "). I vincitori sono: " + nomiVincitori); 
         }
     }
 	
@@ -519,6 +519,9 @@ public class GUI {
     
     private void assegnaActionListenerAltriPulsanti(final ArrayList<String> azioniPossibili) {
     	for (final Pulsante p : listaAltriPulsanti) {
+    	    inputDaInviare = getIndiceAzione(azioniPossibili, "ATTACCA");
+    	    inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
+    	    inputDaInviare = getIndiceAzione(azioniPossibili, "NON_ATTACCA");
     		p.getButton().addActionListener(new ActionListener() {
     			public void actionPerformed(ActionEvent e) {
     				switch(p.getNomePulsante()) {
@@ -547,7 +550,7 @@ public class GUI {
     private String getIndiceAzione(ArrayList<String> azioniPossibili, String azioneCercata) {
     	int indice = 0;
     	for (int i = 0; i < azioniPossibili.size(); i++) {
-    		if (azioniPossibili.get(i) == azioneCercata) {
+    		if (azioniPossibili.get(i).equals(azioneCercata)) {
     			indice = i+1;
     		}
     	}
