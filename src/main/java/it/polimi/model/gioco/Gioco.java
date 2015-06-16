@@ -1,5 +1,7 @@
 package it.polimi.model.gioco;
 
+import it.polimi.client.NotifierClient;
+import it.polimi.common.logger.FilterAllLogs;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.ModelAnnunciatoSettoreEvent;
 import it.polimi.common.observer.ModelAttaccoEvent;
@@ -26,17 +28,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Gioco extends BaseObservable {
 
+    private static final Logger LOGGER = Logger.getLogger(Gioco.class.getName());
     private final Tabellone tabellone;
     private Mazzo mazzoDiCarteSettore;
     private Map<Player,Settore> positions;
     private Map<Player,Settore> positionsOfPlayersInStandBy;
     private Turno turni; //Per gestire i turni
+    
+  //static block
+    static{
+        LOGGER.setFilter(new FilterAllLogs());
+    }
     
     /**
      * Costruttore
@@ -420,6 +430,7 @@ public class Gioco extends BaseObservable {
                this.tabellone.esisteSentieroValido(this.positions.get(player), this.tabellone.getSettore(settore)))
                settori.add(settore);
             } catch (BadSectorException ex){
+                LOGGER.log(Level.INFO, "si ignora l'eccezione", ex);
             	//skip
             }
         }
@@ -433,6 +444,7 @@ public class Gioco extends BaseObservable {
         	if(this.tabellone.getSettore(settore).isValidDestinationForHuman())
                 settori.add(settore);
             } catch (BadSectorException ex){
+                LOGGER.log(Level.INFO, "si ignora l'eccezione", ex);
             	//skip
             }
         }
