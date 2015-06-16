@@ -533,7 +533,7 @@ public class GUI {
     						break;
     				}
     				inputInserito = true;
-    				p.getButton().setEnabled(false);
+    				p.getButton().setEnabled(false);  // disabilitare tutti
     				timer.stop();
 					mostraCountdown.setVisible(false);
 					synchronized(interfaccia){
