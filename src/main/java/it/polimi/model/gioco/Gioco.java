@@ -184,7 +184,7 @@ public class Gioco extends BaseObservable {
     /**
      * Controlla se il gioco è finito
      */
-    private void checkIfGameOver() {
+    public void checkIfGameOver() {
         if(this.isUmanoInScialuppa()){
             this.notify(new ModelGameOver(this.umanoInScialuppa()));
         } else if(this.isUmaniMorti()){
@@ -382,6 +382,7 @@ public class Gioco extends BaseObservable {
     public void putCurrentPlayerToSleep(){
     	if(turni.players().isEmpty()) return;
     	this.positionsOfPlayersInStandBy.put(this.currentPlayer(), this.positions.get(this.currentPlayer()));
+    	this.positions.remove(this.currentPlayer());
     	this.turni.putCurrentPlayerToSleep(); //il giocatore fa comunque parte del gioco
     }
     

@@ -142,9 +142,12 @@ public class Controller extends BaseObservable implements BaseObserver {
      */
 	private void ripristinaModelViewEPassaTurno() {
 		this.notify(new ControllerRispristinaModelView());
-		this.model.putCurrentPlayerToSleep();
+		this.model.putCurrentPlayerToSleep(); //dopo aver ripristinato la model view il current player è quello che si è sconnesso
 		this.notify(new ControllerUpdateModel(this.model.model())); //importante aggiornare il model
-		if(!model.isThisLastPlayerDisconnecting()) this.startTurn();
+		if(!model.isThisLastPlayerDisconnecting()){
+		    this.model.checkIfGameOver(); //check game over visto che è stata saltata data la connessione persa
+		    this.startTurn();
+		}
 		else return;		
 	}
 	

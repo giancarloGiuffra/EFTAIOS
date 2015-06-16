@@ -96,6 +96,10 @@ public class ModelView extends BaseObservable {
 	 public List<String> calcolaSettoriValidiForCurrentPlayer(){
 	     return model.calcolaSettoriValidiForCurrentPlayer();
 	 }
+	 
+	 public void checkIfGameOver() {
+	     model.checkIfGameOver();
+	 }
 
 	/**
 	 * getter per model

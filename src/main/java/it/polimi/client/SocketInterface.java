@@ -170,7 +170,11 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	 */
 	protected String readLineFromServer(){
 	    try {
-            return this.in.readLine();
+            String read = this.in.readLine();
+            if (read != null)
+                return read;
+            else
+                return "ERROR FROM SERVER"; //in OS X non lancia l'exception restituisce null 
         } catch (IOException e) {
             if(!isClosed()){
                 LOGGER.log(Level.SEVERE, "Errore nel leggere dal Server", e);
