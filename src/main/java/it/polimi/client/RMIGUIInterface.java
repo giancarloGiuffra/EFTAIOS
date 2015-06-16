@@ -64,7 +64,7 @@ public class RMIGUIInterface extends RMIInterface {
             LOGGER.log(Level.WARNING, e.getMessage(), e);
         }
         if(gui.isInputInserito() == true)
-            return gui.annunciaSpostamento(); //generalizzare
+            return gui.annunciaInput(); //generalizzare
         else{ //se l'utente non ha inserito input si chiude la connessione
             this.close();
             return "ABORT";

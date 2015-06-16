@@ -37,7 +37,7 @@ public class SocketGUIInterface extends SocketInterface {
                     LOGGER.log(Level.WARNING, e.getMessage(), e);
                 }
     	    	if (gui.isInputInserito() == true)
-    	    	    printToServer(gui.annunciaSpostamento()); //generalizzare
+    	    	    printToServer(gui.annunciaInput()); 
     	    	else // se l'utente non ha inserito input si chiude la connessione
     	    	    this.close();
     	    }
