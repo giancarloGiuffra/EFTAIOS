@@ -337,9 +337,14 @@ public class GUI {
 					attivaPulsanteAttacco();
 					break;
 				case "NON_ATTACCA":
+					attivaPulsanteNessunAttacco();
 					break;
 			}
 		}
+	}
+	
+	private void attivaPulsanteNessunAttacco() {
+		nessunAttacco.getButton().setEnabled(true);
 	}
 	
 	/**
