@@ -527,6 +527,7 @@ public class GUI {
     						inputDaInviare = getIndiceAzione(azioniPossibili, "NON_ATTACCA");
     						break;
     				}
+    				inputInserito = true;
     				p.getButton().setEnabled(false);
     				timer.stop();
 					mostraCountdown.setVisible(false);
