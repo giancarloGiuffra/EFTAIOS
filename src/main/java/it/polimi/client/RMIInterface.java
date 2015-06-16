@@ -52,7 +52,8 @@ public class RMIInterface implements NetworkInterfaceForClient {
 		try {
 			return registerServerInClient() && registerClientInServer();
 		} catch (IOException e) {
-			return false;
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		    return false;
 		}
 	}
 
@@ -255,8 +256,8 @@ public class RMIInterface implements NetworkInterfaceForClient {
 			matcher.reset(portName);
 		}
 		Integer port = Integer.parseInt(portName);
-		//String ipAddress = getMyIPAddress();
-		String ipAddress = "127.0.0.1";
+		String ipAddress = getMyIPAddress();
+		//String ipAddress = "127.0.0.1";
 		if(!"ERROR".equals(ipAddress)){
 			try {
 				this.notifier = new NotifierClient(this);

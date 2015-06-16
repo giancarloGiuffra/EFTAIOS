@@ -444,6 +444,21 @@ public class GUI {
             	assegnaActionListenerAltriPulsanti(azioniPossibili);
                 abilitaAltriPulsanti(azioniPossibili);
                 break;
+            case "PESCA_CARTA":
+                //TODO
+                break;
+            case "SILENZIO_DICHIARATO":
+                //TODO
+                break;
+            case "SETTORE_ANNUNCIATO":
+                //TODO
+                break;
+            case "SETTORE_DA_ANNUNCIARE":
+                //TODO
+                break;
+            case "NESSUNA_GAMEROOM_DISPONIBILE":
+                //TODO
+                break;
             case "RISULTATO_ATTACCO":
             	ArrayList<String> informazioniAttacco = estraiInformazioniDaComando(comando);
             	comunicaRisultatoAttacco(informazioniAttacco);
@@ -459,10 +474,10 @@ public class GUI {
                 comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
                 break;
             case "GIOCO_FINITO":					
-            	ArrayList<String> datiVincitori = estraiInformazioniDaComando(comando);
+            	ArrayList<String> datiVincitori = new ArrayList<String>(estraiInformazioniDaComando(comando));
             	datiVincitori.remove(0);	// il primo termine dell'ArrayList contiene il tipo di fine partita
             	String nomiVincitori = estraiNomiGiocatori(datiVincitori);
-                comunicaMessaggio("Partita terminata " + "(" + comando.get(1) + "). I vincitori sono: " + nomiVincitori); 
+                comunicaMessaggio("Partita terminata " + "(" + comando.get(0) + "). I vincitori sono: " + nomiVincitori); 
         }
     }
 	
@@ -547,7 +562,7 @@ public class GUI {
     private String getIndiceAzione(ArrayList<String> azioniPossibili, String azioneCercata) {
     	int indice = 0;
     	for (int i = 0; i < azioniPossibili.size(); i++) {
-    		if (azioniPossibili.get(i) == azioneCercata) {
+    		if (azioniPossibili.get(i).equals(azioneCercata)) {
     			indice = i+1;
     		}
     	}
