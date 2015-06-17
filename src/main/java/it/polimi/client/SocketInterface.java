@@ -34,6 +34,14 @@ public class SocketInterface implements NetworkInterfaceForClient {
 		
 	}
 	
+	/**
+	 * setter per stdIn
+	 * @param stdIn
+	 */
+	public void setStdIn(BufferedReader stdIn){
+	    this.stdIn = stdIn;
+	}
+	
 	@Override
 	public Boolean connectToServer() {
 		print("Inserisci l'Indirizzo IP del Server: ");
