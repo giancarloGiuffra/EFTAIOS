@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,7 +27,13 @@ public class GUISceltaInterfaccia {
      */
     public GUISceltaInterfaccia(ClientGUI clientGUI){
         this.clientGUI = clientGUI;
-        this.sceltaTecnologiaDiComunicazione();
+    }
+    
+    /**
+     * lancia la GUI per scegliere l'interfaccia di connessione
+     */
+    public void start(){
+    	this.sceltaTecnologiaDiComunicazione();
     }
     
     /**
@@ -38,7 +45,7 @@ public class GUISceltaInterfaccia {
      *      to play online.
      */
     public void sceltaTecnologiaDiComunicazione() {
-        ArrayList<Pulsante> pulsantiStart = new ArrayList<Pulsante>();
+        List<Pulsante> pulsantiStart = new ArrayList<Pulsante>();
         Pulsante inizioPartitaConSocket = new Pulsante(startConSocket);
         Pulsante inizioPartitaConRMI = new Pulsante(startConRMI);
         pulsantiStart.add(inizioPartitaConSocket);
@@ -46,7 +53,8 @@ public class GUISceltaInterfaccia {
         for (int i = 0; i < pulsantiStart.size(); i++) {
             final Pulsante modalità = pulsantiStart.get(i);
             modalità.getButton().addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                @Override
+            	public void actionPerformed(ActionEvent e) {
                     comunicaTecnologiaDiComunicazione(modalità.getNomePulsante());
                 }
             });

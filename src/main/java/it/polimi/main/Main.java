@@ -44,7 +44,7 @@ public class Main implements BaseObserver{
 	 * @param numeroGiocatori
 	 */
 	private Main(Integer numeroGiocatori){
-		this(numeroGiocatori, new View(System.in, System.out));
+		this(numeroGiocatori, new View(System.in, System.out));//NOSONAR
 	}
 	
 	/**

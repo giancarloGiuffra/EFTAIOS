@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -49,7 +50,6 @@ public class GUI {
 	private final Pulsante attacco = new Pulsante("Attacco");
 	private final Pulsante pescaCarta = new Pulsante("Pesca una carta");
 	private final Pulsante nessunAttacco = new Pulsante("Nessun attacco");
-	private JLabel cartaPescata = new JLabel();
 	private String nomeGiocatore;
 	private String razzaGiocatore;
 	private String posizioneAttuale;
@@ -211,7 +211,7 @@ public class GUI {
 	 * Italian: Metodo che colora i pulsanti corrispondenti ai settori, in base alla loro tipologia.
 	 * English: Method used to color the buttons corresponding to the sectors, according to their type.
 	 */
-	public void coloraGUI() {
+	private void coloraGUI() {
 		ricavaSettori();
 		coloraSettoriPerTipo(settoriInaccessibili);
 		coloraSettoriPerTipo(settoriSicuri);
@@ -225,39 +225,13 @@ public class GUI {
 		coloraGUI();
 	}
 	
-	/**
-	 * Italian: Metodo utilizzato per attivare il pulsante "attacco" dopo che un giocatore di 
-	 * 		razza aliena ha effettuato il movimento.
-	 * English: Method used to activate the button "attacco" after the movement of
-	 * 		 an alien player.
-	 */
 	private void attivaPulsanteAttacco() {
 		attacco.getButton().setEnabled(true);
 	}
 	
-	/**
-	 * Italian: Metodo utilizzato per:
-	 * 	1) 	attivare il pulsante "pescaCarta" se uno spostamento porta il giocatore in un 
-	 * 		settore pericoloso;
-	 * 	2)	visualizzare l'etichetta che informa il giocatore riguardo la tipologia 
-	 * 		della carta pescata;
-	 * English: Method used to:
-	 * 	1)	activate the button "pescaCarta" if a player ends up in a dangerous sector 
-	 * 		after a movement;
-	 * 	2)	inform the player about the kind of card received;
-	 */	
 	private void attivaPulsantePescaCarta() {
 		pescaCarta.getButton().setEnabled(true);
 	}
-	
-	private void tipoCartaPescata() {
-		pescaCarta.getButton().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				cartaPescata = new JLabel("Carta pescata: ");
-				
-			}
-		});
-	} 
 	
 	/**
 	 * Italian: Metodo che restituisce la lista contenente tutti i pulsanti corrispondenti a settori.
@@ -286,7 +260,7 @@ public class GUI {
 	 * 	as its name, its race and its initial position.
 	 * @param informazioniIniziali ArrayList contenente le informazioni iniziali
 	 */
-	public void ricavaInformazioniIniziali(ArrayList<String> informazioniIniziali) {
+	public void ricavaInformazioniIniziali(List<String> informazioniIniziali) {
 		nomeGiocatore = informazioniIniziali.get(0);
 		posizioneAttuale = informazioniIniziali.get(1);
 		razzaGiocatore = informazioniIniziali.get(2);
@@ -328,8 +302,8 @@ public class GUI {
 	 * English: method whose function is to enable 'attacco' and/or 'pescaCarta' buttons, 
 	 * 	assuming that some game conditions are satisfied.
 	 */
-	public void abilitaAltriPulsanti(ArrayList<String> azioni) {
-		for (String azione : azioni) {
+	public void abilitaAltriPulsanti(List<String> azioniPossibili) {
+		for (String azione : azioniPossibili) {
 			switch(azione) {
 				case "PESCA_CARTA":
 					attivaPulsantePescaCarta();
@@ -353,7 +327,7 @@ public class GUI {
 	 * English: method that will enable, for the current player, only the sectors where he is allowed to move.
 	 * @param settoriAdiacenti lista dei settori su cui è possibile muoversi, a partire da quello su cui ci si trova
 	 */
-	public void abilitaSettoriAdiacenti(ArrayList<String> settoriAdiacenti) {
+	public void abilitaSettoriAdiacenti(List<String> settoriAdiacenti) {
 		for (int i = 0; i < settoriAdiacenti.size(); i++) {
 			for (int j = 0; j < listaPulsantiSettore.size(); j++) {
 				if (settoriAdiacenti.get(i).equals(listaPulsantiSettore.get(j).getNomePulsante())) {
@@ -414,14 +388,15 @@ public class GUI {
 			p.getButton().addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					settoreAnnunciato = p.getNomePulsante();
+					faseSpostamento = true;
 				}
 			});
 		}
-		faseSpostamento = true;
 	}
 	
-	private String annunciaRumore() {
-		return ("announce: " + this.settoreAnnunciato);
+	private void annunciaRumore() {
+		this.inputDaInviare = new String("announce: " + this.settoreAnnunciato);
+		this.inputInserito = true;
 	}
 	
 	private void assegnaActionListenerSpostamento() {
@@ -450,23 +425,23 @@ public class GUI {
 		}
 	}
 	
-	public void decoderComando(ArrayList<String> comando) {
-        String nomeComando = comando.get(0);
+	public void decoderComando(List<String> list) {
+        String nomeComando = list.get(0);
         switch(nomeComando) {
             case "INIZIO":
-                ArrayList<String> informazioniIniziali = estraiInformazioniDaComando(comando);
+                List<String> informazioniIniziali = estraiInformazioniDaComando(list);
                 ricavaInformazioniIniziali(informazioniIniziali);
                 break;
             case "ABILITA_SETTORI":
-                ArrayList<String> settoriAdiacenti = estraiInformazioniDaComando(comando);
+                List<String> settoriAdiacenti = estraiInformazioniDaComando(list);
                 abilitaSettoriAdiacenti(settoriAdiacenti);
                 break;
             case "CONNESSIONE_PERSA":	
-            	String giocatore = comando.get(1);
+            	String giocatore = list.get(1);
                 comunicaMessaggio("Connessione interrotta con " + giocatore);
                 break;
             case "SCEGLIE_AZIONE":		
-            	ArrayList<String> azioniPossibili = estraiInformazioniDaComando(comando);
+            	List<String> azioniPossibili = estraiInformazioniDaComando(list);
             	assegnaActionListenerAltriPulsanti(azioniPossibili);
                 abilitaAltriPulsanti(azioniPossibili);
                 break;
@@ -477,23 +452,24 @@ public class GUI {
                 comunicaMessaggio(nomeGiocatore + " (" + razzaGiocatore + ") ha dichiarato 'SILENZIO' ");
                 break;
             case "SETTORE_ANNUNCIATO":
-                //TODO
+                comunicaMessaggio(nomeGiocatore + " (" + razzaGiocatore + ") ha dichiarato un RUMORE in " + settoreAnnunciato);
                 break;
             case "SETTORE_DA_ANNUNCIARE":
             	abilitaSettori();
             	comunicaMessaggio("cliccare sul settore in cui si vuole dichiarare un rumore");
             	actionListenerPulsanteSettore();
             	annunciaRumore();
+            	actionListenerPulsanteSettore();
                 break;
             case "NESSUNA_GAMEROOM_DISPONIBILE":
                 comunicaMessaggio("Non ci sono sale libere al momento: riprovare più tardi. La connessione verrà chiusa");
                 break;
             case "RISULTATO_ATTACCO":
-            	ArrayList<String> informazioniAttacco = estraiInformazioniDaComando(comando);
+            	List<String> informazioniAttacco = estraiInformazioniDaComando(list);
             	comunicaRisultatoAttacco(informazioniAttacco);
                 break;
             case "CARTA_PESCATA":
-                String cartaPescata = comando.get(1);
+                String cartaPescata = list.get(1);
                 comunicaMessaggio("Carta pescata: " + cartaPescata);
                 break;
             case "TURNO_FINITO":
@@ -503,10 +479,10 @@ public class GUI {
                 comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
                 break;
             case "GIOCO_FINITO":					
-            	ArrayList<String> datiVincitori = new ArrayList<String>(estraiInformazioniDaComando(comando));
+            	ArrayList<String> datiVincitori = new ArrayList<String>(estraiInformazioniDaComando(list));
             	datiVincitori.remove(0);	// il primo termine dell'ArrayList contiene il tipo di fine partita
             	String nomiVincitori = estraiNomiGiocatori(datiVincitori);
-                comunicaMessaggio("Partita terminata " + "(" + comando.get(0) + "). I vincitori sono: " + nomiVincitori); 
+                comunicaMessaggio("Partita terminata " + "(" + list.get(0) + "). I vincitori sono: " + nomiVincitori); 
         }
     }
 	
@@ -516,12 +492,12 @@ public class GUI {
 		}
 	}
 	
-	private void comunicaRisultatoAttacco(ArrayList<String> informazioniAttacco) {
+	private void comunicaRisultatoAttacco(List<String> informazioniAttacco) {
 		if (informazioniAttacco.size() == 2) {
     		comunicaMessaggio(informazioniAttacco.get(0) + " ha effettuato un attacco in " + informazioniAttacco.get(1) + ". Non ci sono stati morti");
     	}
     	else {
-    		ArrayList<String> datiGiocatoriMorti = informazioniAttacco;	// datiGiocatoriMorti = informazioniAttacco - (primi 2 elementi dell'ArrayList)
+    		List<String> datiGiocatoriMorti = informazioniAttacco;	// datiGiocatoriMorti = informazioniAttacco - (primi 2 elementi dell'ArrayList)
     		datiGiocatoriMorti.remove(0);
     		datiGiocatoriMorti.remove(1);
     		String giocatoriMorti = estraiNomiGiocatori(datiGiocatoriMorti);
@@ -529,7 +505,7 @@ public class GUI {
     	}
 	}
 	
-	private String estraiNomiGiocatori(ArrayList<String> nomi) {
+	private String estraiNomiGiocatori(List<String> nomi) {
 		StringBuilder elencoNomi = new StringBuilder();
 		int contatore = 0;
 		while (contatore < nomi.size()) {
@@ -539,9 +515,9 @@ public class GUI {
 		return elencoNomi.toString();
 	}
 	
-	private ArrayList<String> estraiInformazioniDaComando(ArrayList<String> comando) {
-		comando.remove(0);	// tolto il nome del comando nella prima posizione, restano solo i parametri
-		return comando;
+	private List<String> estraiInformazioniDaComando(List<String> list) {
+		list.remove(0);	// tolto il nome del comando nella prima posizione, restano solo i parametri
+		return list;
 	}
 	
 	/**
@@ -567,7 +543,7 @@ public class GUI {
         countdownPerMossa = 30;
     }
     
-    private void assegnaActionListenerAltriPulsanti(final ArrayList<String> azioniPossibili) {
+    private void assegnaActionListenerAltriPulsanti(final List<String> azioniPossibili) {
     	for (final Pulsante p : listaAltriPulsanti) {
     		p.getButton().addActionListener(new ActionListener() {
     			public void actionPerformed(ActionEvent e) {
@@ -600,7 +576,7 @@ public class GUI {
     	}
     }
     
-    private String getIndiceAzione(ArrayList<String> azioniPossibili, String azioneCercata) {
+    private String getIndiceAzione(List<String> azioniPossibili, String azioneCercata) {
     	int indice = 0;
     	for (int i = 0; i < azioniPossibili.size(); i++) {
     		if (azioniPossibili.get(i).equals(azioneCercata)) {
