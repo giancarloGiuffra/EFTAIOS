@@ -551,7 +551,7 @@ public class GUI {
     					case "Attacco":
     						inputDaInviare = getIndiceAzione(azioniPossibili, "ATTACCA");
     						break;
-    					case "Pesca una carta":
+    					case "Pesca una carta":	// sistemare: server si aspetta un ulteriore input
     						inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
     						break;
     					case "Nessun attacco":
