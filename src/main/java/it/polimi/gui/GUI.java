@@ -50,10 +50,10 @@ public class GUI {
 	private final Pulsante attacco = new Pulsante("Attacco");
 	private final Pulsante pescaCarta = new Pulsante("Pesca una carta");
 	private final Pulsante nessunAttacco = new Pulsante("Nessun attacco");
-	private JLabel cartaPescata = new JLabel();
 	private String nomeGiocatore;
 	private String razzaGiocatore;
 	private String posizioneAttuale;
+	private String settoreAnnunciato;
 	private JLabel topLabel = new JLabel("Giocatore corrente: " + nomeGiocatore + " (" + razzaGiocatore + ")", SwingConstants.CENTER);
 	private JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
 	private JPanel centralPanel = new JPanel();
@@ -64,6 +64,7 @@ public class GUI {
 	private int countdownPerMossa = 30;   // il giocatore ha a disposizione 30 secondi per effettuare la sua mossa
 	private int tempoAggiornamentoCountdown = 1;  
 	private JLabel mostraCountdown = new JLabel("" + countdownPerMossa);
+	private boolean faseSpostamento = true;
 	
 	/**
 	 * Costruttore
@@ -117,7 +118,8 @@ public class GUI {
 		centralPanel.setLayout(null);
 		creaListaPulsantiSettore();
 		setAspettoPulsante();
-		assegnaActionListenerSpostamento();	
+		actionListenerPulsanteSettore();
+		//assegnaActionListenerSpostamento();	
 		contenitoreAltriElementi.add(nessunAttacco.getButton());
 		contenitoreAltriElementi.add(attacco.getButton());  
 		contenitoreAltriElementi.add(pescaCarta.getButton()); 
@@ -209,7 +211,7 @@ public class GUI {
 	 * Italian: Metodo che colora i pulsanti corrispondenti ai settori, in base alla loro tipologia.
 	 * English: Method used to color the buttons corresponding to the sectors, according to their type.
 	 */
-	public void coloraGUI() {
+	private void coloraGUI() {
 		ricavaSettori();
 		coloraSettoriPerTipo(settoriInaccessibili);
 		coloraSettoriPerTipo(settoriSicuri);
@@ -223,41 +225,13 @@ public class GUI {
 		coloraGUI();
 	}
 	
-	/**
-	 * Italian: Metodo utilizzato per attivare il pulsante "attacco" dopo che un giocatore di 
-	 * 		razza aliena ha effettuato il movimento.
-	 * English: Method used to activate the button "attacco" after the movement of
-	 * 		 an alien player.
-	 */
 	private void attivaPulsanteAttacco() {
 		attacco.getButton().setEnabled(true);
 	}
 	
-	/**
-	 * Italian: Metodo utilizzato per:
-	 * 	1) 	attivare il pulsante "pescaCarta" se uno spostamento porta il giocatore in un 
-	 * 		settore pericoloso;
-	 * 	2)	visualizzare l'etichetta che informa il giocatore riguardo la tipologia 
-	 * 		della carta pescata;
-	 * English: Method used to:
-	 * 	1)	activate the button "pescaCarta" if a player ends up in a dangerous sector 
-	 * 		after a movement;
-	 * 	2)	inform the player about the kind of card received;
-	 */	
-	public void attivaPulsantePescaCarta() {
+	private void attivaPulsantePescaCarta() {
 		pescaCarta.getButton().setEnabled(true);
-		tipoCartaPescata();
-		cartaPescata.setVisible(true);
 	}
-	
-	private void tipoCartaPescata() {
-		pescaCarta.getButton().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				cartaPescata = new JLabel("Carta pescata: ");
-				
-			}
-		});
-	} 
 	
 	/**
 	 * Italian: Metodo che restituisce la lista contenente tutti i pulsanti corrispondenti a settori.
@@ -400,6 +374,31 @@ public class GUI {
 		}
 	}
 	
+	private void actionListenerPulsanteSettore() {
+		if (faseSpostamento == true) {
+			assegnaActionListenerSpostamento();
+		}
+		else {
+			actionListenerAnnuncioSettore();
+		}
+	}
+	
+	private void actionListenerAnnuncioSettore() {
+		for (final Pulsante p : listaPulsantiSettore) {
+			p.getButton().addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					settoreAnnunciato = p.getNomePulsante();
+					faseSpostamento = true;
+				}
+			});
+		}
+	}
+	
+	private void annunciaRumore() {
+		this.inputDaInviare = new String("announce: " + this.settoreAnnunciato);
+		this.inputInserito = true;
+	}
+	
 	private void assegnaActionListenerSpostamento() {
 		for (final Pulsante p : listaPulsantiSettore) {
 			p.getButton().addActionListener(new ActionListener() {
@@ -411,6 +410,7 @@ public class GUI {
 					impedisciAltriMovimenti();
 					timer.stop();
 					mostraCountdown.setVisible(false);
+					faseSpostamento = false;
 					synchronized(interfaccia){
 					    interfaccia.notifyAll(); //l'intero blocco dovrà essere inserito in ogni metodo che generi un input per il server
 					} 
@@ -446,19 +446,23 @@ public class GUI {
                 abilitaAltriPulsanti(azioniPossibili);
                 break;
             case "PESCA_CARTA":
-                //TODO
+                attivaPulsantePescaCarta();
                 break;
             case "SILENZIO_DICHIARATO":
-                //TODO
+                comunicaMessaggio(nomeGiocatore + " (" + razzaGiocatore + ") ha dichiarato 'SILENZIO' ");
                 break;
             case "SETTORE_ANNUNCIATO":
-                //TODO
+                comunicaMessaggio(nomeGiocatore + " (" + razzaGiocatore + ") ha dichiarato un RUMORE in " + settoreAnnunciato);
                 break;
             case "SETTORE_DA_ANNUNCIARE":
-                //TODO
+            	abilitaSettori();
+            	comunicaMessaggio("cliccare sul settore in cui si vuole dichiarare un rumore");
+            	actionListenerPulsanteSettore();
+            	annunciaRumore();
+            	actionListenerPulsanteSettore();
                 break;
             case "NESSUNA_GAMEROOM_DISPONIBILE":
-                //TODO
+                comunicaMessaggio("Non ci sono sale libere al momento: riprovare più tardi. La connessione verrà chiusa");
                 break;
             case "RISULTATO_ATTACCO":
             	List<String> informazioniAttacco = estraiInformazioniDaComando(list);
@@ -482,6 +486,12 @@ public class GUI {
         }
     }
 	
+	private void abilitaSettori() {
+		for (Pulsante p : listaPulsantiSettore) {
+			p.getButton().setEnabled(true);
+		}
+	}
+	
 	private void comunicaRisultatoAttacco(List<String> informazioniAttacco) {
 		if (informazioniAttacco.size() == 2) {
     		comunicaMessaggio(informazioniAttacco.get(0) + " ha effettuato un attacco in " + informazioniAttacco.get(1) + ". Non ci sono stati morti");
@@ -495,11 +505,11 @@ public class GUI {
     	}
 	}
 	
-	private String estraiNomiGiocatori(List<String> datiGiocatoriMorti) {
+	private String estraiNomiGiocatori(List<String> nomi) {
 		StringBuilder elencoNomi = new StringBuilder();
 		int contatore = 0;
-		while (contatore < datiGiocatoriMorti.size()) {
-			elencoNomi.append(datiGiocatoriMorti.get(contatore) + ";  ");
+		while (contatore < nomi.size()) {
+			elencoNomi.append(nomi.get(contatore) + ";  ");
 			contatore++;
 		}
 		return elencoNomi.toString();
@@ -541,7 +551,7 @@ public class GUI {
     					case "Attacco":
     						inputDaInviare = getIndiceAzione(azioniPossibili, "ATTACCA");
     						break;
-    					case "Pesca una carta":
+    					case "Pesca una carta":	// sistemare: server si aspetta un ulteriore input
     						inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
     						break;
     					case "Nessun attacco":
@@ -549,7 +559,7 @@ public class GUI {
     						break;
     				}
     				inputInserito = true;
-    				p.getButton().setEnabled(false);
+    				disabilitaAltriPulsanti();
     				timer.stop();
 					mostraCountdown.setVisible(false);
 					synchronized(interfaccia){
@@ -557,6 +567,12 @@ public class GUI {
 					}
     			}
     		});
+    	}
+    }
+    
+    private void disabilitaAltriPulsanti() {
+    	for (Pulsante p : listaAltriPulsanti) {
+    		p.getButton().setEnabled(false);
     	}
     }
     
