@@ -161,4 +161,12 @@ public class GameRoom extends BaseObservable implements BaseObserver{
 				break;
 		}
 	}
+
+	/**
+	 * true se ci sono almeno due client
+	 * @return
+	 */
+	public boolean hasAtLeastMinimumNumberOfClients() {
+		return this.manager.hasAtLeastMinimumNumberOfClients();
+	}
 }

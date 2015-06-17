@@ -213,4 +213,65 @@ public class GameServer implements BaseObserver{
 				this.gameRooms.peekLast().hasStarted();
 	}
 	
+	/**
+     * lancia il server solo per socket connection - usato nei test - ammette solo due connessioni e fa partire la gameroom
+     * @throws IOException
+     */
+    public void startServerSocketOnlyForTest(int maxNumberOfClientsPerRoom) throws IOException {
+    	
+    	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
+    	
+    	//creazione gameroom
+    	this.setCurrentGameRoom(new GameRoom(new ClientManager(MAX_NUMBER_CLIENTS_PER_ROOM)));
+    	
+        //server socket
+        this.serverSocket = new ServerSocket(this.portSocket);
+    	LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
+        while(true){
+                ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
+                synchronized(this){
+	                if(!lastGameRoomAvailableHasStarted()){
+	                	this.currentGameRoom.addClient(clientSocket);
+	                    if(this.currentGameRoom.hasAtLeastMinimumNumberOfClients() && !this.currentGameRoom.hasStarted()){
+	                    	GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
+	                    	gameRoomToLaunch.cancelTimer();
+	                    	gameRoomToLaunch.start();
+	                    }
+	                }else {
+	                    clientSocket.write("Ci dispiace l'ultima sala si è riempita. Prova per favore a connetterti più tardi. Questa connessione verrà chiusa");
+	                    clientSocket.write(buildCommandNoGameRoomAvailable());
+	                    clientSocket.close();
+	                }
+                } //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
+        } //while
+    }
+    
+    /**
+     * lancia il server solo per RMI connection
+     * @throws IOException
+     */
+    public void startServerRMIOnlyForTest(int maxNumberOfClientsPerRoom) throws IOException {
+    	
+    	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
+    	
+    	//creazione gameroom
+    	this.setCurrentGameRoom(new GameRoom(new ClientManager(MAX_NUMBER_CLIENTS_PER_ROOM)));
+    	
+    	
+    	//server rmi
+        String clientRMIFactoryName = "ClientRMIFactory";
+        try{
+        	ClientRMIFactory clientRMIFactory = new RemoteClientRMIFactory();
+        	( (RemoteClientRMIFactory) clientRMIFactory).addObserver(this); //aggiunge il server come observer
+        	ClientRMIFactory clientRMIFactoryStub = (ClientRMIFactory) UnicastRemoteObject.exportObject(clientRMIFactory,this.portRMI);
+        	LocateRegistry.createRegistry(this.portRMI);
+        	Registry registry = LocateRegistry.getRegistry(this.portRMI);
+        	registry.rebind(clientRMIFactoryName, clientRMIFactoryStub);
+        	LOGGER.log(Level.INFO, String.format("GameServer RMI pronto in porta: %d", this.portRMI));
+        } catch (Exception e) {
+        	LOGGER.log(Level.SEVERE, "RMI Exception: ".concat(e.getMessage()),e);
+        }
+    	
+    }
+	
 }
