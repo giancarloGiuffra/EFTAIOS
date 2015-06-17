@@ -4,6 +4,7 @@ import it.polimi.gui.GUI;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,12 +58,14 @@ public class RMIGUIInterface extends RMIInterface {
     @Override
     public String read() throws IOException{
         gui.countDown();
-        try {
-            synchronized(this){
-                this.wait(TIME_LIMIT*1000);
-            }
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.WARNING, e.getMessage(), e);
+        while(!gui.isInputInserito() && !this.isClosed()){
+	        try {
+	            synchronized(this){
+	                this.wait((long) TIME_LIMIT*1000);
+	            }
+	        } catch (InterruptedException e) {
+	            LOGGER.log(Level.WARNING, e.getMessage(), e);
+	        }
         }
         if(gui.isInputInserito() == true)
             return gui.annunciaInput(); //generalizzare
@@ -72,8 +75,8 @@ public class RMIGUIInterface extends RMIInterface {
         }
     }
     
-    private ArrayList<String> getComando(String fromServer){
-        ArrayList<String> datiComando = new ArrayList<String>();
+    private List<String> getComando(String fromServer){
+        List<String> datiComando = new ArrayList<String>();
         String splitStringa[] = fromServer.split("%");
         for (int i = 0; i < splitStringa.length; i++) {
             if (splitStringa[i].equals("COMANDO") == false && splitStringa[i].isEmpty() == false) {

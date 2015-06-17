@@ -3,6 +3,7 @@ package it.polimi.client;
 import it.polimi.gui.GUI;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 public class SocketGUIInterface extends SocketInterface {
@@ -23,7 +24,7 @@ public class SocketGUIInterface extends SocketInterface {
 	    while(!isClosed()){
     	    fromServer = readLineFromServer();
     	    if(this.isCommand(fromServer)){
-	    	    ArrayList<String> comandoRicevuto = getComando(fromServer);
+	    	    List<String> comandoRicevuto = getComando(fromServer);
     	    	gui.decoderComando(comandoRicevuto);
     	    }
     	    if(fromServer.equals("RICHIEDE_INPUT")){
@@ -31,7 +32,7 @@ public class SocketGUIInterface extends SocketInterface {
                 try {
                     //Thread.sleep(TIME_LIMIT*1000);
                     synchronized(this){
-                        this.wait(TIME_LIMIT*1000);
+                        this.wait((long) TIME_LIMIT*1000);
                     }
                 } catch (InterruptedException e) {
                     LOGGER.log(Level.WARNING, e.getMessage(), e);
@@ -49,8 +50,8 @@ public class SocketGUIInterface extends SocketInterface {
 	    }
 	}
     
-    private ArrayList<String> getComando(String fromServer){
-    	ArrayList<String> datiComando = new ArrayList<String>();
+    private List<String> getComando(String fromServer){
+    	List<String> datiComando = new ArrayList<String>();
 		String splitStringa[] = fromServer.split("%");
 		for (int i = 0; i < splitStringa.length; i++) {
 			if (splitStringa[i].equals("COMANDO") == false && splitStringa[i].isEmpty() == false) {

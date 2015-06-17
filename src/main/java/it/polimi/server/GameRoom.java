@@ -85,7 +85,7 @@ public class GameRoom extends BaseObservable implements BaseObserver{
         if(this.manager.hasOneClient()){
         	timer = new Timer();
         	TimeLimitStartGameRoom task = new TimeLimitStartGameRoom(this);
-        	timer.schedule(task, TIME_LIMIT_FOR_START*60*1000);
+        	timer.schedule(task, (long) TIME_LIMIT_FOR_START*60*1000);
         }
     }
     

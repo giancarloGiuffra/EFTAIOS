@@ -88,10 +88,10 @@ public final class ModelGameOver extends Event {
      * @return i nomi degli alieni che hanno vinto
      */
     public List<String> aliens(){
-        List<String> aliens = new ArrayList<String>();
+        List<String> aliensList = new ArrayList<String>();
         for(Player alien : this.aliens)
-            aliens.add(alien.nome());
-        return aliens;
+        	aliensList.add(alien.nome());
+        return aliensList;
     }
 
 }

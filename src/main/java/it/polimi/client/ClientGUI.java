@@ -15,6 +15,13 @@ public class ClientGUI{
     }
     
     /**
+     * lancia la GUI
+     */
+    public void start(){
+    	this.interfaccia.start();
+    }
+    
+    /**
      * comunica all'utente della GUI che la connessione non è stata possibile
      */
     private void comunicaConnessioneFallita() {
@@ -32,9 +39,7 @@ public class ClientGUI{
      * @param args
      */
     public static void main(String[] args) {
-        ClientGUI client = new ClientGUI(); 
-        /*if(client.networkInterface.connectToServer()) (new Thread(client.networkInterface)).start();
-        else client.comunicaConnessioneFallita();*/
+        new ClientGUI().start(); 
     }
 
 }

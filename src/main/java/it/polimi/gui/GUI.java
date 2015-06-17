@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -285,7 +286,7 @@ public class GUI {
 	 * 	as its name, its race and its initial position.
 	 * @param informazioniIniziali ArrayList contenente le informazioni iniziali
 	 */
-	public void ricavaInformazioniIniziali(ArrayList<String> informazioniIniziali) {
+	public void ricavaInformazioniIniziali(List<String> informazioniIniziali) {
 		nomeGiocatore = informazioniIniziali.get(0);
 		posizioneAttuale = informazioniIniziali.get(1);
 		razzaGiocatore = informazioniIniziali.get(2);
@@ -327,8 +328,8 @@ public class GUI {
 	 * English: method whose function is to enable 'attacco' and/or 'pescaCarta' buttons, 
 	 * 	assuming that some game conditions are satisfied.
 	 */
-	public void abilitaAltriPulsanti(ArrayList<String> azioni) {
-		for (String azione : azioni) {
+	public void abilitaAltriPulsanti(List<String> azioniPossibili) {
+		for (String azione : azioniPossibili) {
 			switch(azione) {
 				case "PESCA_CARTA":
 					attivaPulsantePescaCarta();
@@ -352,7 +353,7 @@ public class GUI {
 	 * English: method that will enable, for the current player, only the sectors where he is allowed to move.
 	 * @param settoriAdiacenti lista dei settori su cui è possibile muoversi, a partire da quello su cui ci si trova
 	 */
-	public void abilitaSettoriAdiacenti(ArrayList<String> settoriAdiacenti) {
+	public void abilitaSettoriAdiacenti(List<String> settoriAdiacenti) {
 		for (int i = 0; i < settoriAdiacenti.size(); i++) {
 			for (int j = 0; j < listaPulsantiSettore.size(); j++) {
 				if (settoriAdiacenti.get(i).equals(listaPulsantiSettore.get(j).getNomePulsante())) {
@@ -424,23 +425,23 @@ public class GUI {
 		}
 	}
 	
-	public void decoderComando(ArrayList<String> comando) {
-        String nomeComando = comando.get(0);
+	public void decoderComando(List<String> list) {
+        String nomeComando = list.get(0);
         switch(nomeComando) {
             case "INIZIO":
-                ArrayList<String> informazioniIniziali = estraiInformazioniDaComando(comando);
+                List<String> informazioniIniziali = estraiInformazioniDaComando(list);
                 ricavaInformazioniIniziali(informazioniIniziali);
                 break;
             case "ABILITA_SETTORI":
-                ArrayList<String> settoriAdiacenti = estraiInformazioniDaComando(comando);
+                List<String> settoriAdiacenti = estraiInformazioniDaComando(list);
                 abilitaSettoriAdiacenti(settoriAdiacenti);
                 break;
             case "CONNESSIONE_PERSA":	
-            	String giocatore = comando.get(1);
+            	String giocatore = list.get(1);
                 comunicaMessaggio("Connessione interrotta con " + giocatore);
                 break;
             case "SCEGLIE_AZIONE":		
-            	ArrayList<String> azioniPossibili = estraiInformazioniDaComando(comando);
+            	List<String> azioniPossibili = estraiInformazioniDaComando(list);
             	assegnaActionListenerAltriPulsanti(azioniPossibili);
                 abilitaAltriPulsanti(azioniPossibili);
                 break;
@@ -460,11 +461,11 @@ public class GUI {
                 //TODO
                 break;
             case "RISULTATO_ATTACCO":
-            	ArrayList<String> informazioniAttacco = estraiInformazioniDaComando(comando);
+            	List<String> informazioniAttacco = estraiInformazioniDaComando(list);
             	comunicaRisultatoAttacco(informazioniAttacco);
                 break;
             case "CARTA_PESCATA":
-                String cartaPescata = comando.get(1);
+                String cartaPescata = list.get(1);
                 comunicaMessaggio("Carta pescata: " + cartaPescata);
                 break;
             case "TURNO_FINITO":
@@ -474,19 +475,19 @@ public class GUI {
                 comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
                 break;
             case "GIOCO_FINITO":					
-            	ArrayList<String> datiVincitori = new ArrayList<String>(estraiInformazioniDaComando(comando));
+            	ArrayList<String> datiVincitori = new ArrayList<String>(estraiInformazioniDaComando(list));
             	datiVincitori.remove(0);	// il primo termine dell'ArrayList contiene il tipo di fine partita
             	String nomiVincitori = estraiNomiGiocatori(datiVincitori);
-                comunicaMessaggio("Partita terminata " + "(" + comando.get(0) + "). I vincitori sono: " + nomiVincitori); 
+                comunicaMessaggio("Partita terminata " + "(" + list.get(0) + "). I vincitori sono: " + nomiVincitori); 
         }
     }
 	
-	private void comunicaRisultatoAttacco(ArrayList<String> informazioniAttacco) {
+	private void comunicaRisultatoAttacco(List<String> informazioniAttacco) {
 		if (informazioniAttacco.size() == 2) {
     		comunicaMessaggio(informazioniAttacco.get(0) + " ha effettuato un attacco in " + informazioniAttacco.get(1) + ". Non ci sono stati morti");
     	}
     	else {
-    		ArrayList<String> datiGiocatoriMorti = informazioniAttacco;	// datiGiocatoriMorti = informazioniAttacco - (primi 2 elementi dell'ArrayList)
+    		List<String> datiGiocatoriMorti = informazioniAttacco;	// datiGiocatoriMorti = informazioniAttacco - (primi 2 elementi dell'ArrayList)
     		datiGiocatoriMorti.remove(0);
     		datiGiocatoriMorti.remove(1);
     		String giocatoriMorti = estraiNomiGiocatori(datiGiocatoriMorti);
@@ -494,19 +495,19 @@ public class GUI {
     	}
 	}
 	
-	private String estraiNomiGiocatori(ArrayList<String> nomi) {
+	private String estraiNomiGiocatori(List<String> datiGiocatoriMorti) {
 		StringBuilder elencoNomi = new StringBuilder();
 		int contatore = 0;
-		while (contatore < nomi.size()) {
-			elencoNomi.append(nomi.get(contatore) + ";  ");
+		while (contatore < datiGiocatoriMorti.size()) {
+			elencoNomi.append(datiGiocatoriMorti.get(contatore) + ";  ");
 			contatore++;
 		}
 		return elencoNomi.toString();
 	}
 	
-	private ArrayList<String> estraiInformazioniDaComando(ArrayList<String> comando) {
-		comando.remove(0);	// tolto il nome del comando nella prima posizione, restano solo i parametri
-		return comando;
+	private List<String> estraiInformazioniDaComando(List<String> list) {
+		list.remove(0);	// tolto il nome del comando nella prima posizione, restano solo i parametri
+		return list;
 	}
 	
 	/**
@@ -532,7 +533,7 @@ public class GUI {
         countdownPerMossa = 30;
     }
     
-    private void assegnaActionListenerAltriPulsanti(final ArrayList<String> azioniPossibili) {
+    private void assegnaActionListenerAltriPulsanti(final List<String> azioniPossibili) {
     	for (final Pulsante p : listaAltriPulsanti) {
     		p.getButton().addActionListener(new ActionListener() {
     			public void actionPerformed(ActionEvent e) {
@@ -559,7 +560,7 @@ public class GUI {
     	}
     }
     
-    private String getIndiceAzione(ArrayList<String> azioniPossibili, String azioneCercata) {
+    private String getIndiceAzione(List<String> azioniPossibili, String azioneCercata) {
     	int indice = 0;
     	for (int i = 0; i < azioniPossibili.size(); i++) {
     		if (azioniPossibili.get(i).equals(azioneCercata)) {
