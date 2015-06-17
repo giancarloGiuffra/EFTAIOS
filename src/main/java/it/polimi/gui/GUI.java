@@ -74,6 +74,15 @@ public class GUI {
 	    this.interfaccia = interfaccia;
 	}
 	
+	private void getLookAndFeel() {
+		try {
+		    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} 
+		catch (Exception e) {
+		    e.printStackTrace();
+		}
+	}
+	
     private void creaListaPulsantiSettore() {
 		listaPulsantiSettore = new ArrayList<Pulsante>();
 		for (int j = 0; j < numeroColonne; j++) {
@@ -123,7 +132,6 @@ public class GUI {
 		contenitoreAltriElementi.add(nessunAttacco.getButton());
 		contenitoreAltriElementi.add(attacco.getButton());  
 		contenitoreAltriElementi.add(pescaCarta.getButton()); 
-		//contenitoreAltriPulsanti.add(cartaPescata); 
 		contenitoreAltriElementi.add(bottomLabel); 
 		FlowLayout flow = new FlowLayout();
 		flow.setHgap(20);
@@ -143,7 +151,6 @@ public class GUI {
 		listaAltriPulsanti.add(nessunAttacco);
 		listaAltriPulsanti.add(attacco);
 		listaAltriPulsanti.add(pescaCarta);
-		//cartaPescata.setVisible(false);
 		bottomLabel.setBorder(new EmptyBorder(0, larghezzaSchermo/10, 0, larghezzaSchermo/5));
 		mostraCountdown.setFont(new Font("Dialog", Font.BOLD, 18));
 		mostraCountdown.setVisible(false);
@@ -162,7 +169,7 @@ public class GUI {
 		});
 	}
 	
-	private static void ricavaSettori() {
+	public static void ricavaSettori() {
 		settoriInaccessibili = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.INACCESSIBILE), "Inaccessibili");
 		settoriSicuri = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.SICURO), "Sicuri");
 		settoriPericolosi = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.PERICOLOSO), "Pericolosi");
@@ -173,7 +180,7 @@ public class GUI {
 		
 	}
 	
-	private void setColorePulsante(String nomeLista, JButton pulsante) {
+	public void setColorePulsante(String nomeLista, JButton pulsante) {
 		switch(nomeLista) {
 			case "Inaccessibili":
 				pulsante.setVisible(false);
@@ -221,6 +228,7 @@ public class GUI {
 	}
 	
 	public void visualizzaTabellone() {
+		getLookAndFeel();
 		creaGUI();
 		coloraGUI();
 	}
