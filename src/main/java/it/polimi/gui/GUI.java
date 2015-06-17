@@ -53,6 +53,7 @@ public class GUI {
 	private String nomeGiocatore;
 	private String razzaGiocatore;
 	private String posizioneAttuale;
+	private String settoreAnnunciato;
 	private JLabel topLabel = new JLabel("Giocatore corrente: " + nomeGiocatore + " (" + razzaGiocatore + ")", SwingConstants.CENTER);
 	private JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
 	private JPanel centralPanel = new JPanel();
@@ -63,6 +64,7 @@ public class GUI {
 	private int countdownPerMossa = 30;   // il giocatore ha a disposizione 30 secondi per effettuare la sua mossa
 	private int tempoAggiornamentoCountdown = 1;  
 	private JLabel mostraCountdown = new JLabel("" + countdownPerMossa);
+	private boolean faseSpostamento = true;
 	
 	/**
 	 * Costruttore
@@ -116,7 +118,8 @@ public class GUI {
 		centralPanel.setLayout(null);
 		creaListaPulsantiSettore();
 		setAspettoPulsante();
-		assegnaActionListenerSpostamento();	
+		actionListenerPulsanteSettore();
+		//assegnaActionListenerSpostamento();	
 		contenitoreAltriElementi.add(nessunAttacco.getButton());
 		contenitoreAltriElementi.add(attacco.getButton());  
 		contenitoreAltriElementi.add(pescaCarta.getButton()); 
@@ -243,10 +246,8 @@ public class GUI {
 	 * 		after a movement;
 	 * 	2)	inform the player about the kind of card received;
 	 */	
-	public void attivaPulsantePescaCarta() {
+	private void attivaPulsantePescaCarta() {
 		pescaCarta.getButton().setEnabled(true);
-		tipoCartaPescata();
-		cartaPescata.setVisible(true);
 	}
 	
 	private void tipoCartaPescata() {
@@ -399,6 +400,30 @@ public class GUI {
 		}
 	}
 	
+	private void actionListenerPulsanteSettore() {
+		if (faseSpostamento == true) {
+			assegnaActionListenerSpostamento();
+		}
+		else {
+			actionListenerAnnuncioSettore();
+		}
+	}
+	
+	private void actionListenerAnnuncioSettore() {
+		for (final Pulsante p : listaPulsantiSettore) {
+			p.getButton().addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					settoreAnnunciato = p.getNomePulsante();
+				}
+			});
+		}
+		faseSpostamento = true;
+	}
+	
+	private String annunciaRumore() {
+		return ("announce: " + this.settoreAnnunciato);
+	}
+	
 	private void assegnaActionListenerSpostamento() {
 		for (final Pulsante p : listaPulsantiSettore) {
 			p.getButton().addActionListener(new ActionListener() {
@@ -410,6 +435,7 @@ public class GUI {
 					impedisciAltriMovimenti();
 					timer.stop();
 					mostraCountdown.setVisible(false);
+					faseSpostamento = false;
 					synchronized(interfaccia){
 					    interfaccia.notifyAll(); //l'intero blocco dovrà essere inserito in ogni metodo che generi un input per il server
 					} 
@@ -445,19 +471,22 @@ public class GUI {
                 abilitaAltriPulsanti(azioniPossibili);
                 break;
             case "PESCA_CARTA":
-                //TODO
+                attivaPulsantePescaCarta();
                 break;
             case "SILENZIO_DICHIARATO":
-                //TODO
+                comunicaMessaggio(nomeGiocatore + " (" + razzaGiocatore + ") ha dichiarato 'SILENZIO' ");
                 break;
             case "SETTORE_ANNUNCIATO":
                 //TODO
                 break;
             case "SETTORE_DA_ANNUNCIARE":
-                //TODO
+            	abilitaSettori();
+            	comunicaMessaggio("cliccare sul settore in cui si vuole dichiarare un rumore");
+            	actionListenerPulsanteSettore();
+            	annunciaRumore();
                 break;
             case "NESSUNA_GAMEROOM_DISPONIBILE":
-                //TODO
+                comunicaMessaggio("Non ci sono sale libere al momento: riprovare più tardi. La connessione verrà chiusa");
                 break;
             case "RISULTATO_ATTACCO":
             	ArrayList<String> informazioniAttacco = estraiInformazioniDaComando(comando);
@@ -480,6 +509,12 @@ public class GUI {
                 comunicaMessaggio("Partita terminata " + "(" + comando.get(0) + "). I vincitori sono: " + nomiVincitori); 
         }
     }
+	
+	private void abilitaSettori() {
+		for (Pulsante p : listaPulsantiSettore) {
+			p.getButton().setEnabled(true);
+		}
+	}
 	
 	private void comunicaRisultatoAttacco(ArrayList<String> informazioniAttacco) {
 		if (informazioniAttacco.size() == 2) {
@@ -548,7 +583,7 @@ public class GUI {
     						break;
     				}
     				inputInserito = true;
-    				p.getButton().setEnabled(false);  // disabilitare tutti
+    				disabilitaAltriPulsanti();
     				timer.stop();
 					mostraCountdown.setVisible(false);
 					synchronized(interfaccia){
@@ -556,6 +591,12 @@ public class GUI {
 					}
     			}
     		});
+    	}
+    }
+    
+    private void disabilitaAltriPulsanti() {
+    	for (Pulsante p : listaAltriPulsanti) {
+    		p.getButton().setEnabled(false);
     	}
     }
     
