@@ -74,6 +74,7 @@ public class GameServer implements BaseObserver{
     
     /**
      * lancia il server
+     * @param maxNumberOfClientsPerRoom numero massimo di clients per room
      * @throws IOException
      */
     public void startServer(int maxNumberOfClientsPerRoom) throws IOException {
@@ -227,7 +228,8 @@ public class GameServer implements BaseObserver{
         //server socket
         this.serverSocket = new ServerSocket(this.portSocket);
     	LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
-        while(true){
+        int counter = 2;
+    	while(counter>0){
                 ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
                 synchronized(this){
 	                if(!lastGameRoomAvailableHasStarted()){
@@ -243,7 +245,8 @@ public class GameServer implements BaseObserver{
 	                    clientSocket.close();
 	                }
                 } //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
-        } //while
+                counter--;
+    	} //while
     }
     
     /**

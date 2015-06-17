@@ -169,4 +169,12 @@ public class GameRoom extends BaseObservable implements BaseObserver{
 	public boolean hasAtLeastMinimumNumberOfClients() {
 		return this.manager.hasAtLeastMinimumNumberOfClients();
 	}
+	
+	/**
+	 * il model della ModelView, cioè quello aggiornato real time
+	 * @return
+	 */
+	public Model model(){
+	    return this.modelView.model();
+	}
 }

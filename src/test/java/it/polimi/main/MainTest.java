@@ -59,10 +59,10 @@ public class MainTest {
 	}
 	
 	@Test
-	public void tesPrimoTurnoUnGiocatore(){
+	public void testPrimoTurnoUnGiocatore(){
 		
 		//main specifico
-		Main main = new Main(1,viewSpy);
+		Main main = new Main(2,viewSpy);
 		rispostaPerView.setModel(main.model()); //passa una reference del model per costruire le risposte
 		rispostaPerView.setMainTest(this);
 		
@@ -72,17 +72,17 @@ public class MainTest {
 	    willAnswer(rispostaPerView.risposta(System.lineSeparator())).given(viewSpy).print(matches(PESCA_CARTA.pattern()));
         willAnswer(rispostaPerView.risposta("1")).given(viewSpy).print(matches(SCEGLIE_AZIONE.pattern()));
         willAnswer(rispostaPerView.risposta("announce: M09")).given(viewSpy).print(matches(ANNUNCIA_SETTORE.pattern()));
-        willAnswer(rispostaPerView.risposta("ABORT")).given(viewSpy).print(TURNO_FINITO.pattern());
+        //willAnswer(rispostaPerView.risposta("ABORT")).given(viewSpy).print(TURNO_FINITO.pattern());
 
 		//when
 		viewSpy.run();
 		
 		//then
 		verify(viewSpy,times(1)).run();
-		verify(viewSpy,times(1)).chiediMossa(any(Event.class));
-		verify(viewSpy,times(1)).comunicaSpostamento(anyString());
-		verify(viewSpy,times(1)).chiediAzione(Matchers.anyListOf(AzioneGiocatore.class));
-		verify(viewSpy,times(1)).comunicaTurnoFinito();
+		verify(viewSpy,atLeast(1)).chiediMossa(any(Event.class));
+		verify(viewSpy,atLeast(1)).comunicaSpostamento(anyString());
+		verify(viewSpy,atLeast(1)).chiediAzione(Matchers.anyListOf(AzioneGiocatore.class));
+		verify(viewSpy,atLeast(1)).comunicaTurnoFinito();
 		
 		//print posizioni
 		for(String posizione : posizioni)

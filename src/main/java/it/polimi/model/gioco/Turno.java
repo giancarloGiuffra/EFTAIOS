@@ -21,7 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class Turno {
 
-	private static final int MAX_TURNI = 1;
+	private static final int MAX_TURNI = 39;
 	private int turn_counter = 1;
 	private Player firstPlayer;
 	private Queue<Player> players;
