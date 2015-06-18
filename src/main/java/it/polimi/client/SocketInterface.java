@@ -24,7 +24,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
     protected static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
     private Boolean closed = false;
     private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO%(.+%){1,}COMANDO");
-    protected static final Integer TIME_LIMIT = 30; //in secondi
+    protected static final Integer TIME_LIMIT = 300; //in secondi
 	private static final long TIME_BETWEEN_INPUT_CHECKS = 1; // in secondi
 	
 	/**
