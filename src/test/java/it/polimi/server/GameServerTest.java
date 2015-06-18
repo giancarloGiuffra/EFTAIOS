@@ -43,21 +43,6 @@ public class GameServerTest {
     private RispostaPerServer rispostaClient1;
     private RispostaPerServer rispostaClient2;
     
-    /**
-     * classe ad hoc per far partire un server che accetta due client socket in un thread
-     * porta socket 65535
-     */
-    public class ServerSocketForTwoCLients implements Runnable{
-        public void run(){
-            GameServer server = new GameServer(65535,65510);
-            try {
-                server.startServerSocketOnlyForTest(2);
-            } catch (IOException e) {
-                LOGGER.log(Level.INFO, e.getMessage(), e);
-            }
-        }
-    }
-
     @Before
     public void inizializza(){
         client1 = spy(new SocketInterface());
@@ -71,7 +56,8 @@ public class GameServerTest {
     public void testServerSocketForTwoCLients(){
         
         //game server specifico
-        (new Thread(new ServerSocketForTwoCLients())).start();
+        Thread server = new Thread(new ServerSocketForTwoCLients());
+        server.start();
         
         //given - behavior client1
         //willAnswer(rispostaClient1.risposta(System.lineSeparator())).given(client1).print(matches(BENVENUTO.pattern()));
@@ -90,8 +76,10 @@ public class GameServerTest {
         //when
         client1.connectToServer();
         client2.connectToServer();
-        (new Thread(client1)).start();
-        (new Thread(client2)).start();
+        Thread client1Thread = new Thread(client1);
+        Thread client2Thread = new Thread(client2);
+        client1Thread.start();
+        client2Thread.start();
         
     }
 

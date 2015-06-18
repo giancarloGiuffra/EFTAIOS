@@ -276,5 +276,16 @@ public class GameServer implements BaseObserver{
         }
     	
     }
+
+    /**
+     * chiude il server
+     */
+    public void close() {
+        try {
+            this.serverSocket.close();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Si chiude il server", e);
+        }
+    }
 	
 }
