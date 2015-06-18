@@ -615,7 +615,7 @@ public class GUI {
     	istruzioni.setBorder(new EmptyBorder(10, 20, 10, 20));
     	conferma.addActionListener(new ActionListener() {
     		public void actionPerformed(ActionEvent e) {
-    			inputDaInviare = "\n";
+    			inputDaInviare = System.lineSeparator();
     			inputInserito = true;
     			frame.setVisible(false);
     			disabilitaAltriPulsanti();
