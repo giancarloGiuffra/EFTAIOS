@@ -561,6 +561,8 @@ public class GUI {
     						break;
     					case "Pesca una carta":	// sistemare: server si aspetta un ulteriore input
     						inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
+    						inputInserito = true;
+    						confermaPescaCarta();
     						break;
     					case "Nessun attacco":
     						inputDaInviare = getIndiceAzione(azioniPossibili, "NON_ATTACCA");
@@ -592,6 +594,38 @@ public class GUI {
     		}
     	}
     	return String.valueOf(indice);
+    }
+    
+    private void confermaPescaCarta() {
+    	final JFrame frame = new JFrame("Pesca una carta");
+    	JPanel pannello = new JPanel();
+    	JLabel istruzioni = new JLabel("Clicca sul pulsante per pescare la carta", SwingConstants.CENTER);
+    	JButton conferma = new JButton("Pesca");
+    	istruzioni.setBorder(new EmptyBorder(10, 20, 10, 20));
+    	conferma.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			inputDaInviare = "\n";
+    			inputInserito = true;
+    			frame.setVisible(false);
+    			synchronized(interfaccia){
+				    interfaccia.notifyAll(); 
+				}
+    		}
+    	});
+    	pannello.setLayout(new BorderLayout());
+    	pannello.add(istruzioni, BorderLayout.NORTH);
+    	pannello.add(conferma, BorderLayout.CENTER);
+    	frame.add(pannello);
+    	frame.getContentPane();
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				confermaPescaCarta();
+			}
+		});
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     }
 	
 }
