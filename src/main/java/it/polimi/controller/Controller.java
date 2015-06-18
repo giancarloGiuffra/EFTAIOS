@@ -313,7 +313,11 @@ public class Controller extends BaseObservable implements BaseObserver {
 	 * Chiedi mossa al giocatore
 	 */
 	private void chiediMossa() {
-        this.view.chiediMossa(new RichiediMossaEvent(this.model.calcolaSettoriValidiForCurrentPlayer()));
+	    try{
+	        this.view.chiediMossa(new RichiediMossaEvent(this.model.calcolaSettoriValidiForCurrentPlayer()));
+	    } catch(Exception ex){
+	        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+	    }
     }
 
     /**
