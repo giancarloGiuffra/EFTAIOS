@@ -163,7 +163,7 @@ public class GUI {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {	// risolvere: se è il secondo giocatore ad uscire, si ha errore dal server
+			public void windowClosing(WindowEvent e) {	
 				interfaccia.close();  
 			}
 		});
@@ -180,7 +180,7 @@ public class GUI {
 		
 	}
 	
-	public void setColorePulsante(String nomeLista, JButton pulsante) {
+	private void setColorePulsante(String nomeLista, JButton pulsante) {
 		switch(nomeLista) {
 			case "Inaccessibili":
 				pulsante.setVisible(false);
@@ -364,6 +364,10 @@ public class GUI {
 		this.inputInserito = true;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String annunciaInput() {
 		this.inputInserito = false;
 		return this.inputDaInviare;
@@ -433,6 +437,10 @@ public class GUI {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param list
+	 */
 	public void decoderComando(List<String> list) {
         String nomeComando = list.get(0);
         switch(nomeComando) {
@@ -558,18 +566,21 @@ public class GUI {
     				switch(p.getNomePulsante()) {
     					case "Attacco":
     						inputDaInviare = getIndiceAzione(azioniPossibili, "ATTACCA");
+    						disabilitaAltriPulsanti();
+    						inputInserito = true;
     						break;
     					case "Pesca una carta":	// sistemare: server si aspetta un ulteriore input
     						inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
+    						disabilitaAltriPulsanti();
     						inputInserito = true;
     						confermaPescaCarta();
     						break;
     					case "Nessun attacco":
     						inputDaInviare = getIndiceAzione(azioniPossibili, "NON_ATTACCA");
+    						disabilitaAltriPulsanti();
+    						inputInserito = true;
     						break;
     				}
-    				inputInserito = true;
-    				disabilitaAltriPulsanti();
     				timer.stop();
 					mostraCountdown.setVisible(false);
 					synchronized(interfaccia){
@@ -607,6 +618,7 @@ public class GUI {
     			inputDaInviare = "\n";
     			inputInserito = true;
     			frame.setVisible(false);
+    			disabilitaAltriPulsanti();
     			synchronized(interfaccia){
 				    interfaccia.notifyAll(); 
 				}
@@ -626,6 +638,44 @@ public class GUI {
 			}
 		});
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    }
+    
+    /**
+     * Italian: metodo di supporto per i test, che crea una nuova lista di pulsanti associati ai settori.
+     * English: method used as support for tests, whose purpose is to create a new list of buttons associated to the sectors.
+     * @return listaPulsantiSettore
+     */
+    public List<Pulsante> creaListaPulsantiSettoreHelpTest() {
+    	creaListaPulsantiSettore();
+    	ArrayList<Pulsante> listaPerTest = new ArrayList<Pulsante>();
+    	listaPerTest = this.listaPulsantiSettore;
+    	return listaPerTest;
+    }
+    
+    /**
+     * Italian:
+     * English:
+     * @param nomeLista
+     * @param pulsante
+     */
+    public void setColorePulsanteHelpTest(String nomeLista, JButton pulsante) {
+    	setColorePulsante(nomeLista, pulsante);
+    }
+    
+    /**
+     * 
+     */
+    public void evidenziaSpostamentoHelpTest(Pulsante pulsante) {
+    	evidenziaSpostamento(pulsante);
+    }
+    
+    /**
+     * 
+     * @param azioniPossibili
+     * @param azioneCercata
+     */
+    public void getIndiceAzioneHelpTest(List<String> azioniPossibili, String azioneCercata) {
+    	getIndiceAzione(azioniPossibili, azioneCercata);
     }
 	
 }
