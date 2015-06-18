@@ -380,7 +380,7 @@ public class GUI {
 	private void setAspettoPulsante() {
 		for (Pulsante p : listaPulsantiSettore) {
 			p.getButton().setBounds(p.getAscissa(), p.getOrdinata(), larghezzaPulsanteSettore, altezzaPulsanteSettore);
-			p.getButton().setFont(new Font("Dialog", Font.BOLD, larghezzaPulsanteSettore/5));
+			p.getButton().setFont(new Font("Dialog", Font.BOLD, (larghezzaPulsanteSettore-3)/5));
 			p.getButton().setEnabled(false);
 			centralPanel.add(p.getButton());
 		}
@@ -463,6 +463,7 @@ public class GUI {
                 break;
             case "PESCA_CARTA":
                 attivaPulsantePescaCarta();
+                assegnaActionListenerAltriPulsanti(nomeComando);
                 break;
             case "SILENZIO_DICHIARATO":
                 comunicaMessaggio(nomeGiocatore + " (" + razzaGiocatore + ") ha dichiarato 'SILENZIO' ");
@@ -559,6 +560,10 @@ public class GUI {
         countdownPerMossa = 30;
     }
     
+    private void postInserimentoInput() {
+    	
+    }
+    
     private void assegnaActionListenerAltriPulsanti(final List<String> azioniPossibili) {
     	for (final Pulsante p : listaAltriPulsanti) {
     		p.getButton().addActionListener(new ActionListener() {
@@ -591,6 +596,18 @@ public class GUI {
     	}
     }
     
+    private void assegnaActionListenerAltriPulsanti(String azionePescaCarta) {
+    	for (final Pulsante p : listaAltriPulsanti) {
+    		if (p.getNomePulsante().equals("Pesca una carta")) {
+    			p.getButton().addActionListener(new ActionListener() {
+    				public void actionPerformed(ActionEvent e) {
+    					confermaPescaCarta();
+    				}
+    			});
+    		}
+    	}
+    }
+    
     private void disabilitaAltriPulsanti() {
     	for (Pulsante p : listaAltriPulsanti) {
     		p.getButton().setEnabled(false);
@@ -619,6 +636,8 @@ public class GUI {
     			inputInserito = true;
     			frame.setVisible(false);
     			disabilitaAltriPulsanti();
+    			timer.stop();
+    			mostraCountdown.setVisible(false);
     			synchronized(interfaccia){
 				    interfaccia.notifyAll(); 
 				}
