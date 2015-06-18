@@ -290,8 +290,8 @@ public class View extends BaseObservable implements Runnable {
 	 */
 	private void chiediDiPescareCarta() {
         print("Devi pescare una Carta Settore. Premi invio per procedere.");
-        printRichiedeInput();
         this.sendCommandPescaCarta();
+        printRichiedeInput();
         String invio = this.readLine(); //Verifica se utente ha premuto invio
         Event event = new UserPicksCardEvent();
         if(!connectionError(invio)) this.notify(event);

@@ -130,7 +130,7 @@ public class Turno {
 	 */
 	public void putCurrentPlayerToSleep() {
 		if(this.currentPlayer().equals(firstPlayer)) this.firstPlayer = this.getNextFirstPlayer();
-		this.playersInStandBy.add(this.players.remove());
+		if(!this.players.isEmpty()) this.playersInStandBy.add(this.players.remove());
 	}
 
 	public Boolean isThisLastPlayerDisconnecting() {

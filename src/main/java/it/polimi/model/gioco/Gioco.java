@@ -95,7 +95,10 @@ public class Gioco extends BaseObservable {
      * @return il nome del giocatore corrente
      */
     public String currentPlayerName(){
-        return this.currentPlayer().nome();
+        if(!isThisLastPlayerDisconnecting())
+            return this.currentPlayer().nome();
+        else
+            return "DEFAULT";
     }
     
     /**
@@ -103,7 +106,10 @@ public class Gioco extends BaseObservable {
      * @return
      */
     public String currentPlayerPosition(){
-    	return this.positions.get(this.currentPlayer()).getNome();
+        if(!isThisLastPlayerDisconnecting())
+            return this.positions.get(this.currentPlayer()).getNome();
+        else
+            return "DEFAULT";
     }
     
     /**
