@@ -401,6 +401,7 @@ public class GUI {
 				public void actionPerformed(ActionEvent e) {
 					settoreAnnunciato = p.getNomePulsante();
 					faseSpostamento = true;
+					actionListenerPulsanteSettore();
 				}
 			});
 		}
@@ -409,6 +410,9 @@ public class GUI {
 	private void annunciaRumore() {
 		this.inputDaInviare = new String("announce: " + this.settoreAnnunciato);
 		this.inputInserito = true;
+		synchronized(interfaccia){
+		    interfaccia.notifyAll();
+		}
 	}
 	
 	private void assegnaActionListenerSpostamento() {
@@ -423,6 +427,7 @@ public class GUI {
 					timer.stop();
 					mostraCountdown.setVisible(false);
 					faseSpostamento = false;
+					actionListenerPulsanteSettore();
 					synchronized(interfaccia){
 					    interfaccia.notifyAll(); //l'intero blocco dovrà essere inserito in ogni metodo che generi un input per il server
 					} 
@@ -476,7 +481,6 @@ public class GUI {
             	comunicaMessaggio("cliccare sul settore in cui si vuole dichiarare un rumore");
             	actionListenerPulsanteSettore();
             	annunciaRumore();
-            	actionListenerPulsanteSettore();
                 break;
             case "NESSUNA_GAMEROOM_DISPONIBILE":
                 comunicaMessaggio("Non ci sono sale libere al momento: riprovare più tardi. La connessione verrà chiusa");
@@ -491,6 +495,8 @@ public class GUI {
                 break;
             case "TURNO_FINITO":
                 comunicaMessaggio("Non ci sono altre mosse possibili per il turno corrente");
+                faseSpostamento = true;
+                actionListenerPulsanteSettore();
                 break;
             case "MORTO":
                 comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
