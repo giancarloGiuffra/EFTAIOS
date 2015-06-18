@@ -400,6 +400,7 @@ public class GUI {
 			p.getButton().addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					settoreAnnunciato = p.getNomePulsante();
+					annunciaRumore();
 					faseSpostamento = true;
 					actionListenerPulsanteSettore();
 				}
@@ -480,7 +481,7 @@ public class GUI {
             	abilitaSettori();
             	comunicaMessaggio("cliccare sul settore in cui si vuole dichiarare un rumore");
             	actionListenerPulsanteSettore();
-            	annunciaRumore();
+            	//annunciaRumore();
                 break;
             case "NESSUNA_GAMEROOM_DISPONIBILE":
                 comunicaMessaggio("Non ci sono sale libere al momento: riprovare più tardi. La connessione verrà chiusa");
