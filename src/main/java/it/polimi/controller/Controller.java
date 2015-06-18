@@ -145,8 +145,7 @@ public class Controller extends BaseObservable implements BaseObserver {
 		this.model.putCurrentPlayerToSleep(); //dopo aver ripristinato la model view il current player è quello che si è sconnesso
 		this.notify(new ControllerUpdateModel(this.model.model())); //importante aggiornare il model
 		if(!model.isThisLastPlayerDisconnecting()){
-		    this.model.checkIfGameOver(); //check game over visto che è stata saltata data la connessione persa
-		    this.startTurn();
+		    this.model.checkIfGameOver(); //check game over visto che è stata saltata data la connessione persa (nb: dopo il controllo fa continuare il gioco)
 		}
 		else return;		
 	}
@@ -156,7 +155,7 @@ public class Controller extends BaseObservable implements BaseObserver {
 	 * @param model
 	 */
 	public void setModelView(Model model){
-		this.model = new ModelView(model);
+		this.model.setModel(model);
 		this.model.addObserver(this);
 	}
 

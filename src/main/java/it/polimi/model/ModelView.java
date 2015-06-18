@@ -22,6 +22,14 @@ public class ModelView extends BaseObservable {
 		this.model = new Model(model);
 	}
 	
+	/**
+	 * assegna al model una copia del model passato
+	 * @param model
+	 */
+	public void setModel(Model model){
+	    this.model = new Model(model);
+	}
+	
 	@Override
 	public void addObserver(BaseObserver obs) {
 		model.addObserver(obs);
