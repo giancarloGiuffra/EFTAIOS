@@ -37,7 +37,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
     private Boolean closed = false;
     protected static final Integer TIME_BETWEEN_CONNECTION_CHECKS = 10000; //in miliseconds
     private static final Pattern PATTERN_COMANDO = Pattern.compile("COMANDO%(.+%){1,}COMANDO");
-    protected static final Integer TIME_LIMIT = 30; //in secondi
+    protected static final Integer TIME_LIMIT = 300; //in secondi
 	protected static final long TIME_BETWEEN_INPUT_CHECKS = 1; //in secondi
 	
 	/**
@@ -45,6 +45,15 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 */
 	public RMIInterface(){
 		
+	}
+	
+	/**
+	 * getter per TIME_LIMIT
+	 * @return
+	 */
+	@Override
+	public Integer timeLimit(){
+		return TIME_LIMIT;
 	}
 	
 	@Override

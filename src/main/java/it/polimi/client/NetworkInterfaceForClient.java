@@ -18,5 +18,12 @@ public interface NetworkInterfaceForClient extends Runnable{
 	 * stampa all'utente
 	 */
 	void print(String string);
+	
+	
+	/**
+	 * time limit per input
+	 * @return
+	 */
+	public Integer timeLimit();
 
 }

@@ -42,6 +42,15 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	    this.stdIn = stdIn;
 	}
 	
+	/**
+	 * getter per TIME_LIMIT
+	 * @return
+	 */
+	@Override
+	public Integer timeLimit(){
+		return TIME_LIMIT;
+	}
+	
 	@Override
 	public Boolean connectToServer() {
 		print("Inserisci l'Indirizzo IP del Server: ");

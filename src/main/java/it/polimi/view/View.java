@@ -133,6 +133,7 @@ public class View extends BaseObservable implements Runnable {
 		if(connectionError(mossa)) return; //esce
 		while(!isValidMossa(mossa)){
 			print("La mossa inserita non è valida. Inserirne un'altra.");
+			this.sendCommandChiediMossa(event);
 			printRichiedeInput();
 			mossa = this.readLine();
 			if(connectionError(mossa)) return; //esce
@@ -210,7 +211,7 @@ public class View extends BaseObservable implements Runnable {
         AzioneGiocatore scelta = this.printListaAzioniERestituisceScelta(azioni);
         switch(scelta){
         case PESCA_CARTA:
-        	this.chiediDiPescareCarta();
+        	this.notify(new UserPicksCardEvent());
         	break;
         case ATTACCA:
         	this.notify(new UserAttackEvent());
@@ -356,6 +357,7 @@ public class View extends BaseObservable implements Runnable {
 		if(connectionError(announce)) return; //esce
 		while(!isValidAnnouncement(announce)){
 			print("L'annuncio inserito non è valido. Inserirne un altro.");
+			this.sendCommandChiediSettoreDaAnnunciare();
 			printRichiedeInput();
 			announce = this.readLine();
 			if(connectionError(announce)) return; //esce

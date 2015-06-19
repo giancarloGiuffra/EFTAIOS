@@ -61,7 +61,7 @@ public class GUI {
 	private String inputDaInviare;
 	private NetworkInterfaceForClient interfaccia;
 	private Timer timer;
-	private int countdownPerMossa = 30;   // il giocatore ha a disposizione 30 secondi per effettuare la sua mossa
+	private int countdownPerMossa;   // il giocatore ha a disposizione 30 secondi per effettuare la sua mossa
 	private int tempoAggiornamentoCountdown = 1;  
 	private JLabel mostraCountdown = new JLabel("" + countdownPerMossa);
 	private boolean faseSpostamento = true;
@@ -72,6 +72,7 @@ public class GUI {
 	 */
 	public GUI(NetworkInterfaceForClient interfaccia){
 	    this.interfaccia = interfaccia;
+	    this.countdownPerMossa = this.interfaccia.timeLimit();
 	}
 	
 	private void getLookAndFeel() {
@@ -164,7 +165,8 @@ public class GUI {
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {	
-				interfaccia.close();  
+				interfaccia.close();
+				System.exit(1);
 			}
 		});
 	}
@@ -475,7 +477,8 @@ public class GUI {
                 break;
             case "PESCA_CARTA":
                 removeAllActionsListeners();
-                assegnaActionListenerAltriPulsanti(nomeComando);
+                //assegnaActionListenerAltriPulsanti(nomeComando);
+                assegnaActionListenerPulsanteCarta();
                 attivaPulsantePescaCarta();
                 break;
             case "SILENZIO_DICHIARATO":
@@ -521,6 +524,23 @@ public class GUI {
         }
     }
 	
+	private void assegnaActionListenerPulsanteCarta() {
+		for (final Pulsante p : listaAltriPulsanti) {
+    		p.getButton().addActionListener(new ActionListener() {
+    			public void actionPerformed(ActionEvent e) {
+    				inputDaInviare = "";
+					disabilitaAltriPulsanti();
+					inputInserito = true;
+					timer.stop();
+					mostraCountdown.setVisible(false);
+					synchronized(interfaccia){
+					    interfaccia.notifyAll(); //l'intero blocco dovrà essere inserito in ogni metodo che generi un input per il server
+					}
+    			}
+    		});
+		}
+	}
+
 	private void comunicaSettoreAnnunciato(List<String> list) {
         if(list.size()==3)
             comunicaMessaggio(list.get(1) + "ha dichiarato un RUMORE in " + list.get(2));
@@ -589,7 +609,7 @@ public class GUI {
         timer = new Timer(tempoAggiornamentoCountdown*1000, scorrimentoSecondi);
         timer.setInitialDelay(0);
         timer.start();
-        countdownPerMossa = 30;
+        countdownPerMossa = this.interfaccia.timeLimit();
     }
     
     private void postInserimentoInput() {
@@ -610,7 +630,7 @@ public class GUI {
     						inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
     						disabilitaAltriPulsanti();
     						inputInserito = true;
-    						confermaPescaCarta();//TODO l'annidamento dei notify genera il problema mi sembra
+    						//confermaPescaCarta();//TODO l'annidamento dei notify genera il problema mi sembra
     						break;
     					case "Nessun attacco":
     						inputDaInviare = getIndiceAzione(azioniPossibili, "NON_ATTACCA");
