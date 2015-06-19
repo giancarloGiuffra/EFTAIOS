@@ -689,5 +689,21 @@ public class GUI {
     public void registraSpostamentoHelpTest(Pulsante pulsante) {
     	registraSpostamento(pulsante);
     }
+    
+    /**
+     * Italian: metodo di supporto per i test, utilizzato semplicemente per chiamare il metodo "abilitaAltriPulsanti".
+     * English: method used as support for tests, whose function only consists in calling the method "abilitaAltriPulsanti".
+     */
+    public void abilitaAltriPulsantiHelpTest(List<String> azioniPossibili) {
+    	abilitaAltriPulsanti(azioniPossibili);
+    }
+    
+    /**
+     * Italian: metodo di supporto per i test, utilizzato semplicemente per chiamare il metodo "creaGUI".
+     * English: method used as support for tests, whose function only consists in calling the method "creaGUI".
+     */
+    public void creaGUIHelpTest() {
+    	creaGUI();
+    }
 	
 }
