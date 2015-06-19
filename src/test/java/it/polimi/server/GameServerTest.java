@@ -57,7 +57,7 @@ public class GameServerTest implements BaseObserver{
 
     }
     
-    @Test
+    /*@Test
     public void testServerSocketForTwoCLients(){
         
         //set up
@@ -96,7 +96,7 @@ public class GameServerTest implements BaseObserver{
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		} //wait for server to finish
         server.close(); //chiude server , libera la porta
-    }
+    }*/
 
 	@Override
 	public void notifyRicevuto(BaseObservable source, Event event) {
