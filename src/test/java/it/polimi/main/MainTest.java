@@ -72,7 +72,6 @@ public class MainTest {
 	    willAnswer(rispostaPerView.risposta(System.lineSeparator())).given(viewSpy).print(matches(PESCA_CARTA.pattern()));
         willAnswer(rispostaPerView.risposta("1")).given(viewSpy).print(matches(SCEGLIE_AZIONE.pattern()));
         willAnswer(rispostaPerView.risposta("announce: M09")).given(viewSpy).print(matches(ANNUNCIA_SETTORE.pattern()));
-        //willAnswer(rispostaPerView.risposta("ABORT")).given(viewSpy).print(TURNO_FINITO.pattern());
 
 		//when
 		viewSpy.run();

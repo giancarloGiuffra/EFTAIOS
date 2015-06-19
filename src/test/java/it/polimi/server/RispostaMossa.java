@@ -13,16 +13,17 @@ public class RispostaMossa extends Risposta {
 
 	private static final Pattern TURNO = Pattern.compile("Tocca a .* Posizione (?<posizione>.{3})");
 	private Model model;
+	private GameServerTest gameServerTest;
 	
 	/**
 	 * Costruttore
 	 * @param view
 	 * @param string
-	 * @param model
+	 * @param gameServerTest 
 	 */
-	public RispostaMossa(SocketInterface socketInterface, String string, Model model) {
+	public RispostaMossa(SocketInterface socketInterface, String string, GameServerTest gameServerTest) {
 		super(socketInterface, string);
-		this.model = model;
+		this.gameServerTest = gameServerTest;
 	}
 	
 	/**
@@ -34,6 +35,11 @@ public class RispostaMossa extends Risposta {
 		Matcher matcher = TURNO.matcher(arg);
 		if(matcher.matches()){
 			String posizione = matcher.group("posizione");
+			while(model==null){
+				synchronized(this.gameServerTest){
+					this.gameServerTest.wait(); //si blocca finchè non si aggiorna il model
+				}
+			}
 			String risposta = String.format("move to: %s", model.tabellone().getRandomAdjacentSector(posizione).getNome());
 			this.socketInterface.setStdIn(risposta(risposta));
 		}

@@ -10,9 +10,14 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import it.polimi.client.SocketInterface;
+import it.polimi.common.observer.BaseObservable;
+import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
+import it.polimi.common.observer.SetModelInGameServerTest;
+import it.polimi.controller.Controller;
 import it.polimi.main.Main;
 import it.polimi.main.RispostaPerView;
+import it.polimi.model.Model;
 import it.polimi.model.player.AzioneGiocatore;
 import it.polimi.view.PrintWriterPlus;
 import it.polimi.view.View;
@@ -27,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-public class GameServerTest {
+public class GameServerTest implements BaseObserver{
     
     private static final Logger LOGGER = Logger.getLogger(GameServerTest.class.getName());
     private static final Pattern CHIEDI_MOSSA = Pattern.compile("Indica la tua mossa:.*", Pattern.DOTALL); //DOTALL fa che . matchi anche i line terminator
@@ -55,11 +60,21 @@ public class GameServerTest {
     @Test
     public void testServerSocketForTwoCLients(){
         
-        //game server specifico
-        Thread server = new Thread(new ServerSocketForTwoCLients());
-        server.start();
-        
-        //given - behavior client1
+        //set up
+    	Thread client1Thread = new Thread(client1);
+        Thread client2Thread = new Thread(client2);
+        ServerSocketForTwoCLients server = new ServerSocketForTwoCLients(client1Thread,client2Thread);
+        this.rispostaClient1.setGameServerTest(this);
+        this.rispostaClient2.setGameServerTest(this);
+        server.addObserver(this); //per inviare l'aggiornamento del model per le risposte che dipendono dala posizione del client
+        Thread serverThread = new Thread(server);
+        serverThread.start();
+        client1.connectToServer();
+        client1Thread.start();
+        client2.connectToServer(); 
+        client2Thread.start(); // dovrei avere serverThread che aspetta nel join con i due client trhead che aspettano le comunicazioni dal server
+    	
+    	//given - behavior client1
         //willAnswer(rispostaClient1.risposta(System.lineSeparator())).given(client1).print(matches(BENVENUTO.pattern()));
         willAnswer(rispostaClient1.risposta("mossa_aleatoria")).given(client1).print(matches(TURNO.pattern()));
         willAnswer(rispostaClient1.risposta(System.lineSeparator())).given(client1).print(matches(PESCA_CARTA.pattern()));
@@ -74,14 +89,29 @@ public class GameServerTest {
         willAnswer(rispostaClient2.risposta("announce: M09")).given(client2).print(matches(ANNUNCIA_SETTORE.pattern()));
 
         //when
-        client1.connectToServer();
-        client2.connectToServer();
-        Thread client1Thread = new Thread(client1);
-        Thread client2Thread = new Thread(client2);
-        client1Thread.start();
-        client2Thread.start();
-        
+        (new Thread(server.gameRoom())).start();//faccio partire la game room
+        try {
+			serverThread.join();
+		} catch (InterruptedException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		} //wait for server to finish
+        server.close(); //chiude server , libera la porta
     }
+
+	@Override
+	public void notifyRicevuto(BaseObservable source, Event event) {
+		if(source instanceof ServerSocketForTwoCLients){
+			if(event.name().equals("SetModelInGameServerTest")){
+				Model model = ((SetModelInGameServerTest)event).model();
+				this.rispostaClient1.setModel(model);
+				this.rispostaClient2.setModel(model);
+				synchronized(this){
+					this.notifyAll(); //neccessario per le risposte che stanno aspettando l'assegnamento del model
+				}
+			}
+		}
+		
+	}
 
 
 }

@@ -5,6 +5,7 @@ import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
 import it.polimi.common.observer.ServerNewClientRMIEvent;
+import it.polimi.common.observer.SetModelInGameServerTest;
 import it.polimi.server.exceptions.IllegalObservableForGameServer;
 import it.polimi.server.rmi.ClientRMI;
 import it.polimi.server.rmi.ClientRMIFactory;
@@ -216,9 +217,13 @@ public class GameServer implements BaseObserver{
 	
 	/**
      * lancia il server solo per socket connection - usato nei test - ammette solo due connessioni e fa partire la gameroom
+	 * @param thread2 
+	 * @param thread1 
+	 * @param serverSocketForTwoCLients 
      * @throws IOException
+	 * @throws InterruptedException 
      */
-    public void startServerSocketOnlyForTest(int maxNumberOfClientsPerRoom) throws IOException {
+    public void startServerSocketOnlyForTest(int maxNumberOfClientsPerRoom, Thread thread1, Thread thread2, ServerSocketForTwoCLients serverSocketForTwoCLients) throws IOException, InterruptedException {
     	
     	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
     	
@@ -235,9 +240,9 @@ public class GameServer implements BaseObserver{
 	                if(!lastGameRoomAvailableHasStarted()){
 	                	this.currentGameRoom.addClient(clientSocket);
 	                    if(this.currentGameRoom.hasAtLeastMinimumNumberOfClients() && !this.currentGameRoom.hasStarted()){
-	                    	GameRoom gameRoomToLaunch = makeNewGameRoomAvailable();
-	                    	gameRoomToLaunch.cancelTimer();
-	                    	gameRoomToLaunch.start();
+	                    	this.currentGameRoom.cancelTimer();
+	                    	this.currentGameRoom.setUp();
+	                    	serverSocketForTwoCLients.notifyEvent(new SetModelInGameServerTest(this.currentGameRoom.model()));
 	                    }
 	                }else {
 	                    clientSocket.write("Ci dispiace l'ultima sala si è riempita. Prova per favore a connetterti più tardi. Questa connessione verrà chiusa");

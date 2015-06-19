@@ -7,6 +7,7 @@ public class RispostaPerServer {
 	
 	private SocketInterface socketInterface;
 	private Model model;
+	private GameServerTest gameServerTest;
 	
 	/**
 	 * Costruttore
@@ -25,13 +26,21 @@ public class RispostaPerServer {
 	}
 	
 	/**
+	 * setter per gameServerTest
+	 * @param gameServerTest
+	 */
+    public void setGameServerTest(GameServerTest gameServerTest) {
+		this.gameServerTest = gameServerTest;
+	}
+	
+	/**
 	 * restituisce risposte per la view
 	 * @param string
 	 * @return
 	 */
 	public Risposta risposta(String string){
 		if("mossa_aleatoria".equals(string))
-			return new RispostaMossa(socketInterface, string, model);
+			return new RispostaMossa(socketInterface, string, this.gameServerTest);
 		return new Risposta(socketInterface, string);
 	}
 		

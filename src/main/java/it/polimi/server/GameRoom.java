@@ -18,7 +18,7 @@ import it.polimi.server.exceptions.IllegalObservableForClientManager;
 import it.polimi.server.exceptions.IllegalObservableForGameRoom;
 import it.polimi.view.View;
 
-public class GameRoom extends BaseObservable implements BaseObserver{
+public class GameRoom extends BaseObservable implements BaseObserver, Runnable{
     
     private static final Integer TIME_LIMIT_FOR_START = 5; // in minuti
 	private Model model;
@@ -61,6 +61,22 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     }
     
     /**
+     * fa il set up senza far partire il gioco - usato per il momento dal game server test
+     */
+    public void setUp(){
+    	this.model = new Model(this.manager.numeroGiocatori());
+        this.modelView = new ModelView(this.model);
+        this.manager.inizializza(this.model.players(), this.model.posizioni());
+        this.view = new View(this.manager.currentClient().in(), this.manager.currentClient().out());
+        this.controller = new Controller(modelView,view);
+        this.controller.addObserver(this);
+        this.modelView.addObserver(controller);
+        this.view.addObserver(this.manager); //importante che manager sia il primo observer
+        this.view.addObserver(controller);
+        this.hasStarted = true;
+    }
+    
+    /**
      * restituisce true se la sala è piena
      * @return
      */
@@ -90,9 +106,10 @@ public class GameRoom extends BaseObservable implements BaseObserver{
     }
     
     /**
-     * lancia il gioco
+     * lancia la game room
      */
-    private void run() {        
+    @Override
+    public void run() {        
         (new Thread(view)).start();     
     }
     
