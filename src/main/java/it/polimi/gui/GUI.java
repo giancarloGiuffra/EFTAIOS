@@ -127,7 +127,7 @@ public class GUI {
 		centralPanel.setLayout(null);
 		creaListaPulsantiSettore();
 		setAspettoPulsante();
-		actionListenerPulsanteSettore();
+		//actionListenerPulsanteSettore();
 		//assegnaActionListenerSpostamento();	
 		contenitoreAltriElementi.add(nessunAttacco.getButton());
 		contenitoreAltriElementi.add(attacco.getButton());  
@@ -400,9 +400,12 @@ public class GUI {
 			p.getButton().addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					settoreAnnunciato = p.getNomePulsante();
+					impedisciAltriMovimenti();
+					timer.stop();
+					mostraCountdown.setVisible(false);
 					annunciaRumore();
-					faseSpostamento = true;
-					actionListenerPulsanteSettore();
+					//faseSpostamento = true;
+					//actionListenerPulsanteSettore();
 				}
 			});
 		}
@@ -427,8 +430,8 @@ public class GUI {
 					impedisciAltriMovimenti();
 					timer.stop();
 					mostraCountdown.setVisible(false);
-					faseSpostamento = false;
-					actionListenerPulsanteSettore();
+					//faseSpostamento = false;
+					//actionListenerPulsanteSettore();
 					synchronized(interfaccia){
 					    interfaccia.notifyAll(); //l'intero blocco dovrà essere inserito in ogni metodo che generi un input per il server
 					} 
@@ -456,6 +459,8 @@ public class GUI {
                 break;
             case "ABILITA_SETTORI":
                 List<String> settoriAdiacenti = estraiInformazioniDaComando(list);
+                removeAllActionsListeners();
+                assegnaActionListenerSpostamento();
                 abilitaSettoriAdiacenti(settoriAdiacenti);
                 break;
             case "CONNESSIONE_PERSA":	
@@ -464,23 +469,29 @@ public class GUI {
                 break;
             case "SCEGLIE_AZIONE":		
             	List<String> azioniPossibili = estraiInformazioniDaComando(list);
+            	removeAllActionsListeners();
             	assegnaActionListenerAltriPulsanti(azioniPossibili);
                 abilitaAltriPulsanti(azioniPossibili);
                 break;
             case "PESCA_CARTA":
-                attivaPulsantePescaCarta();
+                removeAllActionsListeners();
                 assegnaActionListenerAltriPulsanti(nomeComando);
+                attivaPulsantePescaCarta();
                 break;
             case "SILENZIO_DICHIARATO":
-                comunicaMessaggio(nomeGiocatore + " (" + razzaGiocatore + ") ha dichiarato 'SILENZIO' ");
+                //TODO gestire due casi: 1) arriva solo silenzio dichiarato, 2) arriva silenzio dichiarato + nome (estrai le info dal comando!!!)
+                comunicaSilenzioDichiarato(list);
                 break;
             case "SETTORE_ANNUNCIATO":
-                comunicaMessaggio(nomeGiocatore + " (" + razzaGiocatore + ") ha dichiarato un RUMORE in " + settoreAnnunciato);
+                //TODO gestire due casi: leggi comando.java (estrai le info dal comando!!!)
+                comunicaSettoreAnnunciato(list);
                 break;
             case "SETTORE_DA_ANNUNCIARE":
-            	abilitaSettori();
-            	comunicaMessaggio("cliccare sul settore in cui si vuole dichiarare un rumore");
-            	actionListenerPulsanteSettore();
+            	removeAllActionsListeners();
+            	actionListenerAnnuncioSettore();
+                abilitaSettori();
+                comunicaMessaggio("cliccare sul settore in cui si vuole dichiarare un rumore");
+            	//actionListenerPulsanteSettore();
             	//annunciaRumore();
                 break;
             case "NESSUNA_GAMEROOM_DISPONIBILE":
@@ -496,8 +507,8 @@ public class GUI {
                 break;
             case "TURNO_FINITO":
                 comunicaMessaggio("Non ci sono altre mosse possibili per il turno corrente");
-                faseSpostamento = true;
-                actionListenerPulsanteSettore();
+                //faseSpostamento = true;
+                //actionListenerPulsanteSettore();
                 break;
             case "MORTO":
                 comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
@@ -510,7 +521,21 @@ public class GUI {
         }
     }
 	
-	private void abilitaSettori() {
+	private void comunicaSettoreAnnunciato(List<String> list) {
+        if(list.size()==3)
+            comunicaMessaggio(list.get(1) + "ha dichiarato un RUMORE in " + list.get(2));
+        else
+            comunicaMessaggio("hai dichiarato un RUMORE in " + list.get(1));
+    }
+
+    private void comunicaSilenzioDichiarato(List<String> list) {
+        if(list.size()==2)
+            comunicaMessaggio( list.get(1) + "ha dichiarato 'SILENZIO' ");
+        else
+            comunicaMessaggio("hai dichiarato 'SILENZIO' ");
+    }
+
+    private void abilitaSettori() {
 		for (Pulsante p : listaPulsantiSettore) {
 			p.getButton().setEnabled(true);
 		}
@@ -585,7 +610,7 @@ public class GUI {
     						inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
     						disabilitaAltriPulsanti();
     						inputInserito = true;
-    						confermaPescaCarta();
+    						confermaPescaCarta();//TODO l'annidamento dei notify genera il problema mi sembra
     						break;
     					case "Nessun attacco":
     						inputDaInviare = getIndiceAzione(azioniPossibili, "NON_ATTACCA");
@@ -604,7 +629,10 @@ public class GUI {
     }
     
     private void assegnaActionListenerAltriPulsanti(String azionePescaCarta) {
-    	for (final Pulsante p : listaAltriPulsanti) {
+        List<String> azione = new ArrayList<String>();
+        azione.add(azionePescaCarta);
+        assegnaActionListenerAltriPulsanti(azione);
+    	/*for (final Pulsante p : listaAltriPulsanti) {
     		if (p.getNomePulsante().equals("Pesca una carta")) {
     			p.getButton().addActionListener(new ActionListener() {
     				public void actionPerformed(ActionEvent e) {
@@ -612,7 +640,7 @@ public class GUI {
     				}
     			});
     		}
-    	}
+    	}*/
     }
     
     private void disabilitaAltriPulsanti() {
@@ -639,7 +667,7 @@ public class GUI {
     	istruzioni.setBorder(new EmptyBorder(10, 20, 10, 20));
     	conferma.addActionListener(new ActionListener() {
     		public void actionPerformed(ActionEvent e) {
-    			inputDaInviare = System.lineSeparator();
+    			inputDaInviare = "";//System.lineSeparator();
     			inputInserito = true;
     			frame.setVisible(false);
     			disabilitaAltriPulsanti();
@@ -702,6 +730,24 @@ public class GUI {
      */
     public void getIndiceAzioneHelpTest(List<String> azioniPossibili, String azioneCercata) {
     	getIndiceAzione(azioniPossibili, azioneCercata);
+    }
+    
+    /**
+     * da migliorare
+     */
+    private void removeAllActionsListeners(){
+        //altri pulsanti
+        for (final Pulsante p : listaAltriPulsanti){
+            for(ActionListener act : p.getButton().getActionListeners()) {
+                p.getButton().removeActionListener(act);
+            }
+        }
+        //pulsanti settori
+        for (final Pulsante p : listaPulsantiSettore){
+            for(ActionListener act : p.getButton().getActionListeners()) {
+                p.getButton().removeActionListener(act);
+            }
+        }
     }
 	
 }
