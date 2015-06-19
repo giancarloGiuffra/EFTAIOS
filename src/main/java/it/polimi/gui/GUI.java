@@ -64,7 +64,6 @@ public class GUI {
 	private int countdownPerMossa;   // il giocatore ha a disposizione 30 secondi per effettuare la sua mossa
 	private int tempoAggiornamentoCountdown = 1;  
 	private JLabel mostraCountdown = new JLabel("" + countdownPerMossa);
-	private boolean faseSpostamento = true;
 	
 	/**
 	 * Costruttore
@@ -108,11 +107,7 @@ public class GUI {
 		yCorrente = yIniziale;
 	}
 
-	/**
-	 * Italian: Metodo utilizzato per la definizione della GUI vera e propria.
-	 * English: Method used to actually define the GUI.
-	 */
-	public void creaGUI() {
+	private void creaGUI() {
 		listaAltriPulsanti = new ArrayList<Pulsante>();
 		JLabel spiegazioneColori = new JLabel("Settori sicuri: colore bianco   |   Settori pericolosi: colore grigio   |   Basi: colore nero   |   Scialuppe: colore azzurro");
 		JFrame frame = new JFrame("Escape from the aliens");
@@ -171,7 +166,39 @@ public class GUI {
 		});
 	}
 	
-	public static void ricavaSettori() {
+	private void setAspettoPulsante() {
+		for (Pulsante p : listaPulsantiSettore) {
+			p.getButton().setBounds(p.getAscissa(), p.getOrdinata(), larghezzaPulsanteSettore, altezzaPulsanteSettore);
+			p.getButton().setFont(new Font("Dialog", Font.BOLD, (larghezzaPulsanteSettore-5)/5));
+			p.getButton().setEnabled(false);
+			centralPanel.add(p.getButton());
+		}
+	}
+	
+	/**
+	 * Italian: metodo che visualizza sullo schermo il tempo rimasto per effettuare una mossa.
+	 * English: method that shows on the screen the time left to perform an action.
+	 */
+    public void countDown() {
+        mostraCountdown.setVisible(true);
+        ActionListener scorrimentoSecondi = new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		mostraCountdown.setText("" + countdownPerMossa);
+        		if (countdownPerMossa == 0) {
+        			timer.stop();
+        		}
+        		else {
+        			countdownPerMossa--;
+        		}
+        	}
+        };
+        timer = new Timer(tempoAggiornamentoCountdown*1000, scorrimentoSecondi);
+        timer.setInitialDelay(0);
+        timer.start();
+        countdownPerMossa = this.interfaccia.timeLimit();
+    }
+	
+	private static void ricavaSettori() {
 		settoriInaccessibili = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.INACCESSIBILE), "Inaccessibili");
 		settoriSicuri = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.SICURO), "Sicuri");
 		settoriPericolosi = new ListaSettore((ArrayList<Settore>) galilei.getSettoriDiTipo(TipoSettore.PERICOLOSO), "Pericolosi");
@@ -216,10 +243,6 @@ public class GUI {
 		}
 	}
 	
-	/**
-	 * Italian: Metodo che colora i pulsanti corrispondenti ai settori, in base alla loro tipologia.
-	 * English: Method used to color the buttons corresponding to the sectors, according to their type.
-	 */
 	private void coloraGUI() {
 		ricavaSettori();
 		coloraSettoriPerTipo(settoriInaccessibili);
@@ -233,14 +256,6 @@ public class GUI {
 		getLookAndFeel();
 		creaGUI();
 		coloraGUI();
-	}
-	
-	private void attivaPulsanteAttacco() {
-		attacco.getButton().setEnabled(true);
-	}
-	
-	private void attivaPulsantePescaCarta() {
-		pescaCarta.getButton().setEnabled(true);
 	}
 	
 	/**
@@ -263,14 +278,7 @@ public class GUI {
 		return this.listaAltriPulsanti;
 	}
 	
-	/**
-	 * Italian: metodo che ricava le informazioni iniziali per il giocatore corrente, quali
-	 * 	il nome, la razza e la posizione iniziale del giocatore.
-	 * English: method which extracts the starting informations about the current player, such
-	 * 	as its name, its race and its initial position.
-	 * @param informazioniIniziali ArrayList contenente le informazioni iniziali
-	 */
-	public void ricavaInformazioniIniziali(List<String> informazioniIniziali) {
+	private void ricavaInformazioniIniziali(List<String> informazioniIniziali) {
 		nomeGiocatore = informazioniIniziali.get(0);
 		posizioneAttuale = informazioniIniziali.get(1);
 		razzaGiocatore = informazioniIniziali.get(2);
@@ -280,10 +288,9 @@ public class GUI {
 	}
 	
 	private void evidenziaPosizioneIniziale(String nomeSettore) {
-		for (int i = 0; i < listaPulsantiSettore.size(); i++) {
-			Pulsante pulsante = listaPulsantiSettore.get(i);
-			if (pulsante.getNomePulsante().equals(nomeSettore)) {
-				pulsante.getButton().setBackground(Color.GREEN);
+		for (Pulsante p : listaPulsantiSettore) {
+			if (p.getNomePulsante().equals(nomeSettore)) {
+				p.getButton().setBackground(Color.GREEN);
 			}
 		}
 	}
@@ -306,13 +313,7 @@ public class GUI {
 		frame.setVisible(true);
 	}
 	
-	/**
-	 * Italian: metodo che può abilitare i pulsanti 'attacco' e/o 'pescaCarta', al verificarsi 
-	 * 	di determinate condizioni di gioco.
-	 * English: method whose function is to enable 'attacco' and/or 'pescaCarta' buttons, 
-	 * 	assuming that some game conditions are satisfied.
-	 */
-	public void abilitaAltriPulsanti(List<String> azioniPossibili) {
+	private void abilitaAltriPulsanti(List<String> azioniPossibili) {
 		for (String azione : azioniPossibili) {
 			switch(azione) {
 				case "PESCA_CARTA":
@@ -326,6 +327,14 @@ public class GUI {
 					break;
 			}
 		}
+	}	
+	
+	private void attivaPulsanteAttacco() {
+		attacco.getButton().setEnabled(true);
+	}
+	
+	private void attivaPulsantePescaCarta() {
+		pescaCarta.getButton().setEnabled(true);
 	}
 	
 	private void attivaPulsanteNessunAttacco() {
@@ -347,9 +356,18 @@ public class GUI {
 		}
 	}
 	
+	private void evidenziaPulsante(Pulsante pulsante) {
+		pulsante.getButton().setBackground(Color.GREEN);
+	}
+	
 	private void evidenziaSpostamento(Pulsante pulsante) {
 		coloraGUI();
 		evidenziaPulsante(pulsante);
+	}
+	
+	private void registraSpostamento(Pulsante destinazione) {
+		this.inputDaInviare = new String("move to: " + destinazione.getNomePulsante());
+		this.inputInserito = true;
 	}
 	
 	/**
@@ -361,13 +379,9 @@ public class GUI {
 		return this.inputInserito;
 	}
 	
-	private void registraSpostamento(Pulsante destinazione) {
-		this.inputDaInviare = new String("move to: " + destinazione.getNomePulsante());
-		this.inputInserito = true;
-	}
-	
 	/**
-	 * 
+	 * Italian: metodo utilizzato per informare il server riguardo l'input inserito dall'utente interagendo con il gioco.
+	 * English: method used to inform the server about the input inserted by the player interacting with the game.
 	 * @return
 	 */
 	public String annunciaInput() {
@@ -375,27 +389,9 @@ public class GUI {
 		return this.inputDaInviare;
 	}
 	
-	private void evidenziaPulsante(Pulsante pulsante) {
-		pulsante.getButton().setBackground(Color.GREEN);
-	}
-	
-	private void setAspettoPulsante() {
-		for (Pulsante p : listaPulsantiSettore) {
-			p.getButton().setBounds(p.getAscissa(), p.getOrdinata(), larghezzaPulsanteSettore, altezzaPulsanteSettore);
-			p.getButton().setFont(new Font("Dialog", Font.BOLD, (larghezzaPulsanteSettore-3)/5));
-			p.getButton().setEnabled(false);
-			centralPanel.add(p.getButton());
-		}
-	}
-	
-	private void actionListenerPulsanteSettore() {
-		if (faseSpostamento == true) {
-			assegnaActionListenerSpostamento();
-		}
-		else {
-			actionListenerAnnuncioSettore();
-		}
-	}
+	private void postInserimentoInput() {
+    	
+    }
 	
 	private void actionListenerAnnuncioSettore() {
 		for (final Pulsante p : listaPulsantiSettore) {
@@ -406,8 +402,6 @@ public class GUI {
 					timer.stop();
 					mostraCountdown.setVisible(false);
 					annunciaRumore();
-					//faseSpostamento = true;
-					//actionListenerPulsanteSettore();
 				}
 			});
 		}
@@ -432,8 +426,6 @@ public class GUI {
 					impedisciAltriMovimenti();
 					timer.stop();
 					mostraCountdown.setVisible(false);
-					//faseSpostamento = false;
-					//actionListenerPulsanteSettore();
 					synchronized(interfaccia){
 					    interfaccia.notifyAll(); //l'intero blocco dovrà essere inserito in ogni metodo che generi un input per il server
 					} 
@@ -449,7 +441,8 @@ public class GUI {
 	}
 	
 	/**
-	 * 
+	 * Italian: metodo che riceve dei comandi dal server e li decodifica, estraendone le informazioni utili.
+	 * English: method that decodes the commands received from the server, in order to extract useful informations from them.
 	 * @param list
 	 */
 	public void decoderComando(List<String> list) {
@@ -477,7 +470,6 @@ public class GUI {
                 break;
             case "PESCA_CARTA":
                 removeAllActionsListeners();
-                //assegnaActionListenerAltriPulsanti(nomeComando);
                 assegnaActionListenerPulsanteCarta();
                 attivaPulsantePescaCarta();
                 break;
@@ -510,8 +502,6 @@ public class GUI {
                 break;
             case "TURNO_FINITO":
                 comunicaMessaggio("Non ci sono altre mosse possibili per il turno corrente");
-                //faseSpostamento = true;
-                //actionListenerPulsanteSettore();
                 break;
             case "MORTO":
                 comunicaMessaggio("Il tuo personaggio è morto in seguito ad un attacco");
@@ -566,9 +556,9 @@ public class GUI {
     		comunicaMessaggio(informazioniAttacco.get(0) + " ha effettuato un attacco in " + informazioniAttacco.get(1) + ". Non ci sono stati morti");
     	}
     	else {
-    		List<String> datiGiocatoriMorti = informazioniAttacco;	// datiGiocatoriMorti = informazioniAttacco - (primi 2 elementi dell'ArrayList)
+    		List<String> datiGiocatoriMorti = new ArrayList<String>(informazioniAttacco);	// datiGiocatoriMorti = informazioniAttacco - (primi 2 elementi dell'ArrayList)
     		datiGiocatoriMorti.remove(0);
-    		datiGiocatoriMorti.remove(1);
+    		datiGiocatoriMorti.remove(0);
     		String giocatoriMorti = estraiNomiGiocatori(datiGiocatoriMorti);
     		comunicaMessaggio(informazioniAttacco.get(0) + " ha effettuato un attacco in " + informazioniAttacco.get(1) + ". Giocatori morti: " + giocatoriMorti);
     	}
@@ -588,33 +578,6 @@ public class GUI {
 		list.remove(0);	// tolto il nome del comando nella prima posizione, restano solo i parametri
 		return list;
 	}
-	
-	/**
-	 * Italian: metodo che visualizza sullo schermo il tempo rimasto per effettuare una mossa.
-	 * English: method that shows on the screen the time left to perform an action.
-	 */
-    public void countDown() {
-        mostraCountdown.setVisible(true);
-        ActionListener scorrimentoSecondi = new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		mostraCountdown.setText("" + countdownPerMossa);
-        		if (countdownPerMossa == 0) {
-        			timer.stop();
-        		}
-        		else {
-        			countdownPerMossa--;
-        		}
-        	}
-        };
-        timer = new Timer(tempoAggiornamentoCountdown*1000, scorrimentoSecondi);
-        timer.setInitialDelay(0);
-        timer.start();
-        countdownPerMossa = this.interfaccia.timeLimit();
-    }
-    
-    private void postInserimentoInput() {
-    	
-    }
     
     private void assegnaActionListenerAltriPulsanti(final List<String> azioniPossibili) {
     	for (final Pulsante p : listaAltriPulsanti) {
@@ -646,21 +609,6 @@ public class GUI {
     			}
     		});
     	}
-    }
-    
-    private void assegnaActionListenerAltriPulsanti(String azionePescaCarta) {
-        List<String> azione = new ArrayList<String>();
-        azione.add(azionePescaCarta);
-        assegnaActionListenerAltriPulsanti(azione);
-    	/*for (final Pulsante p : listaAltriPulsanti) {
-    		if (p.getNomePulsante().equals("Pesca una carta")) {
-    			p.getButton().addActionListener(new ActionListener() {
-    				public void actionPerformed(ActionEvent e) {
-    					confermaPescaCarta();
-    				}
-    			});
-    		}
-    	}*/
     }
     
     private void disabilitaAltriPulsanti() {
@@ -715,44 +663,6 @@ public class GUI {
     }
     
     /**
-     * Italian: metodo di supporto per i test, che crea una nuova lista di pulsanti associati ai settori.
-     * English: method used as support for tests, whose purpose is to create a new list of buttons associated to the sectors.
-     * @return listaPulsantiSettore
-     */
-    public List<Pulsante> creaListaPulsantiSettoreHelpTest() {
-    	creaListaPulsantiSettore();
-    	ArrayList<Pulsante> listaPerTest = new ArrayList<Pulsante>();
-    	listaPerTest = this.listaPulsantiSettore;
-    	return listaPerTest;
-    }
-    
-    /**
-     * Italian:
-     * English:
-     * @param nomeLista
-     * @param pulsante
-     */
-    public void setColorePulsanteHelpTest(String nomeLista, JButton pulsante) {
-    	setColorePulsante(nomeLista, pulsante);
-    }
-    
-    /**
-     * 
-     */
-    public void evidenziaSpostamentoHelpTest(Pulsante pulsante) {
-    	evidenziaSpostamento(pulsante);
-    }
-    
-    /**
-     * 
-     * @param azioniPossibili
-     * @param azioneCercata
-     */
-    public void getIndiceAzioneHelpTest(List<String> azioniPossibili, String azioneCercata) {
-    	getIndiceAzione(azioniPossibili, azioneCercata);
-    }
-    
-    /**
      * da migliorare
      */
     private void removeAllActionsListeners(){
@@ -768,6 +678,47 @@ public class GUI {
                 p.getButton().removeActionListener(act);
             }
         }
+    }
+    
+    /**
+     * Italian: metodo di supporto per i test, che crea una nuova lista di pulsanti associati ai settori.
+     * English: method used as support for tests, whose purpose is to create a new list of buttons associated to the sectors.
+     * @return listaPulsantiSettore
+     */
+    public List<Pulsante> creaListaPulsantiSettoreHelpTest() {
+    	creaListaPulsantiSettore();
+    	ArrayList<Pulsante> listaPerTest = new ArrayList<Pulsante>();
+    	listaPerTest = this.listaPulsantiSettore;
+    	return listaPerTest;
+    }
+    
+    /**
+     * Italian: metodo di supporto per i test, utilizzato semplicemente per chiamare il metodo "setColorePulsante".
+     * English: method used as support for tests, whose function only consists in calling the method "setColorePulsante".
+     * @param nomeLista 
+     * @param pulsante 
+     */
+    public void setColorePulsanteHelpTest(String nomeLista, JButton pulsante) {
+    	setColorePulsante(nomeLista, pulsante);
+    }
+    
+    /**
+     * Italian: metodo di supporto per i test, utilizzato semplicemente per chiamare il metodo "evidenziaSpostamento".
+     * English: method used as support for tests, whose function only consists in calling the method "evidenziaSpostamento".
+     * @param pulsante
+     */
+    public void evidenziaSpostamentoHelpTest(Pulsante pulsante) {
+    	evidenziaSpostamento(pulsante);
+    }
+    
+    /**
+     * Italian:
+     * English:
+     * @param azioniPossibili
+     * @param azioneCercata
+     */
+    public void getIndiceAzioneHelpTest(List<String> azioniPossibili, String azioneCercata) {
+    	getIndiceAzione(azioniPossibili, azioneCercata);
     }
 	
 }
