@@ -122,9 +122,7 @@ public class GUI {
 		frame.add(topPanel, BorderLayout.NORTH);
 		centralPanel.setLayout(null);
 		creaListaPulsantiSettore();
-		setAspettoPulsante();
-		//actionListenerPulsanteSettore();
-		//assegnaActionListenerSpostamento();	
+		setAspettoPulsante();	
 		contenitoreAltriElementi.add(nessunAttacco.getButton());
 		contenitoreAltriElementi.add(attacco.getButton());  
 		contenitoreAltriElementi.add(pescaCarta.getButton()); 
@@ -389,10 +387,6 @@ public class GUI {
 		return this.inputDaInviare;
 	}
 	
-	private void postInserimentoInput() {
-    	
-    }
-	
 	private void actionListenerAnnuncioSettore() {
 		for (final Pulsante p : listaPulsantiSettore) {
 			p.getButton().addActionListener(new ActionListener() {
@@ -486,8 +480,6 @@ public class GUI {
             	actionListenerAnnuncioSettore();
                 abilitaSettori();
                 comunicaMessaggio("cliccare sul settore in cui si vuole dichiarare un rumore");
-            	//actionListenerPulsanteSettore();
-            	//annunciaRumore();
                 break;
             case "NESSUNA_GAMEROOM_DISPONIBILE":
                 comunicaMessaggio("Non ci sono sale libere al momento: riprovare più tardi. La connessione verrà chiusa");
@@ -627,41 +619,6 @@ public class GUI {
     	return String.valueOf(indice);
     }
     
-    private void confermaPescaCarta() {
-    	final JFrame frame = new JFrame("Pesca una carta");
-    	JPanel pannello = new JPanel();
-    	JLabel istruzioni = new JLabel("Clicca sul pulsante per pescare la carta", SwingConstants.CENTER);
-    	JButton conferma = new JButton("Pesca");
-    	istruzioni.setBorder(new EmptyBorder(10, 20, 10, 20));
-    	conferma.addActionListener(new ActionListener() {
-    		public void actionPerformed(ActionEvent e) {
-    			inputDaInviare = "";//System.lineSeparator();
-    			inputInserito = true;
-    			frame.setVisible(false);
-    			disabilitaAltriPulsanti();
-    			timer.stop();
-    			mostraCountdown.setVisible(false);
-    			synchronized(interfaccia){
-				    interfaccia.notifyAll(); 
-				}
-    		}
-    	});
-    	pannello.setLayout(new BorderLayout());
-    	pannello.add(istruzioni, BorderLayout.NORTH);
-    	pannello.add(conferma, BorderLayout.CENTER);
-    	frame.add(pannello);
-    	frame.getContentPane();
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				confermaPescaCarta();
-			}
-		});
-		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-    }
-    
     /**
      * da migliorare
      */
@@ -712,13 +669,25 @@ public class GUI {
     }
     
     /**
-     * Italian:
-     * English:
+     * Italian: metodo di supporto per i test, utilizzato semplicemente per chiamare il metodo "getIndiceAzione". Tale metodo
+     * 	cerca un'azione tra un elenco di azioni possibili e restituisce l'indice dell'azione cercata (partendo da 1).
+     * English: method used as support for tests, whose function only consists in calling the method "getIndiceAzione". This last
+     * 	method looks for an action in a list of possible actions and returns the corresponding index of the action (the count starts from from 1).
      * @param azioniPossibili
      * @param azioneCercata
+     * @return indice dell'azione cercata
      */
-    public void getIndiceAzioneHelpTest(List<String> azioniPossibili, String azioneCercata) {
-    	getIndiceAzione(azioniPossibili, azioneCercata);
+    public String getIndiceAzioneHelpTest(List<String> azioniPossibili, String azioneCercata) {
+    	return getIndiceAzione(azioniPossibili, azioneCercata);
+    }
+    
+    /**
+     * Italian: metodo di supporto per i test, utilizzato semplicemente per chiamare il metodo "registraSpostamento".
+     * English: method used as support for tests, whose function only consists in calling the method "registraSpostamento".
+     * @param pulsante
+     */
+    public void registraSpostamentoHelpTest(Pulsante pulsante) {
+    	registraSpostamento(pulsante);
     }
 	
 }

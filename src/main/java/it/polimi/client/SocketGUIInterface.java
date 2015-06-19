@@ -60,6 +60,15 @@ public class SocketGUIInterface extends SocketInterface {
 		}
     	return datiComando;
     }
+    
+    /**
+     * Italian: metodo di supporto per i test, che restituisce la GUI associata ad un'istanza di "SocketGUIInterface".
+     * English: method used as support for tests. It returns the GUI associated to an instance of "SocketGUIInterface".  
+     * @return GUI
+     */
+    public GUI getGUI() {
+    	return this.gui;
+    }
   
 }
 

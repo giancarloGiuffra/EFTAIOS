@@ -13,17 +13,22 @@ import it.polimi.client.SocketGUIInterface;
 import it.polimi.model.sector.Settore;
 import it.polimi.model.tabellone.Tabellone;
 import it.polimi.model.tabellone.TabelloneFactory;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class GUITest {
 	
-	private SocketGUIInterface socketGUIInterface;
-	private GUI guiDiTest = new GUI(socketGUIInterface);
+	private SocketGUIInterface socketGUIInterface = new SocketGUIInterface();
+	private GUI guiDiTest = socketGUIInterface.getGUI();
+	private ArrayList<Pulsante> listaPulsantiSettore;
 	private List<String> settori = new ArrayList<String>();
 	private static Tabellone galilei = TabelloneFactory.createTabellone("GALILEI");
 	
 	@Before
 	public void operazioniPreliminari() {
 		guiDiTest.creaListaPulsantiSettoreHelpTest();
+		ArrayList<Pulsante> listaPulsantiSettore = guiDiTest.getListaPulsantiSettore();
+		this.listaPulsantiSettore = listaPulsantiSettore;
 	}
 	
 	@Test
@@ -42,8 +47,13 @@ public class GUITest {
 		settori.add(k06.getNome());
 		settori.add(l05.getNome());
 		guiDiTest.abilitaSettoriAdiacenti(settori);
-		
-		//TODO
+		for (String s : settori) {
+			for (Pulsante p : listaPulsantiSettore) {
+				if (p.getNomePulsante().equals(s)) {
+					assertTrue(p.getButton().isEnabled());
+				}
+			}
+		}
 	}
 	
 	@Test
@@ -54,12 +64,23 @@ public class GUITest {
 		assertTrue(l04.getButton().getBackground().equals(Color.GREEN));
 	}
 	
+	@Test
 	public void testGetIndiceAzione() {
 		List<String> azioniPossibili = new ArrayList<String>();
 		azioniPossibili.add("ATTACCA");
 		azioniPossibili.add("PESCA_CARTA");
-		
-		//TODO
+		assertThat(guiDiTest.getIndiceAzioneHelpTest(azioniPossibili, "PESCA_CARTA"), is("2"));
+	}
+	
+	@Test
+	public void testRegistraEAnnunciaSpostamento() {
+		Pulsante m08 = new Pulsante("M08");
+		String inputAnnunciato;
+		guiDiTest.registraSpostamentoHelpTest(m08);
+		assertTrue(guiDiTest.isInputInserito());
+		inputAnnunciato = guiDiTest.annunciaInput();
+		assertFalse(guiDiTest.isInputInserito());
+		assertThat(inputAnnunciato, is("move to: M08"));
 	}
 
 }
