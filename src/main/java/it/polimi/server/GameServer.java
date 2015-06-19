@@ -223,7 +223,7 @@ public class GameServer implements BaseObserver{
      * @throws IOException
 	 * @throws InterruptedException 
      */
-    public void startServerSocketOnlyForTest(int maxNumberOfClientsPerRoom, Thread thread1, Thread thread2, ServerSocketForTwoCLients serverSocketForTwoCLients) throws IOException, InterruptedException {
+	public void startServerSocketOnlyForTest(int maxNumberOfClientsPerRoom, Thread thread1, Thread thread2, ServerSocketForTwoCLients serverSocketForTwoCLients) throws IOException, InterruptedException {
     	
     	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
     	

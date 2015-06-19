@@ -10,7 +10,7 @@ public class ClientGUI{
     /**
      * Costruttore
      */
-    private ClientGUI(){
+    public ClientGUI(){
         interfaccia = new GUISceltaInterfaccia(this);
     }
     
@@ -40,6 +40,10 @@ public class ClientGUI{
      */
     public static void main(String[] args) { 
         new ClientGUI().start(); 
+    }
+    
+    public GUISceltaInterfaccia getInterfaccia() {
+    	return this.interfaccia;
     }
 
 }

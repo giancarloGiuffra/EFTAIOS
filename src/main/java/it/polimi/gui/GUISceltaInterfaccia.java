@@ -96,5 +96,13 @@ public class GUISceltaInterfaccia {
         frame.pack();
         frame.setVisible(true);
     }
+    
+    public void comunicaTecnologiaDiComunicazioneHelpTest(String nomePulsante) {
+    	comunicaTecnologiaDiComunicazione(nomePulsante);
+    }
+    
+    public TipoInterface getTipoInterfaccia() {
+    	return this.tipoInterfaccia;
+    }
 
 }

@@ -21,14 +21,18 @@ public class GUITest {
 	private SocketGUIInterface socketGUIInterface = new SocketGUIInterface();
 	private GUI guiDiTest = socketGUIInterface.getGUI();
 	private ArrayList<Pulsante> listaPulsantiSettore;
+	private ArrayList<Pulsante> listaAltriPulsanti;
 	private List<String> settori = new ArrayList<String>();
 	private static Tabellone galilei = TabelloneFactory.createTabellone("GALILEI");
 	
 	@Before
 	public void operazioniPreliminari() {
 		guiDiTest.creaListaPulsantiSettoreHelpTest();
+		guiDiTest.creaGUIHelpTest();
 		ArrayList<Pulsante> listaPulsantiSettore = guiDiTest.getListaPulsantiSettore();
+		ArrayList<Pulsante> listaAltriPulsanti = guiDiTest.getListaAltriPulsanti();
 		this.listaPulsantiSettore = listaPulsantiSettore;
+		this.listaAltriPulsanti = listaAltriPulsanti;
 	}
 	
 	@Test
@@ -81,6 +85,22 @@ public class GUITest {
 		inputAnnunciato = guiDiTest.annunciaInput();
 		assertFalse(guiDiTest.isInputInserito());
 		assertThat(inputAnnunciato, is("move to: M08"));
+	}
+	
+	@Test
+	public void testAbilitaAltriPulsanti() {
+		List<String> azioniPossibili = new ArrayList<String>();
+		azioniPossibili.add("ATTACCA");
+		azioniPossibili.add("NON_ATTACCA");
+		guiDiTest.abilitaAltriPulsantiHelpTest(azioniPossibili);
+		for (Pulsante p : listaAltriPulsanti) {
+			if (p.getNomePulsante().equals("Attacco") || p.getNomePulsante().equals("Nessun attacco")) {
+				assertTrue(p.getButton().isEnabled());
+			}
+			else {
+				assertFalse(p.getButton().isEnabled());
+			}
+		}
 	}
 
 }
