@@ -55,8 +55,8 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	public Boolean connectToServer() {
 		print("Inserisci l'Indirizzo IP del Server: ");
 		try {
-			//this.socket = new Socket(stdIn.nextLine(), PORT);
-			this.socket = new Socket("127.0.0.1", PORT);
+			this.socket = new Socket(stdIn.readLine(), PORT);
+			//this.socket = new Socket("127.0.0.1", PORT);
 			this.in = new BufferedReader( new InputStreamReader(socket.getInputStream()));
 			this.out = new PrintWriter(socket.getOutputStream());
 			return true;

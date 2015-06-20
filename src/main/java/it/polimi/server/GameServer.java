@@ -14,6 +14,7 @@ import it.polimi.server.rmi.RemoteClientRMIFactory;
 import it.polimi.server.socket.ClientSocket;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -84,7 +85,8 @@ public class GameServer implements BaseObserver{
     	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
     	
     	//print IP address
-    	LOGGER.log(Level.INFO, String.format("IP Address: %s", RMIInterface.getMyIPAddress()));
+    	String ipAddress = RMIInterface.getMyIPAddress();
+    	LOGGER.log(Level.INFO, String.format("IP Address: %s", ipAddress));
     	
     	//creazione gameroom
     	this.setCurrentGameRoom(new GameRoom(new ClientManager(MAX_NUMBER_CLIENTS_PER_ROOM)));
@@ -105,7 +107,8 @@ public class GameServer implements BaseObserver{
         }
     	
         //server socket
-        this.serverSocket = new ServerSocket(this.portSocket);
+        InetAddress addr = InetAddress.getByName(ipAddress);
+        this.serverSocket = new ServerSocket(this.portSocket, 50, addr);
     	LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
         while(true){
                 ClientSocket clientSocket = new ClientSocket(serverSocket.accept());

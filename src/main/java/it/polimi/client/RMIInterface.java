@@ -231,8 +231,8 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 */
 	private Boolean registerServerInClient() throws IOException{
 		print("Inserisci l'Indirizzo IP del Server: ");
-		//String server = stdIn.readLine();
-		String server = "127.0.0.1";
+		String server = stdIn.readLine();
+		//String server = "127.0.0.1";
 		String clientRMIFactoryName = "ClientRMIFactory";
 		Registry registry;
 		try {
