@@ -1,6 +1,7 @@
 package it.polimi.server;
 
 import it.polimi.client.Comando;
+import it.polimi.client.RMIInterface;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
@@ -81,6 +82,9 @@ public class GameServer implements BaseObserver{
     public void startServer(int maxNumberOfClientsPerRoom) throws IOException {
     	
     	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
+    	
+    	//print IP address
+    	LOGGER.log(Level.INFO, String.format("IP Address: %s", RMIInterface.getMyIPAddress()));
     	
     	//creazione gameroom
     	this.setCurrentGameRoom(new GameRoom(new ClientManager(MAX_NUMBER_CLIENTS_PER_ROOM)));

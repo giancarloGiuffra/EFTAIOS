@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
@@ -18,7 +20,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.logging.Level;
@@ -123,7 +128,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * metodo per ottenere un indirizzo IP da inviare al server
 	 * @return
 	 */
-	private String getMyIPAddress() {
+	public static String getMyIPAddress() {
 		Enumeration<NetworkInterface> interfaces;
 		try {
 			interfaces = NetworkInterface.getNetworkInterfaces();
@@ -154,7 +159,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * @param address
 	 * @return
 	 */
-	private boolean isUsable(InetAddress address) {
+	private static boolean isUsable(InetAddress address) {
 		return !address.isLoopbackAddress() &&
 				!address.isLinkLocalAddress() &&
 				!address.isSiteLocalAddress() &&
@@ -255,20 +260,10 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * @throws IOException 
 	 */
 	private Boolean registerClientInServer() throws IOException{
-		print("Inserisci la porta locale da utilizzare per la comunicazione: ");
-		Pattern portPattern = Pattern.compile("\\d+");
-		String portName = stdIn.readLine();
-		Matcher matcher = portPattern.matcher(portName);
-		while(!matcher.matches() || !notValidPort(portName)){
-			print("Porta non valida. Deve essere un numero nel range [49152,65535]. Inserisce ancora: ");
-			portName = stdIn.readLine();
-			matcher.reset(portName);
-		}
-		Integer port = Integer.parseInt(portName);
+		Integer port = getValidPort();
 		String ipAddress = getMyIPAddress();
-		//String ipAddress = "127.0.0.1";
 		if(!"ERROR".equals(ipAddress)){
-			try {
+		    try {
 				this.notifier = new NotifierClient(this);
 				RemoteNotifier notifierStub = (RemoteNotifier) UnicastRemoteObject.exportObject(notifier, port);
 				Registry registry = LocateRegistry.createRegistry(port);
@@ -285,5 +280,22 @@ public class RMIInterface implements NetworkInterfaceForClient {
 			return false;
 		}
 	}
+
+    /**
+     * trova un port disponibile
+     * @return
+     */
+	private int getValidPort(){
+        try {
+            ServerSocket temporary = new ServerSocket(0);
+            temporary.setReuseAddress(true);
+            int port = temporary.getLocalPort();
+            temporary.close();
+            return port;
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Port libero non trovato", e);
+        }
+        throw new IllegalStateException("Non è stato possibile trovare una porta");
+    }
 
 }
