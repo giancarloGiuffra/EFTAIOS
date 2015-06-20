@@ -47,11 +47,11 @@ public class ServerSocketForTwoCLients extends BaseObservable implements Runnabl
      */
     @Override
     public void run(){
-        try {
+        /*try {
             server.startServerSocketOnlyForTest(2, this.thread1, this.thread2, this);
         } catch (InterruptedException | IOException e) {
             LOGGER.log(Level.INFO, e.getMessage(), e);
-        }
+        }*/
     }
 
     /**

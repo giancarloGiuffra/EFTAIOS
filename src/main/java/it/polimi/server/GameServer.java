@@ -215,44 +215,7 @@ public class GameServer implements BaseObserver{
 				this.gameRooms.peekLast().hasStarted();
 	}
 	
-	/**
-     * lancia il server solo per socket connection - usato nei test - ammette solo due connessioni e fa partire la gameroom
-	 * @param thread2 
-	 * @param thread1 
-	 * @param serverSocketForTwoCLients 
-     * @throws IOException
-	 * @throws InterruptedException 
-     */
-	public void startServerSocketOnlyForTest(int maxNumberOfClientsPerRoom, Thread thread1, Thread thread2, ServerSocketForTwoCLients serverSocketForTwoCLients) throws IOException, InterruptedException {
-    	
-    	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
-    	
-    	//creazione gameroom
-    	this.setCurrentGameRoom(new GameRoom(new ClientManager(MAX_NUMBER_CLIENTS_PER_ROOM)));
-    	
-        //server socket
-        this.serverSocket = new ServerSocket(this.portSocket);
-    	LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
-        int counter = 2;
-    	while(counter>0){
-                ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
-                synchronized(this){
-	                if(!lastGameRoomAvailableHasStarted()){
-	                	this.currentGameRoom.addClient(clientSocket);
-	                    if(this.currentGameRoom.hasAtLeastMinimumNumberOfClients() && !this.currentGameRoom.hasStarted()){
-	                    	this.currentGameRoom.cancelTimer();
-	                    	this.currentGameRoom.setUp();
-	                    	serverSocketForTwoCLients.notifyEvent(new SetModelInGameServerTest(this.currentGameRoom.model()));
-	                    }
-	                }else {
-	                    clientSocket.write("Ci dispiace l'ultima sala si è riempita. Prova per favore a connetterti più tardi. Questa connessione verrà chiusa");
-	                    clientSocket.write(buildCommandNoGameRoomAvailable());
-	                    clientSocket.close();
-	                }
-                } //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
-                counter--;
-    	} //while
-    }
+	
     
     /**
      * lancia il server solo per RMI connection
@@ -292,5 +255,36 @@ public class GameServer implements BaseObserver{
             LOGGER.log(Level.SEVERE, "Si chiude il server", e);
         }
     }
+
+    
+    /*public void startServerSocketOnlyForTest(int maxNumberOfClientsPerRoom, Thread thread1, Thread thread2, ServerSocketForTwoCLients serverSocketForTwoCLients) throws IOException, InterruptedException {
+        
+        this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
+        
+        //creazione gameroom
+        this.setCurrentGameRoom(new GameRoom(new ClientManager(MAX_NUMBER_CLIENTS_PER_ROOM)));
+        
+        //server socket
+        this.serverSocket = new ServerSocket(this.portSocket);
+        LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
+        int counter = 2;
+        while(counter>0){
+                ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
+                synchronized(this){
+                    if(!lastGameRoomAvailableHasStarted()){
+                        this.currentGameRoom.addClient(clientSocket);
+                        if(this.currentGameRoom.hasAtLeastMinimumNumberOfClients() && !this.currentGameRoom.hasStarted()){
+                            this.currentGameRoom.cancelTimer();
+                            this.currentGameRoom.setUp();
+                        }
+                    }else {
+                        clientSocket.write("Ci dispiace l'ultima sala si è riempita. Prova per favore a connetterti più tardi. Questa connessione verrà chiusa");
+                        clientSocket.write(buildCommandNoGameRoomAvailable());
+                        clientSocket.close();
+                    }
+                } //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
+                counter--;
+        } //while
+    }*/
 	
 }
