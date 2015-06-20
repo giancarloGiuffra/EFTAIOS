@@ -1,5 +1,6 @@
 package it.polimi.client;
 
+import it.polimi.server.GameServer;
 import it.polimi.server.rmi.ClientRMIFactory;
 import it.polimi.server.rmi.RemoteNotifier;
 
@@ -65,7 +66,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	public Boolean connectToServer() {
 		try {
 			return registerServerInClient() && registerClientInServer();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		    return false;
 		}
@@ -130,7 +131,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 */
 	public static String getMyIPAddress() {
 		Enumeration<NetworkInterface> interfaces;
-		try {
+		/*try {
 			interfaces = NetworkInterface.getNetworkInterfaces();
 			while(interfaces.hasMoreElements()){
 				NetworkInterface n = (NetworkInterface) interfaces.nextElement();
@@ -138,20 +139,20 @@ public class RMIInterface implements NetworkInterfaceForClient {
 				while(addresses.hasMoreElements()){
 					InetAddress address = (InetAddress) addresses.nextElement();
 					if(isUsable(address)) return address.getHostAddress();
-					else
+					else*/
 						try {
-							return InetAddress.getLocalHost().getHostAddress();
+							return InetAddress.getLocalHost().toString();//.getHostAddress();
 						} catch (UnknownHostException e) {
 							LOGGER.log(Level.SEVERE, "Problema con InetAddress", e);
 							return "ERROR";
 						}
-				}
+				/*}
 			}
 		} catch (SocketException e) {
 			LOGGER.log(Level.SEVERE, "Problema in getMyIPAddress", e);
 			return "ERROR";
-		}
-		return "ERROR";
+		}*/
+		//return "ERROR";
 	}
 
 	/**
@@ -257,11 +258,11 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	/**
 	 * crea notifier per poter ricevere richiesta dal server
 	 * @return
-	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	private Boolean registerClientInServer() throws IOException{
+	private Boolean registerClientInServer() throws Exception{
 		Integer port = getValidPort();
-		String ipAddress = getMyIPAddress();
+		String ipAddress = GameServer.getIp();
 		if(!"ERROR".equals(ipAddress)){
 		    try {
 				this.notifier = new NotifierClient(this);

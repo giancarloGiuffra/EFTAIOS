@@ -13,9 +13,13 @@ import it.polimi.server.rmi.ClientRMIFactory;
 import it.polimi.server.rmi.RemoteClientRMIFactory;
 import it.polimi.server.socket.ClientSocket;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -70,7 +74,7 @@ public class GameServer implements BaseObserver{
     	GameServer server = new GameServer(65535, 65533);
     	try{                
             server.startServer(2); //default 8 giocatori al massimo per game room
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
@@ -78,14 +82,14 @@ public class GameServer implements BaseObserver{
     /**
      * lancia il server
      * @param maxNumberOfClientsPerRoom numero massimo di clients per room
-     * @throws IOException
+     * @throws Exception 
      */
-    public void startServer(int maxNumberOfClientsPerRoom) throws IOException {
+    public void startServer(int maxNumberOfClientsPerRoom) throws Exception {
     	
     	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
     	
     	//print IP address
-    	String ipAddress = RMIInterface.getMyIPAddress();
+    	String ipAddress = getIp();
     	LOGGER.log(Level.INFO, String.format("IP Address: %s", ipAddress));
     	
     	//creazione gameroom
@@ -107,8 +111,7 @@ public class GameServer implements BaseObserver{
         }
     	
         //server socket
-        InetAddress addr = InetAddress.getByName(ipAddress);
-        this.serverSocket = new ServerSocket(this.portSocket, 50, addr);
+        this.serverSocket = new ServerSocket(this.portSocket);
     	LOGGER.log(Level.INFO, String.format("GameServer Socket pronto in porta: %d", this.portSocket));
         while(true){
                 ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
@@ -260,6 +263,30 @@ public class GameServer implements BaseObserver{
             this.serverSocket.close();
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Si chiude il server", e);
+        }
+    }
+    
+    /**
+     * calcola l'ip address esterna da usare
+     * @return
+     * @throws Exception 
+     */
+    public static String getIp() throws Exception{
+        URL whatismyip = new URL("http://checkip.amazonaws.com");
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(
+                    whatismyip.openStream()));
+            String ip = in.readLine();
+            return ip;
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "connessione con checkip amazonaws non chiusa", e);
+                }
+            }
         }
     }
 
