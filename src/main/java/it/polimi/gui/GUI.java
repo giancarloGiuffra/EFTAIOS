@@ -549,8 +549,7 @@ public class GUI {
     	}
     	else {
     		List<String> datiGiocatoriMorti = new ArrayList<String>(informazioniAttacco);	// datiGiocatoriMorti = informazioniAttacco - (primi 2 elementi dell'ArrayList)
-    		datiGiocatoriMorti.remove(0);
-    		datiGiocatoriMorti.remove(0);
+    		datiGiocatoriMorti.subList(0, 2).clear();
     		String giocatoriMorti = estraiNomiGiocatori(datiGiocatoriMorti);
     		comunicaMessaggio(informazioniAttacco.get(0) + " ha effettuato un attacco in " + informazioniAttacco.get(1) + ". Giocatori morti: " + giocatoriMorti);
     	}
@@ -581,11 +580,10 @@ public class GUI {
     						disabilitaAltriPulsanti();
     						inputInserito = true;
     						break;
-    					case "Pesca una carta":	// sistemare: server si aspetta un ulteriore input
+    					case "Pesca una carta":	
     						inputDaInviare = getIndiceAzione(azioniPossibili, "PESCA_CARTA");
     						disabilitaAltriPulsanti();
     						inputInserito = true;
-    						//confermaPescaCarta();//TODO l'annidamento dei notify genera il problema mi sembra
     						break;
     					case "Nessun attacco":
     						inputDaInviare = getIndiceAzione(azioniPossibili, "NON_ATTACCA");
@@ -629,7 +627,7 @@ public class GUI {
                 p.getButton().removeActionListener(act);
             }
         }
-        //pulsanti settori
+        //pulsanti-settore
         for (final Pulsante p : listaPulsantiSettore){
             for(ActionListener act : p.getButton().getActionListeners()) {
                 p.getButton().removeActionListener(act);
