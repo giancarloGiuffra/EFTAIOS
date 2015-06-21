@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JLabel;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -101,6 +103,32 @@ public class GUITest {
 				assertFalse(p.getButton().isEnabled());
 			}
 		}
+	}
+	
+	@Test
+	public void testRicavaInformazioniIniziali() {
+		List<String> informazioniIniziali = new ArrayList<String>();
+		informazioniIniziali.add("Ennio Maria Dominoni (CAPITANO)");
+		informazioniIniziali.add("L08");
+		informazioniIniziali.add("HUMAN");
+		JLabel[] guiLabels = guiDiTest.getLabelsHelpTest();
+		guiDiTest.ricavaInformazioniInizialiHelpTest(informazioniIniziali);
+		for (Pulsante p : listaPulsantiSettore) {
+			if (p.getNomePulsante().equals(informazioniIniziali.get(1))) {
+				assertThat(p.getButton().getBackground(), is(Color.GREEN));
+			}
+		}
+		assertThat(guiLabels[0].getText(), is("Posizione attuale: " + informazioniIniziali.get(1)));
+		assertThat(guiLabels[1].getText(), is("Giocatore corrente: " + informazioniIniziali.get(0) + " (" + informazioniIniziali.get(2) + ")"));
+	}
+	
+	@Test
+	public void testEstraiNomiGiocatori() {
+		List<String> nomiGiocatori = new ArrayList<String>();
+		nomiGiocatori.add("Ennio Maria Dominoni (CAPITANO)");
+		nomiGiocatori.add("Julia Niguloti (PILOTA)");
+		String stringaConNomi = guiDiTest.estraiNomiGiocatoriHelpTest(nomiGiocatori);
+		assertTrue(stringaConNomi.equals("Ennio Maria Dominoni (CAPITANO);  Julia Niguloti (PILOTA);  "));
 	}
 
 }

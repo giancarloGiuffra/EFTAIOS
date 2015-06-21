@@ -705,5 +705,37 @@ public class GUI {
     public void creaGUIHelpTest() {
     	creaGUI();
     }
+    
+    /**
+     * Italian: metodo di supporto per i test, utilizzato semplicemente per chiamare il metodo "ricavaInformazioniIniziali".
+     * English: method used as support for tests, whose function only consists in calling the method "ricavaInformazioniIniziali".
+     * @param informazioniIniziali
+     */
+    public void ricavaInformazioniInizialiHelpTest(List<String> informazioniIniziali) {
+    	ricavaInformazioniIniziali(informazioniIniziali);
+    }
+    
+    /**
+     * Italian: metodo di supporto per i test, che restituisce le etichette "bottomLabel" e "topLabel" in un array.
+     * English: method used as support for tests, which returns the "bottomLabel" and "topLabel" JLabels as array.
+     * @return bottomLabel and topLabel
+     */
+    public JLabel[] getLabelsHelpTest() {
+    	JLabel[] labels = {bottomLabel, topLabel};
+    	return labels;
+    }
+    
+    /**
+     * Italian: metodo di supporto per i test, utilizzato semplicemente per chiamare il metodo "estraiNomiGiocatori". Tale metodo
+     * 	riceve in ingresso una lista di nomi di giocatori e restituisce questi nomi in un'unica stringa, usando il simbolo ";" come
+     * 	separatore.
+     * English: method used as support for tests, whose function only consists in calling the method "estraiNomiGiocatori". This last
+     * 	method gets as input a list containing a certain amount of names for players and elaborates this input in order to return all
+     * 	those names in a single string, using the ";" symbol as separator.
+     * @param nomi
+     */
+    public String estraiNomiGiocatoriHelpTest(List<String> nomi) {
+    	return estraiNomiGiocatori(nomi);
+    }
 	
 }
