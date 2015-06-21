@@ -58,7 +58,7 @@ public class MainTest {
 		posizioni = new ArrayDeque<String>();
 	}
 	
-	/*@Test
+	@Test
 	public void testPrimoTurnoUnGiocatore(){
 		
 		//main specifico
@@ -86,6 +86,6 @@ public class MainTest {
 		//print posizioni
 		for(String posizione : posizioni)
 		    print(posizione);
-	}*/
+	}
 
 }

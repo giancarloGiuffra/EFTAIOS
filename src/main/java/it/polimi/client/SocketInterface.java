@@ -18,7 +18,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	private Socket socket;
 	private BufferedReader in;
 	private PrintWriter out;
-	private BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+	private BufferedReader stdIn;
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 65535; //porta di ascolto del server
     protected static final Logger LOGGER = Logger.getLogger(SocketInterface.class.getName());
@@ -31,7 +31,15 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	 * Costruttore
 	 */
 	public SocketInterface(){
-		
+	    stdIn = new BufferedReader(new InputStreamReader(System.in));
+	}
+	
+	/**
+	 * Costruttore
+	 * @param stdIn
+	 */
+	public SocketInterface(BufferedReader stdIn){
+	    this.stdIn = stdIn;
 	}
 	
 	/**

@@ -312,7 +312,7 @@ public class GameServer implements BaseObserver{
     }
 
     
-    /*public void startServerSocketOnlyForTest(int maxNumberOfClientsPerRoom, Thread thread1, Thread thread2, ServerSocketForTwoCLients serverSocketForTwoCLients) throws IOException, InterruptedException {
+    public void startServerSocketOnlyForTest(int maxNumberOfClientsPerRoom) throws IOException {
         
         this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
         
@@ -340,6 +340,6 @@ public class GameServer implements BaseObserver{
                 } //synchronized per evitare che RMI e Socket cerchino di aggiungere un client alla sala quando c'è solo l'ultimo posto disponibile
                 counter--;
         } //while
-    }*/
+    }
 	
 }

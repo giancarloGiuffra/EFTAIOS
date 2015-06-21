@@ -11,8 +11,6 @@ import java.util.logging.Logger;
 public class ServerSocketForTwoCLients extends BaseObservable implements Runnable {
     
     GameServer server;
-    Thread thread1;
-    Thread thread2;
     private static final Logger LOGGER = Logger.getLogger(ServerSocketForTwoCLients.class.getName());
 
     
@@ -21,10 +19,8 @@ public class ServerSocketForTwoCLients extends BaseObservable implements Runnabl
      * @param client2Thread 
      * @param client1Thread 
      */
-    public ServerSocketForTwoCLients(Thread client1Thread, Thread client2Thread){
+    public ServerSocketForTwoCLients(){
          server = new GameServer(65535,65510,1); //così currentGameRoom non può che essere l'unica sala aperta
-         thread1 = client1Thread;
-         thread2 = client2Thread;
     }
     
     /**
@@ -35,23 +31,15 @@ public class ServerSocketForTwoCLients extends BaseObservable implements Runnabl
     }
     
     /**
-     * per mantenere il notify di BaseObservable protected final
-     * @param event
-     */
-    public void notifyEvent(Event event){
-    	this.notify(event);
-    }
-    
-    /**
      * fa partire il server, gestisce le due connessioni, inizializza la sal e aspetta i thread dei client
      */
     @Override
     public void run(){
-        /*try {
-            server.startServerSocketOnlyForTest(2, this.thread1, this.thread2, this);
-        } catch (InterruptedException | IOException e) {
+        try {
+            server.startServerSocketOnlyForTest(2);
+        } catch (IOException e) {
             LOGGER.log(Level.INFO, e.getMessage(), e);
-        }*/
+        }
     }
 
     /**

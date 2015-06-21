@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-public class GameServerTest implements BaseObserver{
+public class GameServerTest {
     
     private static final Logger LOGGER = Logger.getLogger(GameServerTest.class.getName());
     private static final Pattern CHIEDI_MOSSA = Pattern.compile("Indica la tua mossa:.*", Pattern.DOTALL); //DOTALL fa che . matchi anche i line terminator
@@ -43,6 +43,7 @@ public class GameServerTest implements BaseObserver{
     private static final Pattern PESCA_CARTA = Pattern.compile("Devi pescare una Carta Settore.*");
     private static final Pattern SCEGLIE_AZIONE = Pattern.compile("Le azioni possibili sono.*");
     private static final Pattern ANNUNCIA_SETTORE = Pattern.compile(".*RUMORE IN QUALUNQUE SETTORE");
+    private static final Pattern CHIEDE_IP = Pattern.compile("Inserisci l'Indirizzo IP del Server.*");
     private SocketInterface client1;
     private SocketInterface client2;
     private RispostaPerServer rispostaClient1;
@@ -50,68 +51,56 @@ public class GameServerTest implements BaseObserver{
     
     @Before
     public void inizializza(){
-        client1 = spy(new SocketInterface());
-        client2 = spy(new SocketInterface());
+        client1 = spy(new SocketInterface(Risposta.risposta("127.0.0.1")));
+        client2 = spy(new SocketInterface(Risposta.risposta("127.0.0.1")));
         rispostaClient1 = new RispostaPerServer(client1);
         rispostaClient2 = new RispostaPerServer(client2);
 
     }
     
-    /*@Test
-    public void testServerSocketForTwoCLients(){
+    @Test
+    public void testServerSocketForTwoClientsConnectionOnly(){
         
-        //set up
-    	Thread client1Thread = new Thread(client1);
-        Thread client2Thread = new Thread(client2);
-        ServerSocketForTwoCLients server = new ServerSocketForTwoCLients(client1Thread,client2Thread);
-        this.rispostaClient1.setGameServerTest(this);
-        this.rispostaClient2.setGameServerTest(this);
-        server.addObserver(this); //per inviare l'aggiornamento del model per le risposte che dipendono dala posizione del client
+        //set up e test connessione
+        ServerSocketForTwoCLients server = new ServerSocketForTwoCLients();
         Thread serverThread = new Thread(server);
         serverThread.start();
         client1.connectToServer();
-        client1Thread.start();
-        client2.connectToServer(); 
-        client2Thread.start(); // dovrei avere serverThread che aspetta nel join con i due client trhead che aspettano le comunicazioni dal server
-    	
-    	//given - behavior client1
-        //willAnswer(rispostaClient1.risposta(System.lineSeparator())).given(client1).print(matches(BENVENUTO.pattern()));
+        client2.connectToServer();
+        try {
+            serverThread.join(); //per aspettare il set up della game room
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.SEVERE, "Interrupted exception in join", e);
+        }
+        rispostaClient1.setModel(server.gameRoom().model());
+        rispostaClient2.setModel(server.gameRoom().model());
+
+        //given - behavior client1
         willAnswer(rispostaClient1.risposta("mossa_aleatoria")).given(client1).print(matches(TURNO.pattern()));
         willAnswer(rispostaClient1.risposta(System.lineSeparator())).given(client1).print(matches(PESCA_CARTA.pattern()));
         willAnswer(rispostaClient1.risposta("1")).given(client1).print(matches(SCEGLIE_AZIONE.pattern()));
         willAnswer(rispostaClient1.risposta("announce: M09")).given(client1).print(matches(ANNUNCIA_SETTORE.pattern()));
         
-      //given - behavior client2
-        //willAnswer(rispostaClient2.risposta(System.lineSeparator())).given(client2).print(matches(BENVENUTO.pattern()));
+        //given - behavior client2
         willAnswer(rispostaClient2.risposta("mossa_aleatoria")).given(client2).print(matches(TURNO.pattern()));
         willAnswer(rispostaClient2.risposta(System.lineSeparator())).given(client2).print(matches(PESCA_CARTA.pattern()));
         willAnswer(rispostaClient2.risposta("1")).given(client2).print(matches(SCEGLIE_AZIONE.pattern()));
         willAnswer(rispostaClient2.risposta("announce: M09")).given(client2).print(matches(ANNUNCIA_SETTORE.pattern()));
-
-        //when
-        (new Thread(server.gameRoom())).start();//faccio partire la game room
+        
+        // when
+        server.gameRoom().run();
+        Thread client1Thread = new Thread(client1);
+        Thread client2Thread = new Thread(client2);
+        client1Thread.start();
+        client2Thread.start();
         try {
-			serverThread.join();
-		} catch (InterruptedException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-		} //wait for server to finish
-        server.close(); //chiude server , libera la porta
-    }*/
+            client1Thread.join();
+            client2Thread.join();
+            server.gameRoom().thread().join();
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.SEVERE, "Interrupted exception in join", e);
+        }
 
-	@Override
-	public void notifyRicevuto(BaseObservable source, Event event) {
-		if(source instanceof ServerSocketForTwoCLients){
-			if(event.name().equals("SetModelInGameServerTest")){
-				Model model = ((SetModelInGameServerTest)event).model();
-				this.rispostaClient1.setModel(model);
-				this.rispostaClient2.setModel(model);
-				synchronized(this){
-					this.notifyAll(); //neccessario per le risposte che stanno aspettando l'assegnamento del model
-				}
-			}
-		}
-		
-	}
-
+    }
 
 }

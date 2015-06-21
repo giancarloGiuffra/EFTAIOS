@@ -18,7 +18,7 @@ import it.polimi.server.exceptions.IllegalObservableForClientManager;
 import it.polimi.server.exceptions.IllegalObservableForGameRoom;
 import it.polimi.view.View;
 
-public class GameRoom extends BaseObservable implements BaseObserver, Runnable{
+public class GameRoom extends BaseObservable implements BaseObserver{
     
     private static final Integer TIME_LIMIT_FOR_START = 5; // in minuti
 	private Model model;
@@ -29,6 +29,7 @@ public class GameRoom extends BaseObservable implements BaseObserver, Runnable{
     private Boolean hasStarted = false;
     private Boolean hasFinished = false;
     private Timer timer;
+    private Thread thread;
     
     private static AtomicInteger NUMBER_OF_GAMEROOMS = new AtomicInteger(0);
     
@@ -108,9 +109,17 @@ public class GameRoom extends BaseObservable implements BaseObserver, Runnable{
     /**
      * lancia la game room
      */
-    @Override
-    public void run() {        
-        (new Thread(view)).start();     
+    public void run() {  
+        this.thread = new Thread(view);
+        (this.thread).start();     
+    }
+    
+    /**
+     * getter per il thread 
+     * @return
+     */
+    public Thread thread(){
+        return this.thread;
     }
     
     /**
