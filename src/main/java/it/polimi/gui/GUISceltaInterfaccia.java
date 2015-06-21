@@ -12,6 +12,7 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 public class GUISceltaInterfaccia {
     
@@ -91,9 +92,11 @@ public class GUISceltaInterfaccia {
         JFrame frame = new JFrame();
         String tipoMessaggio = "Connessione Fallita";
         JLabel messaggio = new JLabel(tipoMessaggio, SwingConstants.CENTER);
+        messaggio.setBorder(new EmptyBorder(10, 20, 10, 20));
         frame.add(messaggio);
         frame.getContentPane();
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
     
