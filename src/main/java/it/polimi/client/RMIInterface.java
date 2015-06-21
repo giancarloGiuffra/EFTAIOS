@@ -66,20 +66,10 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	public Boolean connectToServer() {
 		try {
 			return registerServerInClient() && registerClientInServer();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		    return false;
 		}
-	}
-
-	/**
-	 * controlla se un port è valido
-	 * @param port
-	 * @return
-	 */
-	private boolean notValidPort(String portName) {
-		Integer port = Integer.parseInt(portName);
-		return (port >= 49152) && (port <= 65535);
 	}
 
 	@Override
@@ -121,50 +111,12 @@ public class RMIInterface implements NetworkInterfaceForClient {
 		}
 	}
 
+	/**
+	 * true se il client è chiuso
+	 * @return
+	 */
 	protected boolean isClosed() {
 		return this.closed;
-	}
-
-	/**
-	 * metodo per ottenere un indirizzo IP da inviare al server
-	 * @return
-	 */
-	public static String getMyIPAddress() {
-		Enumeration<NetworkInterface> interfaces;
-		/*try {
-			interfaces = NetworkInterface.getNetworkInterfaces();
-			while(interfaces.hasMoreElements()){
-				NetworkInterface n = (NetworkInterface) interfaces.nextElement();
-				Enumeration<InetAddress> addresses = n.getInetAddresses();
-				while(addresses.hasMoreElements()){
-					InetAddress address = (InetAddress) addresses.nextElement();
-					if(isUsable(address)) return address.getHostAddress();
-					else*/
-						try {
-							return InetAddress.getLocalHost().toString();//.getHostAddress();
-						} catch (UnknownHostException e) {
-							LOGGER.log(Level.SEVERE, "Problema con InetAddress", e);
-							return "ERROR";
-						}
-				/*}
-			}
-		} catch (SocketException e) {
-			LOGGER.log(Level.SEVERE, "Problema in getMyIPAddress", e);
-			return "ERROR";
-		}*/
-		//return "ERROR";
-	}
-
-	/**
-	 * metodo di supporto per verificare se l'indirizzo IP "può" servire
-	 * @param address
-	 * @return
-	 */
-	private static boolean isUsable(InetAddress address) {
-		return !address.isLoopbackAddress() &&
-				!address.isLinkLocalAddress() &&
-				!address.isSiteLocalAddress() &&
-				!address.isMulticastAddress();
 	}
 
 	/**
@@ -185,6 +137,11 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	    }
 	}
 	
+	/**
+	 * controlla se deve stampare a video la string
+	 * @param string
+	 * @return
+	 */
 	protected boolean mustPrint(String string) {
 		return !string.equals("FINE_MESSAGGIO") && 
 	           !string.equals("RICHIEDE_INPUT") &&
@@ -192,6 +149,11 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	           !isCommand(string);
 	}
 	
+	/**
+	 * controlla se è un comando
+	 * @param string
+	 * @return
+	 */
 	protected boolean isCommand(String string){
 	    Matcher matcher = PATTERN_COMANDO.matcher(string);
 	    return matcher.matches();
@@ -203,9 +165,13 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * @throws IOException 
 	 */
 	public String read() throws IOException{
+	    
+	    //timer
 	    Timer timer = new Timer();
 	    timer.schedule( new TimeLimitInput(this, timer), TIME_LIMIT*1000 );
 	    print(String.format("(hai %s secondi)",TIME_LIMIT));
+	    
+	    //ciclo per attendere l'input
 	    while(!stdIn.ready() && !isClosed()){
 			synchronized(this){
 				try {
@@ -215,10 +181,12 @@ public class RMIInterface implements NetworkInterfaceForClient {
 				}
 			}
 		}
+	    
+	    //controllo l'input
         if(!isClosed()){
         	String input = stdIn.readLine();
             timer.cancel();
-            if(input.equals("ABORT")) this.close(); //cleint decide di chiudere
+            if(input.equals("ABORT")) this.close(); //client decide di chiudere
             return input;
         } else {
         	return "ABORT";
@@ -231,10 +199,12 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * @throws IOException 
 	 */
 	private Boolean registerServerInClient() throws IOException{
-		print("Inserisci l'Indirizzo IP del Server: ");
+		
+	    //chiedi IP del server
+	    print("Inserisci l'Indirizzo IP del Server: ");
 		String server = stdIn.readLine();
-		//String server = "127.0.0.1";
-		String clientRMIFactoryName = "ClientRMIFactory";
+		
+		//get registry del server
 		Registry registry;
 		try {
 			registry = LocateRegistry.getRegistry(server, PORT);
@@ -243,6 +213,8 @@ public class RMIInterface implements NetworkInterfaceForClient {
 			return false;
 		}
 		
+	    //oggetto remoto nel server
+		String clientRMIFactoryName = "ClientRMIFactory";
 		try {
 			this.clientRMIFactory = (ClientRMIFactory) registry.lookup(clientRMIFactoryName);
 		} catch(RemoteException e){
@@ -258,26 +230,38 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	/**
 	 * crea notifier per poter ricevere richiesta dal server
 	 * @return
-	 * @throws Exception 
+	 * @throws IOException 
 	 */
-	private Boolean registerClientInServer() throws Exception{
-		Integer port = getValidPort();
-		String ipAddress = GameServer.getIp();
-		if(!"ERROR".equals(ipAddress)){
-		    try {
-				this.notifier = new NotifierClient(this);
-				RemoteNotifier notifierStub = (RemoteNotifier) UnicastRemoteObject.exportObject(notifier, port);
-				Registry registry = LocateRegistry.createRegistry(port);
-				String notifierName = "Notifier".concat(port.toString());
-				registry.bind(notifierName, notifierStub);
-				this.clientRMIFactory.createNewClientRMI(notifierName, ipAddress, port);
-				return true;
-			} catch (RemoteException | AlreadyBoundException e) {
-				LOGGER.log(Level.SEVERE, "RMI Exception", e);
-				return false;
-			}
-		}else{
-			print("Errore nell'ottenere un indirizzo IP valido da inviare al server");
+	private Boolean registerClientInServer(){
+		//cerca port libero
+	    Integer port;
+		try{
+		    port = getValidPort();
+		} catch (IllegalStateException e){
+		    LOGGER.log(Level.SEVERE, "Non è stato trovare una porta libera", e);
+            return false;
+		}
+		
+		//trova ip address da inviare al server
+		String ipAddress;
+        try {
+            ipAddress = GameServer.getPrivateIpAddress();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Non è stato possibile calcolare l'ip da inviare al server", e);
+            return false;
+        }
+        
+        //register client in server
+	    try {
+			this.notifier = new NotifierClient(this);
+			RemoteNotifier notifierStub = (RemoteNotifier) UnicastRemoteObject.exportObject(notifier, port);
+			Registry registry = LocateRegistry.createRegistry(port);
+			String notifierName = "Notifier".concat(port.toString());
+			registry.bind(notifierName, notifierStub);
+			this.clientRMIFactory.createNewClientRMI(notifierName, ipAddress, port);
+			return true;
+		} catch (RemoteException | AlreadyBoundException e) {
+			LOGGER.log(Level.SEVERE, "RMI Exception", e);
 			return false;
 		}
 	}
@@ -285,8 +269,9 @@ public class RMIInterface implements NetworkInterfaceForClient {
     /**
      * trova un port disponibile
      * @return
+     * @throws IllegalStateException
      */
-	private int getValidPort(){
+	private int getValidPort() throws IllegalStateException {
         try {
             ServerSocket temporary = new ServerSocket(0);
             temporary.setReuseAddress(true);

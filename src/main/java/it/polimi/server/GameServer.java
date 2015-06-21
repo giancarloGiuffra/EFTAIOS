@@ -18,14 +18,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,7 +77,7 @@ public class GameServer implements BaseObserver{
     	GameServer server = new GameServer(65535, 65533);
     	try{                
             server.startServer(2); //default 8 giocatori al massimo per game room
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
@@ -82,15 +85,18 @@ public class GameServer implements BaseObserver{
     /**
      * lancia il server
      * @param maxNumberOfClientsPerRoom numero massimo di clients per room
+     * @throws IOException 
      * @throws Exception 
      */
-    public void startServer(int maxNumberOfClientsPerRoom) throws Exception {
+    public void startServer(int maxNumberOfClientsPerRoom) throws IOException {
     	
     	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
     	
     	//print IP address
-    	String ipAddress = getIp();
-    	LOGGER.log(Level.INFO, String.format("IP Address: %s", ipAddress));
+    	String ipPrivateAddress = getPrivateIpAddress();
+        String ipPublicAddress = getPublicIpAddress();
+    	LOGGER.log(Level.INFO, String.format("Private IP Address: %s", ipPrivateAddress));
+        LOGGER.log(Level.INFO, String.format("Public IP Address: %s", ipPublicAddress));
     	
     	//creazione gameroom
     	this.setCurrentGameRoom(new GameRoom(new ClientManager(MAX_NUMBER_CLIENTS_PER_ROOM)));
@@ -175,7 +181,7 @@ public class GameServer implements BaseObserver{
 	 */
 	private void gesticeServerGameRoomTurnedAvailable(GameRoom gameRoom) {
 		synchronized(this){ //synchronized così i thread che segnalano che la corrispondente game room è chiusa si sincronizzano
-			if(lastGameRoomAvailableHasStarted()){
+			if(lastGameRoomAvailableHasStarted() || isCurrentGameRoom(gameRoom)){ //se ricevo il notify dalla current game room vuol dire che non era partita per via del timeout
 				this.gameRooms.remove(gameRoom);
 				makeNewGameRoomAvailable();
 			} else {
@@ -185,6 +191,15 @@ public class GameServer implements BaseObserver{
 	}
 
 	/**
+	 * true se la gameRoom è la current game room
+	 * @param gameRoom
+	 * @return
+	 */
+	private boolean isCurrentGameRoom(GameRoom gameRoom) {
+	    return gameRoom.equals(this.currentGameRoom);
+    }
+
+    /**
 	 * gestisce l'arrivo di un nuovo client RMI
 	 * @param event
 	 */
@@ -267,27 +282,33 @@ public class GameServer implements BaseObserver{
     }
     
     /**
-     * calcola l'ip address esterna da usare
+     * metodo per ottenere l'indirizzo IP publico
      * @return
-     * @throws Exception 
+     * @throws IOException 
      */
-    public static String getIp() throws Exception{
+    public static String getPublicIpAddress() throws IOException{
         URL whatismyip = new URL("http://checkip.amazonaws.com");
         BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(
-                    whatismyip.openStream()));
-            String ip = in.readLine();
-            return ip;
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "connessione con checkip amazonaws non chiusa", e);
-                }
+        in = new BufferedReader(new InputStreamReader(
+                whatismyip.openStream()));
+        String ip = in.readLine();
+        if (in != null) {
+            try {
+                in.close();
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "connessione con checkip amazonaws non chiusa", e);
             }
         }
+        return ip;
+    }
+    
+    /**
+     * metodo per ottenere l'indirizzo IP privato
+     * @return
+     * @throws IOException 
+     */
+    public static String getPrivateIpAddress() throws IOException {
+        return InetAddress.getLocalHost().getHostAddress();
     }
 
     
