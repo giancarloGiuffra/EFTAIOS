@@ -244,7 +244,6 @@ public class ClientManager extends BaseObservable implements BaseObserver{
      */
     private void removePlayer(Player player) {
         this.clients.remove(this.players.get(player));
-        this.players.remove(player);
     }
 
     /**

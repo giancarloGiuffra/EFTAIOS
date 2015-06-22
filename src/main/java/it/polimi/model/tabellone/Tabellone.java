@@ -132,11 +132,25 @@ public class Tabellone {
      * @param settore
      * @return
      */
-    public Settore getRandomAdjacentSector(Settore settore){
+    public Settore getRandomAdjacentSectorForHuman(Settore settore){
     	Random random = new Random();
     	List<String> adiacenti = settore.getSettoriAdiacenti();
 		Settore scelto = this.getSettore(adiacenti.get(random.nextInt(adiacenti.size()-1)));
-		while(scelto.isBase() || scelto.isInaccessibile()) //se il player fosse alien questa funzione dovrebbe essere chiamata di nuovo
+		while(scelto.isBase() || scelto.isInaccessibile())
+			scelto = this.getSettore(adiacenti.get(random.nextInt(adiacenti.size()-1)));
+		return scelto;
+    }
+    
+    /**
+     * settore adiacenti aleatorio valido per alieno
+     * @param settore
+     * @return
+     */
+    public Settore getRandomAdjacentSectorForAlien(Settore settore){
+    	Random random = new Random();
+    	List<String> adiacenti = settore.getSettoriAdiacenti();
+		Settore scelto = this.getSettore(adiacenti.get(random.nextInt(adiacenti.size()-1)));
+		while(scelto.isBase() || scelto.isInaccessibile() || scelto.isScialuppa())
 			scelto = this.getSettore(adiacenti.get(random.nextInt(adiacenti.size()-1)));
 		return scelto;
     }
@@ -146,8 +160,17 @@ public class Tabellone {
      * @param nomeSettore
      * @return
      */
-    public Settore getRandomAdjacentSector(String nomeSettore){
-    	return this.getRandomAdjacentSector(this.getSettore(nomeSettore));
+    public Settore getRandomAdjacentSectorForHuman(String nomeSettore){
+    	return this.getRandomAdjacentSectorForHuman(this.getSettore(nomeSettore));
+    }
+    
+    /**
+     * settore adiacente aleatorio valido per alieno 
+     * @param nomeSettore
+     * @return
+     */
+    public Settore getRandomAdjacentSectorForAlien(String nomeSettore){
+    	return this.getRandomAdjacentSectorForAlien(this.getSettore(nomeSettore));
     }
     
     @Override

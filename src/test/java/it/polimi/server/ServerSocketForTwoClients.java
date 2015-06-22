@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ServerSocketForTwoCLients extends BaseObservable implements Runnable {
+public class ServerSocketForTwoClients extends BaseObservable implements Runnable {
     
     GameServer server;
-    private static final Logger LOGGER = Logger.getLogger(ServerSocketForTwoCLients.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ServerSocketForTwoClients.class.getName());
 
     
     /**
@@ -19,7 +19,7 @@ public class ServerSocketForTwoCLients extends BaseObservable implements Runnabl
      * @param client2Thread 
      * @param client1Thread 
      */
-    public ServerSocketForTwoCLients(){
+    public ServerSocketForTwoClients(){
          server = new GameServer(65535,65510,1); //così currentGameRoom non può che essere l'unica sala aperta
     }
     

@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.polimi.common.observer.Event;
@@ -23,7 +24,7 @@ public class MainTest {
 	private static final Pattern CHIEDI_MOSSA = Pattern.compile("Indica la tua mossa:.*", Pattern.DOTALL); //DOTALL fa che . matchi anche i line terminator
 	private static final Pattern MOSSA_NON_VALIDA = Pattern.compile("La mossa inserita non è valida.*");
 	private static final Pattern BENVENUTO = Pattern.compile("Benvenuto.*");
-	private static final Pattern TURNO = Pattern.compile("Tocca a .* Posizione (?<posizione>.{3})");
+	private static final Pattern TURNO = Pattern.compile("Tocca a te .*\\((?<personaggio>.*)\\) - Turno numero \\d{1,} - Posizione (?<posizione>.{3})");
 	private static final Pattern TURNO_FINITO = Pattern.compile("Il tuo turno è finito.*", Pattern.DOTALL);
 	private static final Pattern PESCA_CARTA = Pattern.compile("Devi pescare una Carta Settore.*");
 	private static final Pattern SCEGLIE_AZIONE = Pattern.compile("Le azioni possibili sono.*");

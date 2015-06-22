@@ -246,7 +246,7 @@ public class GameServer implements BaseObserver{
      * lancia il server solo per RMI connection
      * @throws IOException
      */
-    public void startServerRMIOnlyForTest(int maxNumberOfClientsPerRoom) throws IOException {
+    public void startServerRMIOnlyForTest(int maxNumberOfClientsPerRoom) {
     	
     	this.MAX_NUMBER_CLIENTS_PER_ROOM = maxNumberOfClientsPerRoom;
     	

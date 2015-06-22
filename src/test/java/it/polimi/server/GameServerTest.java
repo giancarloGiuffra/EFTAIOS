@@ -38,7 +38,7 @@ public class GameServerTest {
     private static final Pattern CHIEDI_MOSSA = Pattern.compile("Indica la tua mossa:.*", Pattern.DOTALL); //DOTALL fa che . matchi anche i line terminator
     private static final Pattern MOSSA_NON_VALIDA = Pattern.compile("La mossa inserita non è valida.*");
     private static final Pattern BENVENUTO = Pattern.compile("Benvenuto.*");
-    private static final Pattern TURNO = Pattern.compile("Tocca a .* Posizione (?<posizione>.{3})");
+	private static final Pattern TURNO = Pattern.compile("Tocca a te .*\\((?<personaggio>.*)\\) - Turno numero \\d{1,} - Posizione (?<posizione>.{3})");
     private static final Pattern TURNO_FINITO = Pattern.compile("Il tuo turno è finito.*", Pattern.DOTALL);
     private static final Pattern PESCA_CARTA = Pattern.compile("Devi pescare una Carta Settore.*");
     private static final Pattern SCEGLIE_AZIONE = Pattern.compile("Le azioni possibili sono.*");
@@ -59,10 +59,10 @@ public class GameServerTest {
     }
     
     @Test
-    public void testServerSocketForTwoClientsConnectionOnly(){
+    public void testServerSocketForTwoClientsConnectionAndGameDynamics(){
         
         //set up e test connessione
-        ServerSocketForTwoCLients server = new ServerSocketForTwoCLients();
+        ServerSocketForTwoClients server = new ServerSocketForTwoClients();
         Thread serverThread = new Thread(server);
         serverThread.start();
         client1.connectToServer();
@@ -96,11 +96,18 @@ public class GameServerTest {
         try {
             client1Thread.join();
             client2Thread.join();
-            server.gameRoom().thread().join();
         } catch (InterruptedException e) {
             LOGGER.log(Level.SEVERE, "Interrupted exception in join", e);
         }
+        
+        //chiusura server
+        server.close();
 
+    }
+    
+    @Test
+    public void testRMIServerForTwoClientsConnectionOnly(){
+    	//TODO
     }
 
 }
