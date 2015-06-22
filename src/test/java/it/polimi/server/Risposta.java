@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 
+import it.polimi.client.NetworkInterfaceForClient;
 import it.polimi.client.SocketInterface;
 
 import org.mockito.invocation.InvocationOnMock;
@@ -11,7 +12,7 @@ import org.mockito.stubbing.Answer;
 
 public class Risposta implements Answer<Void> {
 	
-	protected SocketInterface socketInterface;
+	protected NetworkInterfaceForClient interfaccia;
 	protected String risposta;
 	
 	/**
@@ -19,8 +20,8 @@ public class Risposta implements Answer<Void> {
 	 * @param view
 	 * @param risposta
 	 */
-	Risposta(SocketInterface socketInterface, String risposta){
-		this.socketInterface = socketInterface;
+	Risposta(NetworkInterfaceForClient interfaccia, String risposta){
+		this.interfaccia = interfaccia;
 		this.risposta = risposta;
 	}
 	
@@ -31,14 +32,6 @@ public class Risposta implements Answer<Void> {
 	 */
 	public static BufferedReader risposta(String string){
 		return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(string.getBytes())));
-	}
-	
-	/**
-	 * getter per view
-	 * @return
-	 */
-	public SocketInterface socketInterface(){
-		return this.socketInterface;
 	}
 	
 	/**
@@ -55,7 +48,7 @@ public class Risposta implements Answer<Void> {
 	 */
 	@Override
 	public Void answer(InvocationOnMock invocation) throws Throwable {
-		this.socketInterface.setStdIn(risposta(this.risposta));
+		this.interfaccia.setStdIn(risposta(this.risposta));
 		return null;
 	}
 

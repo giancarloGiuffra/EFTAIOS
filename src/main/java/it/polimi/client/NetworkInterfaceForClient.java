@@ -1,5 +1,7 @@
 package it.polimi.client;
 
+import java.io.BufferedReader;
+
 public interface NetworkInterfaceForClient extends Runnable{
 	
 	/**
@@ -19,6 +21,11 @@ public interface NetworkInterfaceForClient extends Runnable{
 	 */
 	void print(String string);
 	
+	/**
+	 * setter del buffered reader per l'input
+	 * @param stdIn
+	 */
+	void setStdIn(BufferedReader stdIn);
 	
 	/**
 	 * time limit per input

@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import org.mockito.invocation.InvocationOnMock;
 
+import it.polimi.client.NetworkInterfaceForClient;
 import it.polimi.client.SocketInterface;
 import it.polimi.model.Model;
 import it.polimi.view.View;
@@ -20,8 +21,8 @@ public class RispostaMossa extends Risposta {
 	 * @param string
 	 * @param gameServerTest 
 	 */
-	public RispostaMossa(SocketInterface socketInterface, String string, Model model) {
-		super(socketInterface, string);
+	public RispostaMossa(NetworkInterfaceForClient interfaccia, String string, Model model) {
+		super(interfaccia, string);
 		this.model = model;
 	}
 	
@@ -49,7 +50,7 @@ public class RispostaMossa extends Risposta {
 			else
 				risposta = String.format("move to: %s", model.tabellone().getRandomAdjacentSectorForHuman(posizione).getNome());
 
-			this.socketInterface.setStdIn(risposta(risposta));
+			this.interfaccia.setStdIn(risposta(risposta));
 		}
 		return null;
 	}

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ServerSocketForTwoClients extends BaseObservable implements Runnable {
+public class ServerSocketForTwoClients implements Runnable {
     
     GameServer server;
     private static final Logger LOGGER = Logger.getLogger(ServerSocketForTwoClients.class.getName());

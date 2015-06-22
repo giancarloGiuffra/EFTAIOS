@@ -46,6 +46,7 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	 * setter per stdIn
 	 * @param stdIn
 	 */
+	@Override
 	public void setStdIn(BufferedReader stdIn){
 	    this.stdIn = stdIn;
 	}

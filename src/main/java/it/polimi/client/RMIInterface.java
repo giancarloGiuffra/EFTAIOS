@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 
 public class RMIInterface implements NetworkInterfaceForClient {
 
-	private BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+	private BufferedReader stdIn;
 	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 65533; //porta di ascolto del server
     protected static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
@@ -50,7 +50,24 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	 * Costruttore
 	 */
 	public RMIInterface(){
-		
+		stdIn = new BufferedReader(new InputStreamReader(System.in));
+	}
+	
+	/**
+	 * Costruttore
+	 * @param stdIn
+	 */
+	public RMIInterface(BufferedReader stdIn){
+	    this.stdIn = stdIn;
+	}
+	
+	/**
+	 * setter per stdIn
+	 * @param stdIn
+	 */
+	@Override
+	public void setStdIn(BufferedReader stdIn){
+	    this.stdIn = stdIn;
 	}
 	
 	/**

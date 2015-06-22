@@ -101,7 +101,13 @@ public class GUISceltaInterfaccia {
     }
     
     public void comunicaTecnologiaDiComunicazioneHelpTest(String nomePulsante) {
-    	comunicaTecnologiaDiComunicazione(nomePulsante);
+    	finestraIniziale.setVisible(false);
+        if (nomePulsante.equals(startConSocket)) {
+            tipoInterfaccia = TipoInterface.SOCKET_GUI;
+        }
+        else if (nomePulsante.equals(startConRMI)) {
+            tipoInterfaccia = TipoInterface.RMI_GUI;
+        }
     }
     
     public TipoInterface getTipoInterfaccia() {

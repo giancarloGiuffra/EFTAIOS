@@ -9,7 +9,10 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import it.polimi.client.NetworkInterfaceForClient;
+import it.polimi.client.RMIInterface;
 import it.polimi.client.SocketInterface;
+import it.polimi.client.TipoInterface;
 import it.polimi.common.observer.BaseObservable;
 import it.polimi.common.observer.BaseObserver;
 import it.polimi.common.observer.Event;
@@ -44,15 +47,24 @@ public class GameServerTest {
     private static final Pattern SCEGLIE_AZIONE = Pattern.compile("Le azioni possibili sono.*");
     private static final Pattern ANNUNCIA_SETTORE = Pattern.compile(".*RUMORE IN QUALUNQUE SETTORE");
     private static final Pattern CHIEDE_IP = Pattern.compile("Inserisci l'Indirizzo IP del Server.*");
-    private SocketInterface client1;
-    private SocketInterface client2;
+    private NetworkInterfaceForClient client1;
+    private NetworkInterfaceForClient client2;
     private RispostaPerServer rispostaClient1;
     private RispostaPerServer rispostaClient2;
     
-    @Before
-    public void inizializza(){
-        client1 = spy(new SocketInterface(Risposta.risposta("127.0.0.1")));
-        client2 = spy(new SocketInterface(Risposta.risposta("127.0.0.1")));
+    public void inizializza(TipoInterface tipo){
+    	switch(tipo){
+	    	case SOCKET:
+	    		client1 = spy(new SocketInterface(Risposta.risposta("127.0.0.1")));
+	    		client2 = spy(new SocketInterface(Risposta.risposta("127.0.0.1")));
+	    		break;
+	    	case RMI:
+	    		client1 = spy(new RMIInterface(Risposta.risposta("127.0.0.1")));
+	    		client2 = spy(new RMIInterface(Risposta.risposta("127.0.0.1")));
+	    		break;
+	    	default:
+	    		break;
+    	}
         rispostaClient1 = new RispostaPerServer(client1);
         rispostaClient2 = new RispostaPerServer(client2);
 
@@ -61,7 +73,10 @@ public class GameServerTest {
     @Test
     public void testServerSocketForTwoClientsConnectionAndGameDynamics(){
         
-        //set up e test connessione
+        //inizializza client e risposte
+    	inizializza(TipoInterface.SOCKET);
+    	
+    	//set up e test connessione
         ServerSocketForTwoClients server = new ServerSocketForTwoClients();
         Thread serverThread = new Thread(server);
         serverThread.start();
@@ -107,7 +122,18 @@ public class GameServerTest {
     
     @Test
     public void testRMIServerForTwoClientsConnectionOnly(){
-    	//TODO
+    	
+    	//inizializza client e risposte
+    	inizializza(TipoInterface.RMI);
+    	
+    	//set up
+    	ServerRMIForTwoClients server = new ServerRMIForTwoClients();
+    	server.run();
+        
+        //connessioni
+        client1.connectToServer();
+        client2.connectToServer();
+        
     }
 
 }
