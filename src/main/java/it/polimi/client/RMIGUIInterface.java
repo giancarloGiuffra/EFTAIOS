@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RMIGUIInterface extends RMIInterface {
 	
-	private GUI gui;
+	private transient GUI gui;
+	private Boolean hasPrintBeenCalled = false;
     
     /**
      * Costruttore
@@ -22,7 +25,6 @@ public class RMIGUIInterface extends RMIInterface {
 	
 	@Override
     public void run() {
-	    gui.visualizzaTabellone();
 	    while(!isClosed()){
 	    	try {
 				synchronized(this){
@@ -40,6 +42,8 @@ public class RMIGUIInterface extends RMIInterface {
      */
     @Override
     public void print(String string){
+        if(isFirstCallToPrint())
+            gui.visualizzaTabellone();
         if(isCommand(string)){
             gui.decoderComando(getComando(string));
         }
@@ -50,7 +54,19 @@ public class RMIGUIInterface extends RMIInterface {
             }
         }
     }
-    
+
+    /**
+     * true se è la prima volta che si chiama print
+     * @return
+     */
+    private boolean isFirstCallToPrint() {
+        if(!hasPrintBeenCalled){
+            this.hasPrintBeenCalled = true;
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @return
      * @throws IOException 

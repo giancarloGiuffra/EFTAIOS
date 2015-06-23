@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class RMIInterface implements NetworkInterfaceForClient {
 
 	private BufferedReader stdIn;
-	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
+	protected PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 65533; //porta di ascolto del server
     protected static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
     private ClientRMIFactory clientRMIFactory;
@@ -218,7 +218,7 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	private Boolean registerServerInClient() throws IOException{
 		
 	    //chiedi IP del server
-	    print("Inserisci l'Indirizzo IP del Server: ");
+	    richiedeIndirizzoIpServer();
 		String server = stdIn.readLine();
 		
 		//get registry del server
@@ -244,7 +244,12 @@ public class RMIInterface implements NetworkInterfaceForClient {
 		return true;
 	}
 	
-	/**
+	private void richiedeIndirizzoIpServer() {
+        stdOut.println("Inserisci l'Indirizzo IP del Server: ");
+        stdOut.flush();
+    }
+
+    /**
 	 * crea notifier per poter ricevere richiesta dal server
 	 * @return
 	 * @throws IOException 
