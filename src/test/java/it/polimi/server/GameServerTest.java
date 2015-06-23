@@ -126,9 +126,10 @@ public class GameServerTest {
     	//inizializza client e risposte
     	inizializza(TipoInterface.RMI);
     	
-    	//set up
-    	ServerRMIForTwoClients server = new ServerRMIForTwoClients();
-    	server.run();
+    	//set up 
+    	/*ServerRMIForTwoClients server = new ServerRMIForTwoClients();
+    	server.run(); */
+    	
         
         //connessioni
         client1.connectToServer();
