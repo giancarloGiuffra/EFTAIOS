@@ -62,9 +62,9 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	
 	@Override
 	public Boolean connectToServer() {
-		print("Inserisci l'Indirizzo IP del Server: ");
+	    String ipAddress = readIpAddress();
 		try {
-			this.socket = new Socket(stdIn.readLine(), PORT);
+			this.socket = new Socket(ipAddress, PORT);
 			//this.socket = new Socket("127.0.0.1", PORT);
 			this.in = new BufferedReader( new InputStreamReader(socket.getInputStream()));
 			this.out = new PrintWriter(socket.getOutputStream());
@@ -80,6 +80,36 @@ public class SocketInterface implements NetworkInterfaceForClient {
 	}
 	
 	/**
+	 * chiede l'ip address del server finchè l'utente non inserisce un ip valido (in formato)
+	 * @return
+	 */
+	private String readIpAddress() {
+    	try {    
+    	    print("Inserisci l'Indirizzo IP del Server: ");
+            String ipAddress = stdIn.readLine();
+            while(!isValidIpAddress(ipAddress)){
+                print("Quello non è un indirizzo IP valido. Inserirne un altro:");
+                ipAddress = stdIn.readLine();
+            }
+            return ipAddress;
+    	} catch (IOException ex){
+    	    LOGGER.log(Level.SEVERE, "errore di lettura dal stdIn nell'inserimento dell'IP address del server", ex);
+    	    return "Errore di Lettura";
+    	}
+    }
+
+    /**
+	 * Controlla che la string inserita sia un indirizzo ip (in formato) valido
+	 * @param ipAddress
+	 * @return
+	 */
+	private boolean isValidIpAddress(String ipAddress) {
+        final Pattern formatoIndirizzoIP = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+        Matcher matcher = formatoIndirizzoIP.matcher(ipAddress);
+        return matcher.matches();
+    }
+
+    /**
 	 * controlla se il server ha chiuso la connessione
 	 * @return
 	 */

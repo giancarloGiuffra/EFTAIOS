@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class RMIInterface implements NetworkInterfaceForClient {
 
 	private BufferedReader stdIn;
-	private PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
+	protected PrintWriter stdOut = new PrintWriter(System.out); //NOSONAR si vuole usare System.out 
 	private static final Integer PORT = 65533; //porta di ascolto del server
     protected static final Logger LOGGER = Logger.getLogger(RMIInterface.class.getName());
     private ClientRMIFactory clientRMIFactory;
@@ -218,13 +218,12 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	private Boolean registerServerInClient() throws IOException{
 		
 	    //chiedi IP del server
-	    print("Inserisci l'Indirizzo IP del Server: ");
-		String server = stdIn.readLine();
+		String ipAddress = readIpAddress();;
 		
 		//get registry del server
 		Registry registry;
 		try {
-			registry = LocateRegistry.getRegistry(server, PORT);
+			registry = LocateRegistry.getRegistry(ipAddress, PORT);
 		} catch (RemoteException e){
 			LOGGER.log(Level.SEVERE, "Non è stato possibile connettersi al server", e);
 			return false;
@@ -245,6 +244,41 @@ public class RMIInterface implements NetworkInterfaceForClient {
 	}
 	
 	/**
+     * chiede l'ip address del server finchè l'utente non inserisce un ip valido (in formato)
+     * @return
+     */
+    private String readIpAddress() {
+        try {    
+            richiedeIndirizzoIpServer();
+            String ipAddress = stdIn.readLine();
+            while(!isValidIpAddress(ipAddress)){
+                richiedeIndirizzoIpServer();
+                ipAddress = stdIn.readLine();
+            }
+            return ipAddress;
+        } catch (IOException ex){
+            LOGGER.log(Level.SEVERE, "errore di lettura dal stdIn nell'inserimento dell'IP address del server", ex);
+            return "Errore di Lettura";
+        }
+    }
+
+    /**
+     * Controlla che la string inserita sia un indirizzo ip (in formato) valido
+     * @param ipAddress
+     * @return
+     */
+    private boolean isValidIpAddress(String ipAddress) {
+        final Pattern formatoIndirizzoIP = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+        Matcher matcher = formatoIndirizzoIP.matcher(ipAddress);
+        return matcher.matches();
+    }
+	
+	private void richiedeIndirizzoIpServer() {
+        stdOut.println("Inserisci l'Indirizzo IP del Server: ");
+        stdOut.flush();
+    }
+
+    /**
 	 * crea notifier per poter ricevere richiesta dal server
 	 * @return
 	 * @throws IOException 

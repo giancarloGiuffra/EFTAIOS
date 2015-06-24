@@ -16,8 +16,6 @@ public class ServerSocketForTwoClients implements Runnable {
     
     /**
      * Costruttore
-     * @param client2Thread 
-     * @param client1Thread 
      */
     public ServerSocketForTwoClients(){
          server = new GameServer(65535,65510,1); //così currentGameRoom non può che essere l'unica sala aperta

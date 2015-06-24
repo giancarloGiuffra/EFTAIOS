@@ -1,5 +1,9 @@
 package it.polimi.client;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+
 import it.polimi.gui.*;
 
 public class ClientGUI{
@@ -30,10 +34,20 @@ public class ClientGUI{
     
     public void runNetworkInterface(TipoInterface tipo){
         this.networkInterface = NetworkInterfaceFactory.getInterface(tipo);
+        this.networkInterface.setStdIn(stringToBufferedReader(interfaccia.getIP()));
         if(this.networkInterface.connectToServer()) (new Thread(this.networkInterface)).start();
         else this.comunicaConnessioneFallita();
     }
     
+    /**
+     * crea un buffered reader con la string
+     * @param string
+     * @return
+     */
+    private BufferedReader stringToBufferedReader(String string) {
+        return  new BufferedReader(new InputStreamReader(new ByteArrayInputStream(string.getBytes())));
+    }
+
     /**
      * MAIN
      * @param args
