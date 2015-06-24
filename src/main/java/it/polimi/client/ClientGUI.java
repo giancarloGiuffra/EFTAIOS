@@ -29,7 +29,7 @@ public class ClientGUI{
      * comunica all'utente della GUI che la connessione non è stata possibile
      */
     private void comunicaConnessioneFallita() {
-        interfaccia.comunicaConnessioneFallita();    
+        interfaccia.comunicaMessaggio("Connessione fallita");    
     }
     
     public void runNetworkInterface(TipoInterface tipo){

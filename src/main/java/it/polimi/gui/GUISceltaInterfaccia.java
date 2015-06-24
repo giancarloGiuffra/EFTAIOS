@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -17,11 +19,11 @@ public class GUISceltaInterfaccia {
     private final JFrame finestraIniziale = new JFrame("Start");
     private final String startConSocket = new String("Start con Socket");
     private final String startConRMI = new String("Start con RMI");
-    private final JPanel contenitorePulsanti = new JPanel();	//
-    private final JPanel bottomPanel = new JPanel();			//
-    private final JTextField spazioPerIP = new JTextField(12);	//
+    private final JPanel contenitorePulsanti = new JPanel();
+    private final JPanel bottomPanel = new JPanel();
+    private final JTextField spazioPerIP = new JTextField(12);
     private final JLabel messaggioIP = new JLabel("Inserire l'indirizzo IP del server", SwingConstants.CENTER);
-    private String ipInserito;									//
+    private String ipInserito;
     private TipoInterface tipoInterfaccia;
     private ClientGUI clientGUI;
     
@@ -41,12 +43,13 @@ public class GUISceltaInterfaccia {
     }
     
     /**
-     * Italian: Metodo che genera una finestra dotata di pulsanti. Cliccando su un pulsante, 
+     * Italian: Metodo che genera una finestra dotata di pulsanti e un TextField per l'inserimento
+     * 		dell'indirizzo IP del server. Cliccando su un pulsante, 
      *      l'utente si 'registra' come partecipante alla partita utilizzando una delle
      *      tecnologie fornite per la giocabilità online.
-     * English: Method which creates a frame endowed with buttons. Clicking on a button
-     *      the user will join to the list of players, using one of the available technologies
-     *      to play online.
+     * English: Method which creates a frame endowed with buttons and a TextField to insert the
+     * 		IP address. Clicking on a button the user will join to the list of players, 
+     *      using one of the available technologies to play online.
      */
     public void sceltaTecnologiaDiComunicazione() {
         List<Pulsante> pulsantiStart = new ArrayList<Pulsante>();
@@ -54,29 +57,24 @@ public class GUISceltaInterfaccia {
         Pulsante inizioPartitaConRMI = new Pulsante(startConRMI);
         pulsantiStart.add(inizioPartitaConSocket);
         pulsantiStart.add(inizioPartitaConRMI);
-        for (int i = 0; i < pulsantiStart.size(); i++) {
-            final Pulsante modalità = pulsantiStart.get(i);
-            modalità.getButton().addActionListener(new ActionListener() {
+        for (final Pulsante modalità: pulsantiStart) {
+        	modalità.getButton().addActionListener(new ActionListener() {
                 @Override
             	public void actionPerformed(ActionEvent e) {
-                    ipInserito = spazioPerIP.getText();
-                    comunicaTecnologiaDiComunicazione(modalità.getNomePulsante());
+                	tentaConnessione(modalità);
                 }
             });
         }
-        //finestraIniziale.setLayout(new FlowLayout());
-        finestraIniziale.setLayout(new BorderLayout());					//
-        finestraIniziale.add(contenitorePulsanti, BorderLayout.NORTH);	//
-        finestraIniziale.add(bottomPanel, BorderLayout.CENTER);			//
-        contenitorePulsanti.setLayout(new FlowLayout());				//
-        bottomPanel.setLayout(new BorderLayout());						//
+        finestraIniziale.setLayout(new BorderLayout());
+        finestraIniziale.add(contenitorePulsanti, BorderLayout.NORTH);
+        finestraIniziale.add(bottomPanel, BorderLayout.CENTER);
+        contenitorePulsanti.setLayout(new FlowLayout());
+        bottomPanel.setLayout(new BorderLayout());
         bottomPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        contenitorePulsanti.add(inizioPartitaConSocket.getButton());	//
-        contenitorePulsanti.add(inizioPartitaConRMI.getButton());		//
-        bottomPanel.add(messaggioIP, BorderLayout.NORTH); 				//
-        bottomPanel.add(spazioPerIP, BorderLayout.CENTER); 				//
-        //finestraIniziale.add(inizioPartitaConSocket.getButton());
-        //finestraIniziale.add(inizioPartitaConRMI.getButton());
+        contenitorePulsanti.add(inizioPartitaConSocket.getButton());
+        contenitorePulsanti.add(inizioPartitaConRMI.getButton());
+        bottomPanel.add(messaggioIP, BorderLayout.NORTH);
+        bottomPanel.add(spazioPerIP, BorderLayout.CENTER);
         finestraIniziale.getContentPane();
         finestraIniziale.pack();
         finestraIniziale.setLocationRelativeTo(null);
@@ -84,6 +82,27 @@ public class GUISceltaInterfaccia {
         finestraIniziale.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
+    private void tentaConnessione(Pulsante modalità) {
+    	if (isPossibileIP(spazioPerIP.getText()) == true) {
+    		ipInserito = spazioPerIP.getText();
+            comunicaTecnologiaDiComunicazione(modalità.getNomePulsante());
+    	}
+    	else {
+    		comunicaMessaggio("Indirizzo IP non valido");
+    	}
+    }
+    
+    private boolean isPossibileIP(String ipInserito) {
+    	final Pattern formatoIndirizzoIP = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+        Matcher matcher = formatoIndirizzoIP.matcher(ipInserito);
+        return matcher.matches();
+    }
+    
+    /**
+     * Italian: metodo che restituisce l'indirizzo IP inserito dall'utente.
+     * English: method which returns the IP address inserted by the user. 
+     * @return indirizzo IP
+     */
     public String getIP() {
     	return this.ipInserito;
     }
@@ -99,16 +118,14 @@ public class GUISceltaInterfaccia {
         this.clientGUI.runNetworkInterface(tipoInterfaccia);
     }
     
-    /**
-     * Italian: metodo che informerà il giocatore riguardo eventi che possono verificarsi 
-     *  durante la partita.
-     * English: method used to inform the player about events that can possibly happen during 
-     *  the game.
-     * @param tipoMessaggio messaggio da comunicare
-     */
-    public void comunicaConnessioneFallita() {
+	/**
+	 * Italian: metodo che informerà l'utente riguardo eventuali problemi con la connessione al server.
+	 * English: method used to inform the user about possible problems with his attempt to connect
+	 * 	to the server.
+	 * @param tipoMessaggio messaggio da comunicare
+	 */
+    public void comunicaMessaggio(String tipoMessaggio) {
         JFrame frame = new JFrame();
-        String tipoMessaggio = "Connessione Fallita";
         JLabel messaggio = new JLabel(tipoMessaggio, SwingConstants.CENTER);
         messaggio.setBorder(new EmptyBorder(10, 20, 10, 20));
         frame.add(messaggio);
@@ -117,21 +134,6 @@ public class GUISceltaInterfaccia {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-    
-    /*
-    private void inserimentoIP() {
-    	JFrame frame = new JFrame();
-    	JLabel messaggio = new JLabel("Inserire l'indirizzo IP del server", SwingConstants.CENTER);
-    	JTextField spazioPerIP = new JTextField(12); 
-    	messaggio.setBorder(new EmptyBorder(10, 20, 10, 20));
-    	frame.setLayout(new BorderLayout());
-    	frame.add(messaggio, BorderLayout.NORTH);
-    	frame.add(spazioPerIP, BorderLayout.CENTER);
-    	frame.getContentPane();
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    } */
     
     /**
      * 
