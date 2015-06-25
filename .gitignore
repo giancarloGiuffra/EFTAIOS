@@ -1,5 +1,6 @@
-#esclude tutto eccetto cartella src, pom.xml, .gitignore
+#esclude tutto eccetto cartella src, pom.xml, .gitignore e la cartella docs
 /*
 !/src
 !pom.xml
 !.gitignore
+!/docs
