@@ -54,6 +54,12 @@ public class GUI {
 	private String razzaGiocatore;
 	private String posizioneAttuale;
 	private String settoreAnnunciato;
+	private JLabel spiegazioneColori = new JLabel("Settori sicuri: colore bianco   |   Settori pericolosi: colore grigio   |   Basi: colore nero   |   Scialuppe: colore azzurro");
+	private JFrame frame = new JFrame("Escape from the aliens");
+	private JPanel topPanel = new JPanel();
+	private JPanel bottomPanel = new JPanel();
+	private JPanel contenitoreLegenda = new JPanel(); 
+	private JPanel contenitoreAltriElementi = new JPanel();
 	private JLabel topLabel = new JLabel("Giocatore corrente: " + nomeGiocatore + " (" + razzaGiocatore + ")", SwingConstants.CENTER);
 	private JLabel bottomLabel = new JLabel("Posizione attuale: " + posizioneAttuale, SwingConstants.CENTER);
 	private JPanel centralPanel = new JPanel();
@@ -61,7 +67,7 @@ public class GUI {
 	private String inputDaInviare;
 	private NetworkInterfaceForClient interfaccia;
 	private Timer timer;
-	private int countdownPerMossa;   // il giocatore ha a disposizione 30 secondi per effettuare la sua mossa
+	private int countdownPerMossa;
 	private int tempoAggiornamentoCountdown = 1;  
 	private JLabel mostraCountdown = new JLabel("" + countdownPerMossa);
 	
@@ -106,16 +112,9 @@ public class GUI {
 		xCorrente = xIniziale;
 		yCorrente = yIniziale;
 	}
-
-	private void creaGUI() {
-		listaAltriPulsanti = new ArrayList<Pulsante>();
-		JLabel spiegazioneColori = new JLabel("Settori sicuri: colore bianco   |   Settori pericolosi: colore grigio   |   Basi: colore nero   |   Scialuppe: colore azzurro");
-		JFrame frame = new JFrame("Escape from the aliens");
-		JPanel topPanel = new JPanel();
-		JPanel bottomPanel = new JPanel();
-		JPanel contenitoreLegenda = new JPanel(); 
-		JPanel contenitoreAltriElementi = new JPanel(); 
-		frame.setLayout(new BorderLayout());
+    
+    private void definisciGUI() {
+    	frame.setLayout(new BorderLayout());
 		topPanel.setLayout(new BorderLayout());
 		topPanel.setBorder(new EmptyBorder(15, 0, 0, 0));
 		topPanel.add(topLabel, BorderLayout.CENTER);
@@ -151,6 +150,11 @@ public class GUI {
 		spiegazioneColori.setBorder(new EmptyBorder(0, larghezzaSchermo/12, 0, 0)); 
 		frame.add(centralPanel, BorderLayout.CENTER);
 		frame.add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+	private void creaGUI() {
+		listaAltriPulsanti = new ArrayList<Pulsante>();
+		definisciGUI();
 		frame.getContentPane();
 		frame.pack();
 		frame.setLocationRelativeTo(null);
@@ -702,34 +706,7 @@ public class GUI {
      */
     public void creaGUIHelpTest() {
     	listaAltriPulsanti = new ArrayList<Pulsante>();
-		JLabel spiegazioneColori = new JLabel("Settori sicuri: colore bianco   |   Settori pericolosi: colore grigio   |   Basi: colore nero   |   Scialuppe: colore azzurro");
-		JFrame frame = new JFrame("Escape from the aliens");
-		JPanel topPanel = new JPanel();
-		JPanel bottomPanel = new JPanel();
-		JPanel contenitoreLegenda = new JPanel(); 
-		JPanel contenitoreAltriElementi = new JPanel(); 
-		topPanel.add(topLabel);
-		frame.add(topPanel);
-		creaListaPulsantiSettore();
-		setAspettoPulsante();
-		contenitoreAltriElementi.add(nessunAttacco.getButton());
-		contenitoreAltriElementi.add(attacco.getButton());  
-		contenitoreAltriElementi.add(pescaCarta.getButton()); 
-		contenitoreAltriElementi.add(bottomLabel);
-		contenitoreLegenda.add(spiegazioneColori);
-		bottomPanel.add(contenitoreAltriElementi); 
-		bottomPanel.add(contenitoreLegenda);
-		bottomPanel.add(mostraCountdown);
-		attacco.getButton().setEnabled(false);
-		pescaCarta.getButton().setEnabled(false);
-		nessunAttacco.getButton().setEnabled(false);
-		listaAltriPulsanti.add(nessunAttacco);
-		listaAltriPulsanti.add(attacco);
-		listaAltriPulsanti.add(pescaCarta);	
-		mostraCountdown.setFont(new Font("Dialog", Font.BOLD, 18));
-		mostraCountdown.setVisible(false);
-		frame.add(centralPanel);
-		frame.add(bottomPanel);
+    	definisciGUI();
     }
     
     /**
