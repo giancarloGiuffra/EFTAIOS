@@ -697,11 +697,39 @@ public class GUI {
     }
     
     /**
-     * Italian: metodo di supporto per i test, utilizzato semplicemente per chiamare il metodo "creaGUI".
-     * English: method used as support for tests, whose function only consists in calling the method "creaGUI".
+     * Italian: metodo di supporto per i test, che esegue una versione "ridotta" del metodo "creaGUI". 
+     * English: method used as support for tests, used to execute a "reduced" version of the method "creaGUI".
      */
     public void creaGUIHelpTest() {
-    	creaGUI();
+    	listaAltriPulsanti = new ArrayList<Pulsante>();
+		JLabel spiegazioneColori = new JLabel("Settori sicuri: colore bianco   |   Settori pericolosi: colore grigio   |   Basi: colore nero   |   Scialuppe: colore azzurro");
+		JFrame frame = new JFrame("Escape from the aliens");
+		JPanel topPanel = new JPanel();
+		JPanel bottomPanel = new JPanel();
+		JPanel contenitoreLegenda = new JPanel(); 
+		JPanel contenitoreAltriElementi = new JPanel(); 
+		topPanel.add(topLabel);
+		frame.add(topPanel);
+		creaListaPulsantiSettore();
+		setAspettoPulsante();
+		contenitoreAltriElementi.add(nessunAttacco.getButton());
+		contenitoreAltriElementi.add(attacco.getButton());  
+		contenitoreAltriElementi.add(pescaCarta.getButton()); 
+		contenitoreAltriElementi.add(bottomLabel);
+		contenitoreLegenda.add(spiegazioneColori);
+		bottomPanel.add(contenitoreAltriElementi); 
+		bottomPanel.add(contenitoreLegenda);
+		bottomPanel.add(mostraCountdown);
+		attacco.getButton().setEnabled(false);
+		pescaCarta.getButton().setEnabled(false);
+		nessunAttacco.getButton().setEnabled(false);
+		listaAltriPulsanti.add(nessunAttacco);
+		listaAltriPulsanti.add(attacco);
+		listaAltriPulsanti.add(pescaCarta);	
+		mostraCountdown.setFont(new Font("Dialog", Font.BOLD, 18));
+		mostraCountdown.setVisible(false);
+		frame.add(centralPanel);
+		frame.add(bottomPanel);
     }
     
     /**

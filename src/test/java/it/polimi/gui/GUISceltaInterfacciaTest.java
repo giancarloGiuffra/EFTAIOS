@@ -1,4 +1,3 @@
-// inserire "127.0.0.1" come indirizzo IP del server per eseguire il test
 package it.polimi.gui;
 
 import static org.junit.Assert.*;
